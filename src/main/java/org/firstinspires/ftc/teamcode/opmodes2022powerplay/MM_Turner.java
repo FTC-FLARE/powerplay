@@ -23,7 +23,7 @@ public class MM_Turner{
     }
 
     public void runTurner() {
-        if (!slide.lowFlip()) {
+        if (!slide.tooLowToPivot()) {
             if (opMode.dpadLeftPressed(opMode.GAMEPAD2)) {
                 turner.setPosition(BACK);
             } else if (opMode.dpadRightPressed(opMode.GAMEPAD2)) {
