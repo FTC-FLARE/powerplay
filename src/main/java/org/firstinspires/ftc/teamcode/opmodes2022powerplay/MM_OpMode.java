@@ -70,5 +70,19 @@ public abstract class MM_OpMode extends LinearOpMode {
             return false;
         }
     }
+
+    public boolean rightBumperPressed(int gamepad) {
+        if (gamepad == GAMEPAD1) {
+            if (gamepad1Current.right_bumper && !gamepad1Prior.right_bumper) {
+            return true;
+            }
+            return false;
+        } else {
+            if (gamepad2Current.right_bumper && !gamepad2Prior.right_bumper) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
