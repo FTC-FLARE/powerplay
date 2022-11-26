@@ -18,7 +18,7 @@ public class MM_Drivetrain {
     static final int FAST = 0;
     static final int SLOW = 1;
     static final int SUPER_SLOW = 2;
-    private int slowMode = 0;
+    private int slowMode = SLOW;
 
     private double flPower = 0;
     private double frPower = 0;
@@ -92,11 +92,15 @@ public class MM_Drivetrain {
 
     private void handleSlowMode() {
         if (opMode.aPressed(opMode.GAMEPAD1)) {
-            if (slowMode == SUPER_SLOW) {
+//            if (slowMode == SUPER_SLOW) {
+//                slowMode = FAST;
+//            }else {
+//                slowMode += 1;
+//            }
+            if (slowMode == FAST) { // Temporary fix
+                slowMode = SLOW;
+            } else
                 slowMode = FAST;
-            }else {
-                slowMode += 1;
-            }
         }
         if (slowMode == SLOW) {
             flPower = flPower * 0.65;
