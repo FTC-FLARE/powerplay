@@ -16,19 +16,20 @@ public class MM_Slide {
 
     private int slideCurrent = 0;
     private int slideTarget = 0;
+    public int slideLevelTarget = opMode.COLLECT;
 
         //not accurate
     enum slidePosition {
         COLLECT(0),
         GROUND(300),
-        LOW(1000),
-        PIVOT_POSITION(1400),
-        MEDIUM(2000),
-        HIGH(3500);
+        LOW(1500),
+        PIVOT_POSITION(1550),
+        MEDIUM(2650),
+        HIGH(3750);
 
         public final int ticks;
 
-        private slidePosition(int ticks) {
+        slidePosition(int ticks) {
             this.ticks = ticks;
         }
     }
@@ -63,17 +64,63 @@ public class MM_Slide {
         turner.runTurner();
     }
 
-    public void startMoving(int ticks) {
-        if (slide.getCurrentPosition() > ticks) {
+    public void positionRun() {
+        if (opMode.xPressed(opMode.GAMEPAD2)) {
+            setSlideTargetAndStart(opMode.COLLECT);
+        } else if (opMode.dpadDownPressed(opMode.GAMEPAD2)) {
+            setSlideTargetAndStart(opMode.GROUND);
+        } else if (opMode.aPressed(opMode.GAMEPAD2)) {
+            setSlideTargetAndStart(opMode.LOW);
+        } else if (opMode.bPressed(opMode.GAMEPAD2)) {
+            setSlideTargetAndStart(opMode.MEDIUM);
+        } else if (opMode.yPressed(opMode.GAMEPAD2)) {
+            setSlideTargetAndStart(opMode.HIGH);
+        }
+    }
+
+    private void setSlideTargetAndStart(int slideLevelTarget) {
+        slideTarget = getTicksForLevel(slideLevelTarget);
+        this.slideLevelTarget = slideLevelTarget;
+        slide.setTargetPosition(slideTarget);
+        slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slide.setPower(SLIDE_POWER);
+    }
+
+    public void startMoving(int slideLevelTarget) {
+        this.slideLevelTarget = slideLevelTarget;
+        slideTarget = getTicksForLevel(slideLevelTarget);
+        if (slide.getCurrentPosition() > slideTarget) {
             slide.setPower(-SLIDE_POWER);
-        } else if (slide.getCurrentPosition() < ticks) {
+        } else if (slide.getCurrentPosition() < slideTarget) {
             slide.setPower(SLIDE_POWER);
         }
-        slideTarget = ticks;
+    }
+
+    private void stop() {
+        slide.setPower(0);
+    }
+
+    private int getTicksForLevel(int slideLevelTarget) {
+        if (slideLevelTarget == opMode.GROUND) {
+            return slidePosition.GROUND.ticks;
+        } else if (slideLevelTarget == opMode.LOW) {
+            return slidePosition.LOW.ticks;
+        } else if (slideLevelTarget == opMode.MEDIUM) {
+            return slidePosition.MEDIUM.ticks;
+        } else if (slideLevelTarget == opMode.HIGH) {
+            return slidePosition.HIGH.ticks;
+        } else {
+            return  slidePosition.COLLECT.ticks;
+        }
+    }
+
+    public int getSlideLevelTarget(int slideLevelTarget) {
+        return this.slideLevelTarget;
     }
 
     public boolean reachedPosition() {
         if (Math.abs(slide.getCurrentPosition() - slideTarget) < 30 || isTriggered(topStop) || isTriggered(bottomStop)) {
+            stop();
             return true;
         }
         return false;
