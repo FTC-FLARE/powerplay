@@ -17,5 +17,11 @@ public class MM_Robot {
         collector = new MM_Collector(opMode);
     }
 
+    public void runSlideToPosition(int level) {
+        slide.startMoving(level);
 
+        while (!slide.reachedPosition()) {
+
+        }
+    }
 }
