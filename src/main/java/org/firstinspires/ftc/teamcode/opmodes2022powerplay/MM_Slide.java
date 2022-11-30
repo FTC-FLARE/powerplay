@@ -16,7 +16,7 @@ public class MM_Slide {
 
     private int slideCurrent = 0;
     private int slideTarget = 0;
-    public int slideLevelTarget = opMode.COLLECT;
+    public int slideLevelTarget = 0;
 
         //not accurate
     enum slidePosition {
@@ -135,7 +135,7 @@ public class MM_Slide {
 
     //the slide is too far down to flip the pivot/turner
     public boolean tooLowToPivot() {  // if no additional logic is added, this can be improved
-        if (slide.getCurrentPosition() < 1050) {  // was 1400
+        if (slide.getCurrentPosition() < slidePosition.PIVOT_POSITION.ticks) {  // was 1400
             return true;
         }
         return false;

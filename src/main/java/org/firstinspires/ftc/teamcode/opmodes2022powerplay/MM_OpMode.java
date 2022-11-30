@@ -33,6 +33,7 @@ public abstract class MM_OpMode extends LinearOpMode {
             return false;
         }
     }
+
     public boolean bPressed(int gamepad) {
         if (gamepad == GAMEPAD1) {
             if (gamepad1Current.b && !gamepad1Prior.b) {
