@@ -4,13 +4,16 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 public abstract class MM_OpMode extends LinearOpMode {
-    public MM_Robot robot = new MM_Robot(this);
+
 
     public Gamepad gamepad1Current = new Gamepad();
     public Gamepad gamepad1Prior = new Gamepad();
     public Gamepad gamepad2Current = new Gamepad();
     public Gamepad gamepad2Prior = new Gamepad();
 
+    static double DRIVE_P_COEFFICIENT = 0.00001598;
+    static double STRAFE_P_COEFFICIENT = 0.000155;
+    static double TURN_P_COEFFICIENT = .015;
     final int GAMEPAD1 = 0;
     final int GAMEPAD2 = 1;
 
@@ -19,6 +22,12 @@ public abstract class MM_OpMode extends LinearOpMode {
     final int LOW = 2;
     final int MEDIUM = 3;
     final int HIGH = 4;
+
+    public MM_Robot robot = new MM_Robot(this);
+    public MM_P_Controller pTurnController = new MM_P_Controller(this, 1, TURN_P_COEFFICIENT);
+    public MM_P_Controller pLeftDriveController = new MM_P_Controller(this,1.6, DRIVE_P_COEFFICIENT);
+    public MM_P_Controller pRightDriveController = new MM_P_Controller(this,1.6, DRIVE_P_COEFFICIENT);
+    public MM_P_Controller pBackDriveController = new MM_P_Controller(this,1.6, STRAFE_P_COEFFICIENT);
 
     public boolean aPressed(int gamepad) {
         if (gamepad == GAMEPAD1) {

@@ -15,6 +15,10 @@ public class MM_Drivetrain {
     private DcMotorEx rightEncoder = null;
     private DcMotorEx backEncoder = null;
 
+    private static final double WHEEL_DIAMETER = 2;  // odometry wheels in inches
+    private static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
+    private static final double TICKS_PER_REVOLUTION = 8192;
+    private static final double TICKS_PER_INCH = (TICKS_PER_REVOLUTION / WHEEL_CIRCUMFERENCE);
     static final int FAST = 0;
     static final int SLOW = 1;
     static final int SUPER_SLOW = 2;
@@ -25,11 +29,53 @@ public class MM_Drivetrain {
     private double frPower = 0;
     private double blPower = 0;
     private double brPower = 0;
+    private double leftDrivePower = 0;
+    private double rightDrivePower = 0;
+
+    private int leftCurrentTicks = 0;
+    private int rightCurrentTicks = 0;
+    private int backCurrentTicks = 0;
 
     public MM_Drivetrain(MM_OpMode opMode) {
         this.opMode = opMode;
         init();
     }
+
+    public void prepareToDrive(double inches) {
+        int leftTargetTicks = MM_Util.inchesToTicks(inches);
+        int rightTargetTicks = MM_Util.inchesToTicks(inches);
+
+        opMode.pLeftDriveController.setInputRange(leftEncoder.getCurrentPosition(), leftTargetTicks);
+        opMode.pRightDriveController.setInputRange(rightEncoder.getCurrentPosition(), rightTargetTicks);
+        opMode.pLeftDriveController.setSetpoint(leftTargetTicks);
+        opMode.pRightDriveController.setSetpoint(rightTargetTicks);
+    }
+
+    private void setStraightPower() {
+        leftCurrentTicks = leftEncoder.getCurrentPosition();
+        rightCurrentTicks = rightEncoder.getCurrentPosition();
+
+        leftDrivePower = opMode.pLeftDriveController.calculatePower(leftCurrentTicks);
+        rightDrivePower = opMode.pRightDriveController.calculatePower(rightCurrentTicks);
+
+        flPower = leftDrivePower;
+        frPower = rightDrivePower;
+        blPower = leftDrivePower;
+        brPower = rightDrivePower;
+
+        normalize();
+        setMotorPower(flPower, frPower, blPower, brPower);
+    }
+
+    public boolean reachedPosition() {
+        setStraightPower();
+        if (opMode.pLeftDriveController.reachedTarget() || opMode.pRightDriveController.reachedTarget()) {
+            stop();
+            return true;
+        }
+        return false;
+    }
+
 
     public void driveWithSticks() {
         double drive = -opMode.gamepad1.left_stick_y;
@@ -76,6 +122,10 @@ public class MM_Drivetrain {
         opMode.telemetry.addData("front right power:", frPower);
         opMode.telemetry.addData("back left power:,", blPower);
         opMode.telemetry.addData("back right power:",  brPower);
+    }
+
+    private void stop() {
+        setMotorPower(0,0,0,0);
     }
 
     private void normalize() {
