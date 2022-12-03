@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 public class MM_Robot {
     public MM_Drivetrain drivetrain;
     public MM_Slide slide;
@@ -12,6 +14,8 @@ public class MM_Robot {
     static final double MAX_STRAFE_POWER = 0.0;
     static final double MIN_ROTATE_POWER = 0.0;
     static final double MAX_ROTATE_POWER = 0.0;
+
+    ElapsedTime runtime = new ElapsedTime();
 
     private MM_OpMode opMode;
 
@@ -28,6 +32,16 @@ public class MM_Robot {
         opMode.pLeftDriveController.setOutputRange(MIN_DRIVE_SPEED, MAX_DRIVE_SPEED);
         opMode.pRightDriveController.setOutputRange(MIN_DRIVE_SPEED, MAX_DRIVE_SPEED);
         opMode.pBackDriveController.setOutputRange(MIN_STRAFE_POWER, MAX_STRAFE_POWER);
+    }
+
+    public void driveInches(double inches) {
+        drivetrain.prepareToDrive(inches);
+        boolean driveDone = false;
+        runtime.reset();
+
+        while (opMode.opModeIsActive() && runtime.seconds() < 5 && !driveDone) {
+            driveDone = drivetrain.reachedPosition();
+        }
     }
 
 /*    public void runSlideToPosition(int level) {

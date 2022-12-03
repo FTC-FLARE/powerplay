@@ -8,8 +8,8 @@ public class MM_Turner{
     private MM_OpMode opMode;
     private MM_Slide slide;
 
-    final int FRONT = 1;
-    final int BACK = 0;
+    final double FRONT = 0.95;
+    final double BACK = 0;
 
     public MM_Turner(MM_OpMode opMode, MM_Slide slide) {
         this.opMode = opMode;

@@ -76,7 +76,6 @@ public class MM_Drivetrain {
         return false;
     }
 
-
     public void driveWithSticks() {
         double drive = -opMode.gamepad1.left_stick_y;
         double turn = opMode.gamepad1.right_stick_x;
