@@ -8,7 +8,7 @@ public class MM_Turner{
     private MM_OpMode opMode;
     private MM_Slide slide;
 
-    final double FRONT = 0.90;
+    final double FRONT = 0.885;
     final double BACK = 0;
 
     public MM_Turner(MM_OpMode opMode, MM_Slide slide) {

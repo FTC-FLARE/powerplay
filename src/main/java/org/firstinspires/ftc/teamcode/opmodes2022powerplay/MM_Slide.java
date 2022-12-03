@@ -20,12 +20,12 @@ public class MM_Slide {
 
         //not accurate
     enum slidePosition {
-        COLLECT(0),
-        GROUND(300),
-        LOW(1500),
-        PIVOT_POSITION(1550),
-        MEDIUM(2650),
-        HIGH(3750);
+        COLLECT(115),
+        GROUND(400),
+        LOW(1750),
+        PIVOT_POSITION(1040),
+        MEDIUM(2850),
+        HIGH(4000);
 
         public final int ticks;
 
