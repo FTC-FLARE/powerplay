@@ -7,7 +7,7 @@ public class MM_Robot {
     public MM_Slide slide;
     public MM_Collector collector;
 
-    static final double MIN_DRIVE_SPEED = 0.14;
+    static final double MIN_DRIVE_SPEED = 0.24;
     static final double MAX_DRIVE_SPEED = 0.6;
     static final double FASTER_MAX_DRIVE_SPEED = 0.0;
     static final double MIN_STRAFE_POWER = 0.0;
@@ -40,6 +40,7 @@ public class MM_Robot {
         runtime.reset();
 
         while (opMode.opModeIsActive() && runtime.seconds() < 5 && !driveDone) {
+            opMode.telemetry.addData("inches target", inches);
             driveDone = drivetrain.reachedPosition();
         }
     }

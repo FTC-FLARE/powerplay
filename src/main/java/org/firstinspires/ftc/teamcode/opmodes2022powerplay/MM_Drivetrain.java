@@ -109,6 +109,19 @@ public class MM_Drivetrain {
         rightEncoder = opMode.hardwareMap.get(DcMotorEx.class, "FRMotor");
         backEncoder = opMode.hardwareMap.get(DcMotorEx.class, "BLMotor");
 
+        switchEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        switchEncoderMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+    }
+
+    private void switchEncoderMode(DcMotor.RunMode runMode) {
+        frontLeftDrive.setMode(runMode);
+        frontRightDrive.setMode(runMode);
+        backLeftDrive.setMode(runMode);
+        backRightDrive.setMode(runMode);
+        leftEncoder.setMode(runMode);
+        rightEncoder.setMode(runMode);
+        backEncoder.setMode(runMode);
     }
 
     private void setMotorPower(double flPower, double frPower, double blPower, double brPower) {
