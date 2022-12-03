@@ -22,6 +22,7 @@ public abstract class MM_OpMode extends LinearOpMode {
     final int LOW = 2;
     final int MEDIUM = 3;
     final int HIGH = 4;
+    final int STACK = 5;
 
     public MM_Robot robot = new MM_Robot(this);
     public MM_P_Controller pTurnController = new MM_P_Controller(this, 1, TURN_P_COEFFICIENT);
@@ -121,6 +122,34 @@ public abstract class MM_OpMode extends LinearOpMode {
             return false;
         } else {
             if (gamepad2Current.dpad_right && !gamepad2Prior.dpad_right) {
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public boolean dpadUpPressed(int gamepad) {
+        if (gamepad == GAMEPAD1) {
+            if (gamepad1Current.dpad_up && !gamepad1Prior.dpad_up) {
+                return true;
+            }
+            return false;
+        } else {
+            if (gamepad2Current.dpad_up && !gamepad2Prior.dpad_up) {
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public boolean rightJoystickPressed(int gamepad) {
+        if (gamepad == GAMEPAD1) {
+            if (gamepad1Current.right_stick_button && !gamepad1Prior.right_stick_button) {
+                return true;
+            }
+            return false;
+        } else {
+            if (gamepad2Current.right_stick_button && !gamepad2Prior.right_stick_button) {
                 return true;
             }
             return false;

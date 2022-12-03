@@ -17,10 +17,12 @@ public class MM_Slide {
     private int slideCurrent = 0;
     private int slideTarget = 0;
     public int slideLevelTarget = 0;
+    private int stackLevel = 0;
 
         //not accurate
     enum slidePosition {
         COLLECT(115),
+        STACK(155),
         GROUND(400),
         LOW(1750),
         PIVOT_POSITION(1040),
@@ -48,10 +50,12 @@ public class MM_Slide {
             slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             slide.setPower(SLIDE_POWER);
             slideTarget = slide.getCurrentPosition();
+            stackLevel = 0;
         } else if (opMode.gamepad2.left_trigger > 0.1) {
             slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             slide.setPower(-SLIDE_POWER);
             slideTarget = slide.getCurrentPosition();
+            stackLevel = 0;
         } else {  // hold current position
             slide.setTargetPosition(slideTarget);
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -61,13 +65,14 @@ public class MM_Slide {
         slideCurrent = slide.getCurrentPosition();
         opMode.telemetry.addData("Slide", "Current: %d  Target: %d", slideCurrent, slideTarget);
         opMode.telemetry.addData("Top Stop", isTriggered(topStop));
+        opMode.telemetry.addData("Stack Level (+1)", stackLevel);
         turner.runTurner();
     }
 
     public void positionRun() {
         if (opMode.xPressed(opMode.GAMEPAD2)) {
             setSlideTargetAndStart(opMode.COLLECT);
-        } else if (opMode.dpadDownPressed(opMode.GAMEPAD2)) {
+        } else if (opMode.rightJoystickPressed(opMode.GAMEPAD2)) {
             setSlideTargetAndStart(opMode.GROUND);
         } else if (opMode.aPressed(opMode.GAMEPAD2)) {
             setSlideTargetAndStart(opMode.LOW);
@@ -75,6 +80,12 @@ public class MM_Slide {
             setSlideTargetAndStart(opMode.MEDIUM);
         } else if (opMode.yPressed(opMode.GAMEPAD2)) {
             setSlideTargetAndStart(opMode.HIGH);
+        } else if (opMode.dpadDownPressed(opMode.GAMEPAD2)) {
+            stackLevel -= 1;
+            setSlideTargetAndStart(opMode.STACK);
+        } else if (opMode.dpadUpPressed(opMode.GAMEPAD2)) {
+            stackLevel -= 1;
+            setSlideTargetAndStart(opMode.STACK);
         }
     }
 
@@ -101,6 +112,14 @@ public class MM_Slide {
     }
 
     private int getTicksForLevel(int slideLevelTarget) {
+        if (slideLevelTarget == opMode.STACK) {
+            if (stackLevel < 0) {
+                stackLevel = 0;
+                return slideTarget;
+            }
+            return slidePosition.COLLECT.ticks + (slidePosition.STACK.ticks * stackLevel);
+        }
+        stackLevel = 0;
         if (slideLevelTarget == opMode.GROUND) {
             return slidePosition.GROUND.ticks;
         } else if (slideLevelTarget == opMode.LOW) {
