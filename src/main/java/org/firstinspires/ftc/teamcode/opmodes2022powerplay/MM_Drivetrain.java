@@ -4,6 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -18,9 +19,14 @@ public class MM_Drivetrain {
     private DcMotor backRightDrive = null;
     private DcMotor frontLeftDrive = null;
     private DcMotor frontRightDrive = null;
+
     private DcMotorEx leftEncoder = null;
     private DcMotorEx rightEncoder = null;
     private DcMotorEx backEncoder = null;
+
+    private Servo leftOdomLift = null;
+    private Servo rightOdomLift = null;
+    private Servo backOdomLift = null;
 
     private static final double WHEEL_DIAMETER = 2;  // odometry wheels in inches
     private static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
@@ -197,5 +203,18 @@ public class MM_Drivetrain {
             brPower = brPower * 0.35;
         }
         opMode.telemetry.addData("Slowmode level", slowMode);
+    }
+    private void initOdomServos(){
+        if(opMode.getClass() == MM_TeleOp.class){
+            leftOdomLift = opMode.hardwareMap.get(Servo.class,"leftOdometryLift");
+            rightOdomLift = opMode.hardwareMap.get(Servo.class,"rightOdometryLift");
+            backOdomLift = opMode.hardwareMap.get(Servo.class,"backOdometryLift");
+
+//            positions will need to be changed after testing
+            leftOdomLift.setPosition(1);
+            rightOdomLift.setPosition(1);
+            backOdomLift.setPosition(1);
+        }
+
     }
 }
