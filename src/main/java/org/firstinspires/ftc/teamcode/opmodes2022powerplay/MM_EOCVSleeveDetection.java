@@ -49,7 +49,6 @@ public class MM_EOCVSleeveDetection extends OpenCvPipeline {
             }
             loopCount += 1;
         }
-
         return max;
     }
 
@@ -80,6 +79,18 @@ public class MM_EOCVSleeveDetection extends OpenCvPipeline {
             return new Scalar(75, 195, 100);
         } else {
             return new Scalar(10, 90, 165);
+        }
+    }
+
+    public String getMaxColorString() {
+        if (maxColor == BLUE) {
+            return "Blue";
+        } else if (maxColor == RED) {
+            return "Red";
+        } else if (maxColor == YELLOW) {
+            return "Yellow";
+        } else {
+            return "no max";
         }
     }
 }

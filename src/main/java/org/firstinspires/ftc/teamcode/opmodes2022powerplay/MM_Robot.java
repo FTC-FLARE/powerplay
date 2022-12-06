@@ -46,6 +46,20 @@ public class MM_Robot {
         }
     }
 
+    public void sleevePark(int sleeveColor) {
+        if (sleeveColor == opMode.RED) {
+            //left
+            opMode.telemetry.addLine("Traveling to Red");
+        } else if (sleeveColor == opMode.BLUE) {
+            //middle
+            opMode.telemetry.addLine("Traveling to Blue");
+        } else {
+            //right & yellow
+            opMode.telemetry.addLine("Traveling to Yellow");
+        }
+        opMode.telemetry.update();
+    }
+
 /*    public void runSlideToPosition(int level) {
         slide.startMoving(level);
 

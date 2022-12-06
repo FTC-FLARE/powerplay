@@ -56,7 +56,7 @@ public class MM_Slide {
             slide.setPower(-SLIDE_POWER);
             slideTarget = slide.getCurrentPosition();
             stackLevel = 0;
-        } else {  // hold current position
+        } else {  // hold current target
             slide.setTargetPosition(slideTarget);
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             slide.setPower(SLIDE_POWER);

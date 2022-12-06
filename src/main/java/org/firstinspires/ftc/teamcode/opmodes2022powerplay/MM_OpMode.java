@@ -24,6 +24,10 @@ public abstract class MM_OpMode extends LinearOpMode {
     final int HIGH = 4;
     final int STACK = 5;
 
+    final int RED = 0;
+    final int BLUE = 1;
+    final int YELLOW = 2;
+
     public MM_Robot robot = new MM_Robot(this);
     public MM_P_Controller pTurnController = new MM_P_Controller(this, 1, TURN_P_COEFFICIENT);
     public MM_P_Controller pLeftDriveController = new MM_P_Controller(this,1.6, DRIVE_P_COEFFICIENT);
