@@ -1,11 +1,18 @@
 package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+
 public class MM_Drivetrain {
     private MM_OpMode opMode;
+
+    BNO055IMU imu;
 
     private DcMotor backLeftDrive = null;
     private DcMotor backRightDrive = null;
@@ -35,6 +42,7 @@ public class MM_Drivetrain {
     private int leftCurrentTicks = 0;
     private int rightCurrentTicks = 0;
     private int backCurrentTicks = 0;
+
 
     public MM_Drivetrain(MM_OpMode opMode) {
         this.opMode = opMode;
@@ -89,6 +97,9 @@ public class MM_Drivetrain {
         normalize();
         handleSlowMode();
         setMotorPower(flPower, frPower, blPower, brPower);
+
+        opMode.telemetry.addData("first heading", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
+
     }
 
     private void init() {
@@ -105,12 +116,18 @@ public class MM_Drivetrain {
         frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        leftEncoder = opMode.hardwareMap.get(DcMotorEx.class,"FLMotor");
-        rightEncoder = opMode.hardwareMap.get(DcMotorEx.class, "FRMotor");
+        leftEncoder = opMode.hardwareMap.get(DcMotorEx.class,"BRMotor");
+        rightEncoder = opMode.hardwareMap.get(DcMotorEx.class, "FLMotor");
         backEncoder = opMode.hardwareMap.get(DcMotorEx.class, "BLMotor");
 
         switchEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         switchEncoderMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+
+        imu = opMode.hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
 
     }
 
