@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class MM_AutoTest extends MM_OpMode {
     private MM_Robot robot = new MM_Robot(this);
 
-    public static int INCHES = 12;
+    public static int INCHES = 48;
 
     private ElapsedTime runtime = new ElapsedTime();
 

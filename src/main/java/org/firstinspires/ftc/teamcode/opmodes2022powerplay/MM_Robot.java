@@ -42,6 +42,7 @@ public class MM_Robot {
         while (opMode.opModeIsActive() && runtime.seconds() < 5 && !driveDone) {
             opMode.telemetry.addData("inches target", inches);
             driveDone = drivetrain.reachedPosition();
+            opMode.telemetry.update();
         }
     }
 

@@ -105,8 +105,8 @@ public class MM_Drivetrain {
         frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        leftEncoder = opMode.hardwareMap.get(DcMotorEx.class,"FLMotor");
-        rightEncoder = opMode.hardwareMap.get(DcMotorEx.class, "FRMotor");
+        leftEncoder = opMode.hardwareMap.get(DcMotorEx.class,"BRMotor");
+        rightEncoder = opMode.hardwareMap.get(DcMotorEx.class, "FLMotor");
         backEncoder = opMode.hardwareMap.get(DcMotorEx.class, "BLMotor");
 
         switchEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
