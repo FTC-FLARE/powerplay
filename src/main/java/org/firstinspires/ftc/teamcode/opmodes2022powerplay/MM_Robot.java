@@ -47,15 +47,23 @@ public class MM_Robot {
     }
 
     public void sleevePark(int sleeveColor) {
-        if (sleeveColor == opMode.RED) {
-            //left
-            opMode.telemetry.addLine("Traveling to Red");
-        } else if (sleeveColor == opMode.BLUE) {
-            //middle
-            opMode.telemetry.addLine("Traveling to Blue");
+        if (sleeveColor == opMode.RED || sleeveColor == opMode.YELLOW) {
+            driveInches(6); //get away from wall
+            double angleTarget = -90;
+            if (sleeveColor == opMode.YELLOW) {
+                angleTarget = -angleTarget;
+                opMode.telemetry.addLine("Traveling to Yellow");
+            } else {
+                opMode.telemetry.addLine("Traveling to Red");
+            }
+            //rotate to angle target
+            driveInches(24);
+            //rotate to 0
+            driveInches(24);
+
         } else {
-            //right & yellow
-            opMode.telemetry.addLine("Traveling to Yellow");
+            opMode.telemetry.addLine("Traveling to Blue");
+            driveInches(30);
         }
         opMode.telemetry.update();
     }
