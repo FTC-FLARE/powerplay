@@ -18,10 +18,11 @@ public class MM_Slide {
     private int slideTarget = 0;
     public int slideLevelTarget = 0;
     private int stackLevel = 0;
+    private boolean isHandled = false;
 
         //not accurate
     enum slidePosition {
-        COLLECT(115),
+        COLLECT(0),
         STACK(155),
         GROUND(400),
         LOW(1750),
@@ -42,20 +43,23 @@ public class MM_Slide {
     }
 
     public void manualRun() {
-        if (isTriggered(bottomStop) && opMode.gamepad2.right_trigger <= .1) {  // disengage motor
+        if (isTriggered(bottomStop) && opMode.gamepad2.right_trigger <= .1 && !isHandled) {  // disengage motor
             slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             slideTarget = 0;
+            isHandled = true;
         } else if (opMode.gamepad2.right_trigger > 0.1 && !isTriggered(topStop)) {
             slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             slide.setPower(SLIDE_POWER);
             slideTarget = slide.getCurrentPosition();
             stackLevel = 0;
+            isHandled = false;
         } else if (opMode.gamepad2.left_trigger > 0.1) {
             slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             slide.setPower(-SLIDE_POWER);
             slideTarget = slide.getCurrentPosition();
             stackLevel = 0;
+            isHandled = false;
         } else {  // hold current target
             slide.setTargetPosition(slideTarget);
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
