@@ -28,7 +28,6 @@ public class MM_P_Controller {
     }
     public double calculatePower(double currentInput){
         this.currentInput = currentInput;
-/*        absError = Math.abs(setpoint - currentInput);*/
         currentError = setpoint - currentInput;
 
         double power = currentError * P_COEFFICIENT * (outputRange);

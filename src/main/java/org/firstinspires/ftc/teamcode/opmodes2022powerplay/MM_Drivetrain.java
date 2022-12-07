@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -28,6 +29,8 @@ public class MM_Drivetrain {
     private Servo rightOdomLift = null;
     private Servo backOdomLift = null;
 
+    private final ElapsedTime runtime = new ElapsedTime();
+
     private static final double WHEEL_DIAMETER = 2;  // odometry wheels in inches
     private static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
     private static final double TICKS_PER_REVOLUTION = 8192;
@@ -49,6 +52,12 @@ public class MM_Drivetrain {
     private int rightCurrentTicks = 0;
     private int backCurrentTicks = 0;
 
+    private static final double SECONDS_PER_DEGREE = 0.01;//??
+
+    private double priorAngle = 0;
+    private int leftPriorEncoder = 0;
+    private int rightPriorEncoder = 0;
+    private int backPriorEncoder = 0;
 
     public MM_Drivetrain(MM_OpMode opMode) {
         this.opMode = opMode;
@@ -175,7 +184,6 @@ public class MM_Drivetrain {
             brPower = brPower/max;
         }
     }
-
     private void handleSlowMode() {
         if (opMode.aPressed(opMode.GAMEPAD1) && slowMode != SUPER_SLOW) {
             if (slowMode == FAST) { // Temporary fix
@@ -216,5 +224,48 @@ public class MM_Drivetrain {
             backOdomLift.setPosition(1);
         }
 
+    }
+
+    public void rotateDegrees(double targetAngle){
+        double timeOut = Math.max(2, Math.abs(SECONDS_PER_DEGREE * targetAngle - imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle));
+
+        int rightStartingTicks = rightEncoder.getCurrentPosition();
+        int leftStartingTicks = leftEncoder.getCurrentPosition();
+        int backStartingTicks = backEncoder.getCurrentPosition();
+
+        opMode.pTurnController.setInputRange(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle, targetAngle);
+        opMode.pTurnController.setSetpoint(targetAngle);
+        runtime.reset();
+
+        do {
+            double turnPower = Math.abs(opMode.pTurnController.calculatePower(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle));
+
+            if(correctedAngle(opMode.pTurnController.getCurrentError()) > 0){
+                setMotorPower(-turnPower, turnPower, -turnPower, turnPower);
+            }else {
+                setMotorPower(turnPower, -turnPower, turnPower, -turnPower);
+            }
+            opMode.telemetry.addData("target reached", opMode.pTurnController.reachedTarget());
+            opMode.telemetry.update();
+
+        } while (opMode.opModeIsActive() && !opMode.pTurnController.reachedTarget() && runtime.seconds() < timeOut);
+
+        if (opMode.pTurnController.reachedTarget()) {
+            opMode.telemetry.update();
+            stop();
+        }
+
+        priorAngle = targetAngle;
+        rightPriorEncoder = rightPriorEncoder - rightStartingTicks + rightEncoder.getCurrentPosition();
+        leftPriorEncoder = leftPriorEncoder - leftStartingTicks + leftEncoder.getCurrentPosition();
+        backPriorEncoder = backPriorEncoder - backStartingTicks + backEncoder.getCurrentPosition();
+    }
+    private double correctedAngle(double angle) {
+        if (angle > 180) {
+            angle -= 360;
+        } else if (angle < -180) {
+            angle += 360;
+        }
+        return angle;
     }
 }
