@@ -88,7 +88,7 @@ public class MM_Slide {
             stackLevel -= 1;
             setSlideTargetAndStart(opMode.STACK);
         } else if (opMode.dpadUpPressed(opMode.GAMEPAD2)) {
-            stackLevel -= 1;
+            stackLevel += 1;
             setSlideTargetAndStart(opMode.STACK);
         }
     }
@@ -122,17 +122,20 @@ public class MM_Slide {
                 return slideTarget;
             }
             return slidePosition.COLLECT.ticks + (slidePosition.STACK.ticks * stackLevel);
-        }
-        stackLevel = 0;
-        if (slideLevelTarget == opMode.GROUND) {
+        } else if (slideLevelTarget == opMode.GROUND) {
+            stackLevel = 0;
             return slidePosition.GROUND.ticks;
         } else if (slideLevelTarget == opMode.LOW) {
+            stackLevel = 0;
             return slidePosition.LOW.ticks;
         } else if (slideLevelTarget == opMode.MEDIUM) {
+            stackLevel = 0;
             return slidePosition.MEDIUM.ticks;
         } else if (slideLevelTarget == opMode.HIGH) {
+            stackLevel = 0;
             return slidePosition.HIGH.ticks;
         } else {
+            stackLevel = 0;
             return  slidePosition.COLLECT.ticks;
         }
     }
