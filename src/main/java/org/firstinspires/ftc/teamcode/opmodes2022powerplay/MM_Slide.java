@@ -23,7 +23,7 @@ public class MM_Slide {
         //not accurate
     enum slidePosition {
         COLLECT(0),
-        STACK(155),
+        STACK(145),
         GROUND(400),
         LOW(1750),
         PIVOT_POSITION(1040),
@@ -69,7 +69,7 @@ public class MM_Slide {
         slideCurrent = slide.getCurrentPosition();
         opMode.telemetry.addData("Slide", "Current: %d  Target: %d", slideCurrent, slideTarget);
         opMode.telemetry.addData("Top Stop", isTriggered(topStop));
-        opMode.telemetry.addData("Stack Level (+1)", stackLevel);
+        opMode.telemetry.addData("Stack Level (+1)", stackLevel + 1);
         turner.runTurner();
     }
 
@@ -117,11 +117,11 @@ public class MM_Slide {
 
     private int getTicksForLevel(int slideLevelTarget) {
         if (slideLevelTarget == opMode.STACK) {
-            if (stackLevel < 0) {
+            if (stackLevel < 1) {
                 stackLevel = 0;
                 return slideTarget;
             }
-            return slidePosition.COLLECT.ticks + (slidePosition.STACK.ticks * stackLevel);
+            return slidePosition.COLLECT.ticks + (slidePosition.STACK.ticks * (stackLevel - 1));
         } else if (slideLevelTarget == opMode.GROUND) {
             stackLevel = 0;
             return slidePosition.GROUND.ticks;
