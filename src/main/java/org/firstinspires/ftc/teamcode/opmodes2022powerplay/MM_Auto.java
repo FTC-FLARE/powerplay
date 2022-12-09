@@ -37,6 +37,7 @@ public class MM_Auto extends MM_OpMode {
         telemetry.update();
         waitForStart();
 
+        robot.runSlideToPosition(LOW);
         telemetry.addData("Max Color", detector.getMaxColorString());
         telemetry.update();
 

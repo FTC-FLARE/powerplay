@@ -56,23 +56,23 @@ public class MM_Robot {
             } else {
                 opMode.telemetry.addLine("Traveling to Red");
             }
-            //rotate to angle target
+            drivetrain.rotateDegrees(angleTarget);
             driveInches(24);
-            //rotate to 0
-            driveInches(24);
+            drivetrain.rotateDegrees(0);
+            driveInches(30);
 
         } else {
             opMode.telemetry.addLine("Traveling to Blue");
-            driveInches(30);
+            driveInches(36);
         }
+        runSlideToPosition(opMode.COLLECT);
         opMode.telemetry.update();
     }
 
-/*    public void runSlideToPosition(int level) {
+    public void runSlideToPosition(int level) {
         slide.startMoving(level);
-
         while (!slide.reachedPosition()) {
 
         }
-    }*/
+    }
 }

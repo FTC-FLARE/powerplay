@@ -145,7 +145,7 @@ public class MM_Slide {
     }
 
     public boolean reachedPosition() {
-        if (Math.abs(slide.getCurrentPosition() - slideTarget) < 30 || isTriggered(topStop) || isTriggered(bottomStop)) {
+        if (Math.abs(slide.getCurrentPosition() - slideTarget) < 50 || isTriggered(topStop) || isTriggered(bottomStop)) { //large for testing purpose
             stop();
             return true;
         }
