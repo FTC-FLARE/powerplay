@@ -52,7 +52,7 @@ public class MM_Drivetrain {
     private int rightCurrentTicks = 0;
     private int backCurrentTicks = 0;
 
-    private static final double SECONDS_PER_DEGREE = 0.01;//??
+    private static final double SECONDS_PER_DEGREE = 0.025;//??
 
     private double priorAngle = 0;
     private int leftPriorEncoder = 0;
