@@ -17,15 +17,18 @@ public class MM_Slide {
     private int slideCurrent = 0;
     private int slideTarget = 0;
     public int slideLevelTarget = 0;
+    private int stackLevel = 0;
+    private boolean isHandled = false;
 
         //not accurate
     enum slidePosition {
         COLLECT(0),
-        GROUND(300),
-        LOW(1500),
-        PIVOT_POSITION(1550),
-        MEDIUM(2650),
-        HIGH(3750);
+        STACK(155),
+        GROUND(400),
+        LOW(1750),
+        PIVOT_POSITION(1040),
+        MEDIUM(2850),
+        HIGH(4000);
 
         public final int ticks;
 
@@ -40,19 +43,24 @@ public class MM_Slide {
     }
 
     public void manualRun() {
-        if (isTriggered(bottomStop) && opMode.gamepad2.right_trigger <= .1) {  // disengage motor
+        if (isTriggered(bottomStop) && opMode.gamepad2.right_trigger <= .1 && !isHandled) {  // disengage motor
             slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             slideTarget = 0;
+            isHandled = true;
         } else if (opMode.gamepad2.right_trigger > 0.1 && !isTriggered(topStop)) {
             slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             slide.setPower(SLIDE_POWER);
             slideTarget = slide.getCurrentPosition();
+            stackLevel = 0;
+            isHandled = false;
         } else if (opMode.gamepad2.left_trigger > 0.1) {
             slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             slide.setPower(-SLIDE_POWER);
             slideTarget = slide.getCurrentPosition();
-        } else {  // hold current position
+            stackLevel = 0;
+            isHandled = false;
+        } else {  // hold current target
             slide.setTargetPosition(slideTarget);
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             slide.setPower(SLIDE_POWER);
@@ -61,13 +69,14 @@ public class MM_Slide {
         slideCurrent = slide.getCurrentPosition();
         opMode.telemetry.addData("Slide", "Current: %d  Target: %d", slideCurrent, slideTarget);
         opMode.telemetry.addData("Top Stop", isTriggered(topStop));
+        opMode.telemetry.addData("Stack Level (+1)", stackLevel);
         turner.runTurner();
     }
 
     public void positionRun() {
         if (opMode.xPressed(opMode.GAMEPAD2)) {
             setSlideTargetAndStart(opMode.COLLECT);
-        } else if (opMode.dpadDownPressed(opMode.GAMEPAD2)) {
+        } else if (opMode.rightJoystickPressed(opMode.GAMEPAD2)) {
             setSlideTargetAndStart(opMode.GROUND);
         } else if (opMode.aPressed(opMode.GAMEPAD2)) {
             setSlideTargetAndStart(opMode.LOW);
@@ -75,6 +84,12 @@ public class MM_Slide {
             setSlideTargetAndStart(opMode.MEDIUM);
         } else if (opMode.yPressed(opMode.GAMEPAD2)) {
             setSlideTargetAndStart(opMode.HIGH);
+        } else if (opMode.dpadDownPressed(opMode.GAMEPAD2)) {
+            stackLevel -= 1;
+            setSlideTargetAndStart(opMode.STACK);
+        } else if (opMode.dpadUpPressed(opMode.GAMEPAD2)) {
+            stackLevel += 1;
+            setSlideTargetAndStart(opMode.STACK);
         }
     }
 
@@ -101,15 +116,26 @@ public class MM_Slide {
     }
 
     private int getTicksForLevel(int slideLevelTarget) {
-        if (slideLevelTarget == opMode.GROUND) {
+        if (slideLevelTarget == opMode.STACK) {
+            if (stackLevel < 0) {
+                stackLevel = 0;
+                return slideTarget;
+            }
+            return slidePosition.COLLECT.ticks + (slidePosition.STACK.ticks * stackLevel);
+        } else if (slideLevelTarget == opMode.GROUND) {
+            stackLevel = 0;
             return slidePosition.GROUND.ticks;
         } else if (slideLevelTarget == opMode.LOW) {
+            stackLevel = 0;
             return slidePosition.LOW.ticks;
         } else if (slideLevelTarget == opMode.MEDIUM) {
+            stackLevel = 0;
             return slidePosition.MEDIUM.ticks;
         } else if (slideLevelTarget == opMode.HIGH) {
+            stackLevel = 0;
             return slidePosition.HIGH.ticks;
         } else {
+            stackLevel = 0;
             return  slidePosition.COLLECT.ticks;
         }
     }

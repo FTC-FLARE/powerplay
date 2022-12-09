@@ -7,8 +7,10 @@ public class MM_Collector {
 
     private MM_OpMode opMode;
 
-    private final int CLOSED = 0;
+    private final double CLOSED = 0.185;
     private final int OPEN = 1;
+
+    private double position = OPEN;
 
     public MM_Collector(MM_OpMode opMode) {
         this.opMode = opMode;
@@ -21,10 +23,20 @@ public class MM_Collector {
     }
 
     public void runCollector() {
-        if (opMode.rightBumperPressed(opMode.GAMEPAD2)) {
+/*        if (opMode.rightBumperPressed(opMode.GAMEPAD2)) {
             grabber.setPosition(CLOSED);
         } else if (opMode.leftBumperPressed(opMode.GAMEPAD2)) {
             grabber.setPosition(OPEN);
+        }*/
+
+        if (opMode.rightBumperPressed(opMode.GAMEPAD2)) {
+            if (position == OPEN) {
+                grabber.setPosition(CLOSED);
+                position = CLOSED;
+            } else {
+                grabber.setPosition(OPEN);
+                position = OPEN;
+            }
         }
 
         opMode.telemetry.addData("Collector Position", grabber.getPosition());
