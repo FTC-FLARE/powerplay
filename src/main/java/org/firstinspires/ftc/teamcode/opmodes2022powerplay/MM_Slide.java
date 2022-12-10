@@ -105,10 +105,7 @@ public class MM_Slide {
     public void startMoving(int slideLevelTarget) {
         this.slideLevelTarget = slideLevelTarget;
         slideTarget = getTicksForLevel(slideLevelTarget);
-        if (slide.getCurrentPosition() > slideTarget) {
-            slide.setPower(-SLIDE_POWER);
-            headedUp = false;
-        } else if (slide.getCurrentPosition() < slideTarget) {
+        if (slide.getCurrentPosition() < slideTarget) {
             slide.setPower(SLIDE_POWER);
             headedUp = true;
         }

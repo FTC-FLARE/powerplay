@@ -26,8 +26,26 @@ public class MM_AutoTest extends MM_OpMode {
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+
         waitForStart();
 
-        robot.runSlideandDrive(MEDIUM, 24, 7);
+        robot.runSlideToPosition(LOW);
+
+        robot.driveInches(42);
+        robot.driveInches(-8);
+
+
+        robot.drivetrain.rotateDegrees(55);
+        robot.driveInches(5);
+
+        robot.collector.autoRunCollector(robot.collector.OPEN);
+        robot.driveInches(-5);
+        robot.drivetrain.rotateDegrees(0);
+
+        telemetry.update();
+
+
+
+//        robot.runSlideandDrive(HIGH, 24, 7);
     }
 }
