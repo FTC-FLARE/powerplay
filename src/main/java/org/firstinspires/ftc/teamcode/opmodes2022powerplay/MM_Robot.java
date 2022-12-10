@@ -49,7 +49,7 @@ public class MM_Robot {
     public void sleevePark(int sleeveColor) {
         if (sleeveColor == opMode.RED || sleeveColor == opMode.YELLOW) {
             driveInches(6); //get away from wall
-            double angleTarget = -90;
+            double angleTarget = 90;
             if (sleeveColor == opMode.YELLOW) {
                 angleTarget = -angleTarget;
                 opMode.telemetry.addLine("Traveling to Yellow");
@@ -63,7 +63,8 @@ public class MM_Robot {
 
         } else {
             opMode.telemetry.addLine("Traveling to Blue");
-            driveInches(36);
+            driveInches(42);
+            driveInches(-8);
         }
         runSlideToPosition(opMode.COLLECT);
         opMode.telemetry.update();

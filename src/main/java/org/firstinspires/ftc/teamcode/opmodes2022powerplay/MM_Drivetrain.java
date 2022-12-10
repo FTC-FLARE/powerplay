@@ -51,13 +51,13 @@ public class MM_Drivetrain {
     private int leftCurrentTicks = 0;
     private int rightCurrentTicks = 0;
     private int backCurrentTicks = 0;
-
-    private static final double SECONDS_PER_DEGREE = 0.025;//??
+    private int leftPriorEncoderTarget = 0;
+    private int rightPriorEncoderTarget = 0;
+    private int backPriorEncoderTarget = 0;
 
     private double priorAngle = 0;
-    private int leftPriorEncoder = 0;
-    private int rightPriorEncoder = 0;
-    private int backPriorEncoder = 0;
+    private static final double SECONDS_PER_DEGREE = 0.025;//??
+
 
     public MM_Drivetrain(MM_OpMode opMode) {
         this.opMode = opMode;
@@ -65,13 +65,15 @@ public class MM_Drivetrain {
     }
 
     public void prepareToDrive(double inches) {
-        int leftTargetTicks = MM_Util.inchesToTicks(inches);
-        int rightTargetTicks = MM_Util.inchesToTicks(inches);
+        int leftTargetTicks = leftPriorEncoderTarget + MM_Util.inchesToTicks(inches);
+        int rightTargetTicks = rightPriorEncoderTarget + MM_Util.inchesToTicks(inches);
 
-        opMode.pLeftDriveController.setInputRange(leftEncoder.getCurrentPosition(), leftTargetTicks);
-        opMode.pRightDriveController.setInputRange(rightEncoder.getCurrentPosition(), rightTargetTicks);
+        opMode.pLeftDriveController.setInputRange(leftPriorEncoderTarget, leftTargetTicks);
+        opMode.pRightDriveController.setInputRange(rightPriorEncoderTarget, rightTargetTicks);
         opMode.pLeftDriveController.setSetpoint(leftTargetTicks);
         opMode.pRightDriveController.setSetpoint(rightTargetTicks);
+        rightPriorEncoderTarget = rightTargetTicks;
+        leftPriorEncoderTarget = leftTargetTicks;
     }
 
     private void setStraightPower() {
@@ -223,7 +225,6 @@ public class MM_Drivetrain {
             rightOdomLift.setPosition(1);
             backOdomLift.setPosition(1);
         }
-
     }
 
     public void rotateDegrees(double targetAngle){
@@ -256,9 +257,9 @@ public class MM_Drivetrain {
         }
 
         priorAngle = targetAngle;
-        rightPriorEncoder = rightPriorEncoder - rightStartingTicks + rightEncoder.getCurrentPosition();
-        leftPriorEncoder = leftPriorEncoder - leftStartingTicks + leftEncoder.getCurrentPosition();
-        backPriorEncoder = backPriorEncoder - backStartingTicks + backEncoder.getCurrentPosition();
+        rightPriorEncoderTarget = rightPriorEncoderTarget - rightStartingTicks + rightEncoder.getCurrentPosition();
+        leftPriorEncoderTarget = leftPriorEncoderTarget - leftStartingTicks + leftEncoder.getCurrentPosition();
+        backPriorEncoderTarget = backPriorEncoderTarget - backStartingTicks + backEncoder.getCurrentPosition();
     }
     private double correctedAngle(double angle) {
         if (angle > 180) {

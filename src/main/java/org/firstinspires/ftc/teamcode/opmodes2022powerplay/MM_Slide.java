@@ -18,6 +18,7 @@ public class MM_Slide {
     private int slideTarget = 0;
     public int slideLevelTarget = 0;
     private int stackLevel = 0;
+    private boolean headedUp = true;
     private boolean isHandled = false;
 
         //not accurate
@@ -106,8 +107,10 @@ public class MM_Slide {
         slideTarget = getTicksForLevel(slideLevelTarget);
         if (slide.getCurrentPosition() > slideTarget) {
             slide.setPower(-SLIDE_POWER);
+            headedUp = false;
         } else if (slide.getCurrentPosition() < slideTarget) {
             slide.setPower(SLIDE_POWER);
+            headedUp = true;
         }
     }
 
@@ -145,7 +148,7 @@ public class MM_Slide {
     }
 
     public boolean reachedPosition() {
-        if (Math.abs(slide.getCurrentPosition() - slideTarget) < 50 || isTriggered(topStop) || isTriggered(bottomStop)) { //large for testing purpose
+        if (Math.abs(slide.getCurrentPosition() - slideTarget) < 50 || (!headedUp && isTriggered(bottomStop))) { //large for testing purpose
             stop();
             return true;
         }
