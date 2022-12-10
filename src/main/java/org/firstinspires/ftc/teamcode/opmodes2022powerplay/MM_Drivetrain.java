@@ -135,9 +135,9 @@ public class MM_Drivetrain {
 
         initOdomServos();
 
-        leftEncoder = opMode.hardwareMap.get(DcMotorEx.class,"BRMotor");
-        rightEncoder = opMode.hardwareMap.get(DcMotorEx.class, "FLMotor");
-        backEncoder = opMode.hardwareMap.get(DcMotorEx.class, "BLMotor");
+        leftEncoder = opMode.hardwareMap.get(DcMotorEx.class,"BRMotor"); // port 3
+        rightEncoder = opMode.hardwareMap.get(DcMotorEx.class, "FLMotor"); // port 0
+        backEncoder = opMode.hardwareMap.get(DcMotorEx.class, "BLMotor"); // port 2
 
         switchEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         switchEncoderMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -189,11 +189,14 @@ public class MM_Drivetrain {
         }
     }
     private void handleSlowMode() {
-        if (opMode.aPressed(opMode.GAMEPAD1) && slowMode != SUPER_SLOW) {
-            if (slowMode == FAST) { // Temporary fix
+        if (opMode.aPressed(opMode.GAMEPAD1)){
+            if (slowMode == FAST) {
                 slowMode = SLOW;
-            } else
+            } else if(slowMode == SLOW) {
                 slowMode = FAST;
+            }else{ // must have been super-slow
+                slowMode = previousSlowMode;
+            }
         }
         if (opMode.bPressed(opMode.GAMEPAD1)) {
             if (slowMode == SUPER_SLOW) {
