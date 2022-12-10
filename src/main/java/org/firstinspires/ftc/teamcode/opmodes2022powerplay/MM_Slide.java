@@ -27,7 +27,7 @@ public class MM_Slide {
         STACK(145),
         GROUND(400),
         LOW(1750),
-        PIVOT_POSITION(1040),
+        PIVOT_POSITION(1600),
         MEDIUM(2850),
         HIGH(4000);
 

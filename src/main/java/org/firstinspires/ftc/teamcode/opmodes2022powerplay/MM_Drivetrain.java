@@ -133,6 +133,8 @@ public class MM_Drivetrain {
         frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        initOdomServos();
+
         leftEncoder = opMode.hardwareMap.get(DcMotorEx.class,"BRMotor");
         rightEncoder = opMode.hardwareMap.get(DcMotorEx.class, "FLMotor");
         backEncoder = opMode.hardwareMap.get(DcMotorEx.class, "BLMotor");
@@ -222,7 +224,7 @@ public class MM_Drivetrain {
 
 //            positions will need to be changed after testing
             leftOdomLift.setPosition(1);
-            rightOdomLift.setPosition(1);
+            rightOdomLift.setPosition(0);
             backOdomLift.setPosition(1);
         }
     }

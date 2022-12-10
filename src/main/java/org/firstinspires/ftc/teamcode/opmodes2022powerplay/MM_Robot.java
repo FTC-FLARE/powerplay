@@ -36,19 +36,16 @@ public class MM_Robot {
 
     public void driveInches(double inches) {
         drivetrain.prepareToDrive(inches);
-        boolean driveDone = false;
         runtime.reset();
-
-        while (opMode.opModeIsActive() && runtime.seconds() < 5 && !driveDone) {
+        while (opMode.opModeIsActive() && runtime.seconds() < 5 && !drivetrain.reachedPosition()) {
             opMode.telemetry.addData("inches target", inches);
-            driveDone = drivetrain.reachedPosition();
             opMode.telemetry.update();
         }
     }
 
     public void sleevePark(int sleeveColor) {
         if (sleeveColor == opMode.RED || sleeveColor == opMode.YELLOW) {
-            driveInches(6); //get away from wall
+            driveInches(5); //get away from wall
             double angleTarget = 90;
             if (sleeveColor == opMode.YELLOW) {
                 angleTarget = -angleTarget;
@@ -59,7 +56,7 @@ public class MM_Robot {
             drivetrain.rotateDegrees(angleTarget);
             driveInches(24);
             drivetrain.rotateDegrees(0);
-            driveInches(30);
+            driveInches(31);
 
         } else {
             opMode.telemetry.addLine("Traveling to Blue");
@@ -72,8 +69,24 @@ public class MM_Robot {
 
     public void runSlideToPosition(int level) {
         slide.startMoving(level);
-        while (!slide.reachedPosition()) {
+        while (opMode.opModeIsActive() && !slide.reachedPosition()) {
 
         }
     }
+
+    public void runSlideandDrive(int level, double inches, double timeoutTime) {
+        slide.startMoving(level);
+        drivetrain.prepareToDrive(inches);
+        boolean driveDone = false;
+        boolean slideDone = false;
+        runtime.reset();
+        while (opMode.opModeIsActive() && (!driveDone || !slideDone) && runtime.seconds() < timeoutTime) {
+            driveDone = drivetrain.reachedPosition();
+            slideDone = slide.reachedPosition();
+            opMode.telemetry.addData("inches target", inches);
+            opMode.telemetry.addData("slide target", level);
+            opMode.telemetry.update();
+        }
+    }
+
 }

@@ -28,6 +28,6 @@ public class MM_AutoTest extends MM_OpMode {
         telemetry.update();
         waitForStart();
 
-        robot.drivetrain.rotateDegrees(90);
+        robot.runSlideandDrive(MEDIUM, 24, 7);
     }
 }
