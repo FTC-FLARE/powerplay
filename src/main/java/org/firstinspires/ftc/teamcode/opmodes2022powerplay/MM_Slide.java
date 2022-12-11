@@ -143,7 +143,9 @@ public class MM_Slide {
     }
 
     public boolean reachedPosition() {
-        if (!slide.isBusy() || (!headedUp && isTriggered(bottomStop))) {
+        if (!slide.isBusy()) {
+            return true;
+        } else if (!headedUp && isTriggered(bottomStop)) {
             stop();
             return true;
         }
