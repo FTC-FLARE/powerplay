@@ -103,10 +103,8 @@ public class MM_Slide {
     }
 
     public void startMoving(int slideLevelTarget) {
-        this.slideLevelTarget = slideLevelTarget;
-        slideTarget = getTicksForLevel(slideLevelTarget);
+        setSlideTargetAndStart(slideLevelTarget);
         if (slide.getCurrentPosition() < slideTarget) {
-            slide.setPower(SLIDE_POWER);
             headedUp = true;
         }
     }
@@ -145,7 +143,7 @@ public class MM_Slide {
     }
 
     public boolean reachedPosition() {
-        if (Math.abs(slide.getCurrentPosition() - slideTarget) < 50 || (!headedUp && isTriggered(bottomStop))) { //large for testing purpose
+        if (!slide.isBusy() || (!headedUp && isTriggered(bottomStop))) {
             stop();
             return true;
         }

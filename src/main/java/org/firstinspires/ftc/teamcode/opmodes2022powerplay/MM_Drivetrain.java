@@ -35,6 +35,7 @@ public class MM_Drivetrain {
     private static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
     private static final double TICKS_PER_REVOLUTION = 8192;
     private static final double TICKS_PER_INCH = (TICKS_PER_REVOLUTION / WHEEL_CIRCUMFERENCE);
+    private double STRAIGHTEN_P = .0780;
     static final int FAST = 0;
     static final int SLOW = 1;
     static final int SUPER_SLOW = 2;
@@ -88,6 +89,7 @@ public class MM_Drivetrain {
         blPower = leftDrivePower;
         brPower = rightDrivePower;
 
+        angleStraighten(leftDrivePower, rightDrivePower);
         normalize();
         setMotorPower(flPower, frPower, blPower, brPower);
     }
@@ -266,6 +268,18 @@ public class MM_Drivetrain {
         leftPriorEncoderTarget = leftPriorEncoderTarget - leftStartingTicks + leftEncoder.getCurrentPosition();
         backPriorEncoderTarget = backPriorEncoderTarget - backStartingTicks + backEncoder.getCurrentPosition();
     }
+
+    private void angleStraighten(double leftCalculatedPower, double rightCalculatedPower) {
+        double headingError = correctedAngle(priorAngle - imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
+
+        if (headingError != 0) {
+            flPower = flPower - (headingError * STRAIGHTEN_P * Math.abs(leftCalculatedPower));
+            frPower = frPower + (headingError * STRAIGHTEN_P * Math.abs(rightCalculatedPower));
+            blPower = blPower - (headingError * STRAIGHTEN_P * Math.abs(leftCalculatedPower));
+            brPower = brPower + (headingError * STRAIGHTEN_P * Math.abs(rightCalculatedPower));
+        }
+    }
+
     private double correctedAngle(double angle) {
         if (angle > 180) {
             angle -= 360;
