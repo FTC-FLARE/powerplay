@@ -19,7 +19,7 @@ public class MM_Slide {
     public int slideLevelTarget = 0;
     private int stackLevel = 0;
     private boolean headedUp = true;
-    private boolean isHandled = false;
+//    private boolean isHandled = false;
 
         //not accurate
     enum slidePosition {
@@ -44,25 +44,25 @@ public class MM_Slide {
     }
 
     public void manualRun() {
-        if (isTriggered(bottomStop) && opMode.gamepad2.right_trigger <= .1 && !isHandled) {  // disengage motor
+        if (isTriggered(bottomStop) && opMode.gamepad2.right_trigger <= .1 && slide.getCurrentPosition() > slideTarget) {  // disengage motor
             slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             slideTarget = 0;
-            isHandled = true;
+//            isHandled = true;
         } else if (opMode.gamepad2.right_trigger > 0.1 && !isTriggered(topStop)) {
             slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             slide.setPower(SLIDE_POWER);
             slideTarget = slide.getCurrentPosition();
             stackLevel = 0;
-            isHandled = false;
-        } else if (opMode.gamepad2.left_trigger > 0.1) {
+//            isHandled = false;
+        } else if (opMode.gamepad2.left_trigger > 0.1 && !isTriggered(bottomStop)) {
             slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             slide.setPower(-SLIDE_POWER);
             slideTarget = slide.getCurrentPosition();
             stackLevel = 0;
-            isHandled = false;
+//            isHandled = false;
         } else {  // hold current target
-            slide.setTargetPosition(slideTarget);
+            slide.setTargetPosition(slideTarget); // replace these 3 lines w/ call to setSlideTargetAndStart()
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             slide.setPower(SLIDE_POWER);
         }
@@ -76,7 +76,7 @@ public class MM_Slide {
 
     public void positionRun() {
         if (opMode.xPressed(opMode.GAMEPAD2)) {
-            setSlideTargetAndStart(opMode.COLLECT);
+             setSlideTargetAndStart(opMode.COLLECT);
         } else if (opMode.rightJoystickPressed(opMode.GAMEPAD2)) {
             setSlideTargetAndStart(opMode.GROUND);
         } else if (opMode.aPressed(opMode.GAMEPAD2)) {
@@ -94,7 +94,7 @@ public class MM_Slide {
         }
     }
 
-    private void setSlideTargetAndStart(int slideLevelTarget) {
+    private void setSlideTargetAndStart(int slideLevelTarget) { //change parameter to ticks
         slideTarget = getTicksForLevel(slideLevelTarget);
         this.slideLevelTarget = slideLevelTarget;
         slide.setTargetPosition(slideTarget);
@@ -102,7 +102,7 @@ public class MM_Slide {
         slide.setPower(SLIDE_POWER);
     }
 
-    public void startMoving(int slideLevelTarget) {
+    public void startMoving(int slideLevelTarget) { // dont' need this?
         setSlideTargetAndStart(slideLevelTarget);
         if (slide.getCurrentPosition() < slideTarget) {
             headedUp = true;
