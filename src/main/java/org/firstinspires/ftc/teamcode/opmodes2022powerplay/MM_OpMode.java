@@ -20,8 +20,11 @@ public abstract class MM_OpMode extends LinearOpMode {
     final int COLLECT = 0;
     final int GROUND = 1;
     final int LOW = 2;
+    final int LOW_LOWER = 6;
     final int MEDIUM = 3;
+    final int MEDIUM_LOWER = 7;
     final int HIGH = 4;
+    final int HIGH_LOWER = 8;
     final int STACK = 5;
 
     final int RED = 0;
