@@ -55,15 +55,15 @@ public class MM_Auto_Left extends MM_OpMode {
             robot.drivetrain.rotateDegrees(90);
             robot.driveInches(2.35);
             runtime.reset();
-            while (runtime.seconds() < 3) {
+            while (opModeIsActive() && runtime.seconds() < 3) {
             }
             robot.runSlideToPosition(MEDIUM_LOWER);
             runtime.reset();
-            while (runtime.seconds() < 1) {
+            while (opModeIsActive() && runtime.seconds() < 1) {
             }
             robot.collector.autoRunCollector(robot.collector.OPEN);
             runtime.reset();
-            while (runtime.seconds() < 1) {
+            while (opModeIsActive() && runtime.seconds() < 1) {
             }
             robot.driveInches(-2.5);
         } else if (maxColor == RED) {
@@ -76,15 +76,15 @@ public class MM_Auto_Left extends MM_OpMode {
             robot.drivetrain.rotateDegrees(-90);
             robot.driveInches(2.25);
             runtime.reset();
-            while (runtime.seconds() < 3) {
+            while (opModeIsActive() && runtime.seconds() < 3) {
             }
             robot.runSlideToPosition(LOW_LOWER);
             runtime.reset();
-            while (runtime.seconds() < 1) {
+            while (opModeIsActive() && runtime.seconds() < 1) {
             }
             robot.collector.autoRunCollector(robot.collector.OPEN);
             runtime.reset();
-            while (runtime.seconds() < 1) {
+            while (opModeIsActive() && runtime.seconds() < 1) {
             }
             robot.driveInches(-1.75);
         } else {
@@ -92,15 +92,15 @@ public class MM_Auto_Left extends MM_OpMode {
             robot.drivetrain.rotateDegrees(-90);
             robot.driveInches(1.75);
             runtime.reset();
-            while (runtime.seconds() < 3) {
+            while (opModeIsActive() && runtime.seconds() < 3) {
             }
             robot.runSlideToPosition(MEDIUM_LOWER);
             runtime.reset();
-            while (runtime.seconds() < 1) {
+            while (opModeIsActive() && runtime.seconds() < 1) {
             }
             robot.collector.autoRunCollector(robot.collector.OPEN);
             runtime.reset();
-            while (runtime.seconds() < 1) {
+            while (opModeIsActive() && runtime.seconds() < 1) {
             }
             robot.driveInches(-2.75);
         }
