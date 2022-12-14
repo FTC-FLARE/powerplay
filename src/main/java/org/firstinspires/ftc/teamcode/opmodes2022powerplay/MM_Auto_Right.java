@@ -12,8 +12,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Config
-@Autonomous(name="MM_AutoTest", group="MM")
-public class MM_AutoTest extends MM_OpMode {
+@Autonomous(name="MM_Auto_Right", group="MM")
+public class MM_Auto_Right extends MM_OpMode {
     private MM_Robot robot = new MM_Robot(this);
 
     MM_EOCVSleeveDetection detector = new MM_EOCVSleeveDetection();
@@ -46,13 +46,49 @@ public class MM_AutoTest extends MM_OpMode {
 
         //red left
         if (maxColor == YELLOW) {
-            robot.driveInches(5);
+            robot.driveInches(3.5);
             robot.drivetrain.rotateDegrees(-90);
-            robot.driveInches(22);
+            robot.driveInches(21);
             robot.drivetrain.rotateDegrees(0);
-            robot.runSlideandDrive(MEDIUM, 34, 5);
+            robot.driveInches(35.25);
             robot.drivetrain.rotateDegrees(90);
-            robot.driveInches(2.35);
+            robot.driveInches(.75);
+            runtime.reset();
+            while (runtime.seconds() < 3) {
+            }
+            robot.runSlideToPosition(LOW_LOWER);
+            runtime.reset();
+            while (runtime.seconds() < 1) {
+            }
+            robot.collector.autoRunCollector(robot.collector.OPEN);
+            runtime.reset();
+            while (runtime.seconds() < 1) {
+            }
+            robot.driveInches(-1.5);
+        } else if (maxColor == RED) {
+            robot.driveInches(5);//5
+            robot.drivetrain.rotateDegrees(90);
+            robot.driveInches(22);//22
+            robot.drivetrain.rotateDegrees(0);
+            robot.runSlideandDrive(MEDIUM, 33, 5);// 34 medium
+            robot.drivetrain.rotateDegrees(-90);
+            robot.driveInches(2.3);//2.35
+            runtime.reset();
+            while (runtime.seconds() < 3) {
+            }
+            robot.runSlideToPosition(MEDIUM_LOWER);
+            runtime.reset();
+            while (runtime.seconds() < 1) {
+            }
+            robot.collector.autoRunCollector(robot.collector.OPEN);
+            runtime.reset();
+            while (runtime.seconds() < 1) {
+            }
+            robot.driveInches(-1.7);
+        } else {
+            robot.runSlideandDrive(MEDIUM, 39, 5);
+            robot.drivetrain.rotateDegrees(90);
+            robot.driveInches(3);
             runtime.reset();
             while (runtime.seconds() < 3) {
             }
@@ -65,43 +101,6 @@ public class MM_AutoTest extends MM_OpMode {
             while (runtime.seconds() < 1) {
             }
             robot.driveInches(-2.5);
-        } else if (maxColor == RED) {
-            robot.runSlideToPosition(LOW);
-            robot.driveInches(2);
-            robot.drivetrain.rotateDegrees(90);
-            robot.driveInches(24);
-            robot.drivetrain.rotateDegrees(0);
-            robot.driveInches(33.5);
-            robot.drivetrain.rotateDegrees(-90);
-            robot.driveInches(2.5);
-            runtime.reset();
-            while (runtime.seconds() < 3) {
-            }
-            robot.runSlideToPosition(LOW_LOWER);
-            runtime.reset();
-            while (runtime.seconds() < 1) {
-            }
-            robot.collector.autoRunCollector(robot.collector.OPEN);
-            runtime.reset();
-            while (runtime.seconds() < 1) {
-            }
-            robot.driveInches(-2);
-        } else {
-            robot.runSlideandDrive(MEDIUM, 39.5, 5);
-            robot.drivetrain.rotateDegrees(-90);
-            robot.driveInches(2);
-            runtime.reset();
-            while (runtime.seconds() < 3) {
-            }
-            robot.runSlideToPosition(MEDIUM_LOWER);
-            runtime.reset();
-            while (runtime.seconds() < 1) {
-            }
-            robot.collector.autoRunCollector(robot.collector.OPEN);
-            runtime.reset();
-            while (runtime.seconds() < 1) {
-            }
-            robot.driveInches(-3);
         }
         robot.drivetrain.rotateDegrees(0);
         robot.runSlideToPosition(COLLECT);
