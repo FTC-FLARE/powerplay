@@ -20,7 +20,7 @@ public class MM_Collector {
 
     private void init() {
         grabber = opMode.hardwareMap.get(Servo.class, "Grabber");
-        grabber.setPosition(CLOSED);
+        grabber.setPosition(OPEN);
     }
 
     public void runCollector() {

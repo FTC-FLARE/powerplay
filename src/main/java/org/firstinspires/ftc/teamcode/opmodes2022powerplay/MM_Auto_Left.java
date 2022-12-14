@@ -39,7 +39,8 @@ public class MM_Auto_Left extends MM_OpMode {
 
         waitForStart();
 
-
+        robot.collector.autoRunCollector(robot.collector.CLOSED);
+        sleep(1000);
         robot.runSlideToPosition(LOW);
         int maxColor = detector.getMaxColor();
         telemetry.addData("Max Color", detector.getMaxColorString());
