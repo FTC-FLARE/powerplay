@@ -12,7 +12,7 @@ public class MM_Slide {
 
     private MM_OpMode opMode;
 
-    private final double SLIDE_POWER = 0.5;
+    private final double SLIDE_POWER = 0.6;
 
     private int slideCurrent = 0;
     private int slideTarget = 0;

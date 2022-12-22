@@ -8,7 +8,7 @@ public class MM_Collector {
 
     private MM_OpMode opMode;
 
-    public final double CLOSED = 0.09; //0.185
+    public final double CLOSED = 0.07; //0.185 - 0.09
     public final double OPEN = 1.0;
 
     private double position = OPEN;

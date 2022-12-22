@@ -191,7 +191,7 @@ public class MM_Drivetrain {
         }
     }
     private void handleSlowMode() {
-        if (opMode.aPressed(opMode.GAMEPAD1)){
+        if (opMode.aPressed(opMode.GAMEPAD1) || opMode.rightBumperPressed(opMode.GAMEPAD1)){
             if (slowMode == FAST) {
                 slowMode = SLOW;
             } else if(slowMode == SLOW) {
