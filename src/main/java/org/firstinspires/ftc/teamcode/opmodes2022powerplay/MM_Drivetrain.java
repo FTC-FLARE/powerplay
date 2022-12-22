@@ -64,6 +64,14 @@ public class MM_Drivetrain {
         this.opMode = opMode;
         init();
     }
+    public void driveInches(double inches) {
+        prepareToDrive(inches);
+        runtime.reset();
+        while (opMode.opModeIsActive() && runtime.seconds() < 5 && !reachedPosition()) {
+            opMode.telemetry.addData("inches target", inches);
+            opMode.telemetry.update();
+        }
+    }
 
     public void prepareToDrive(double inches) {
         int leftTargetTicks = leftPriorEncoderTarget + MM_Util.inchesToTicks(inches);
@@ -234,7 +242,7 @@ public class MM_Drivetrain {
         }
     }
 
-    public void rotateDegrees(double targetAngle){
+    public void rotateToAngle(double targetAngle){
         double timeOut = Math.max(2, Math.abs(SECONDS_PER_DEGREE * targetAngle - imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle));
 
         int rightStartingTicks = rightEncoder.getCurrentPosition();

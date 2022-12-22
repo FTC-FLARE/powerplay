@@ -49,11 +49,11 @@ public class MM_Auto_Left extends MM_OpMode {
         //red left
         if (maxColor == MM_EOCVSleeveDetection.YELLOW) {
             robot.driveInches(5);
-            robot.drivetrain.rotateDegrees(-90);
+            robot.drivetrain.rotateToAngle(-90);
             robot.driveInches(22);
-            robot.drivetrain.rotateDegrees(0);
+            robot.drivetrain.rotateToAngle(0);
             robot.runSlideandDrive(MEDIUM, 34, 5);
-            robot.drivetrain.rotateDegrees(90);
+            robot.drivetrain.rotateToAngle(90);
             robot.driveInches(2.35);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 3) {
@@ -70,11 +70,11 @@ public class MM_Auto_Left extends MM_OpMode {
         } else if (maxColor == MM_EOCVSleeveDetection.RED) {
             robot.runSlideToPosition(LOW);
             robot.driveInches(2);
-            robot.drivetrain.rotateDegrees(90);
+            robot.drivetrain.rotateToAngle(90);
             robot.driveInches(24);
-            robot.drivetrain.rotateDegrees(0);
+            robot.drivetrain.rotateToAngle(0);
             robot.driveInches(33.5);
-            robot.drivetrain.rotateDegrees(-90);
+            robot.drivetrain.rotateToAngle(-90);
             robot.driveInches(2.25);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 3) {
@@ -90,7 +90,7 @@ public class MM_Auto_Left extends MM_OpMode {
             robot.driveInches(-1.75);
         } else {
             robot.runSlideandDrive(MEDIUM, 39.5, 5);
-            robot.drivetrain.rotateDegrees(-90);
+            robot.drivetrain.rotateToAngle(-90);
             robot.driveInches(1.75);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 3) {
@@ -105,7 +105,7 @@ public class MM_Auto_Left extends MM_OpMode {
             }
             robot.driveInches(-2.75);
         }
-        robot.drivetrain.rotateDegrees(0);
+        robot.drivetrain.rotateToAngle(0);
         robot.runSlideToPosition(COLLECT);
 
 

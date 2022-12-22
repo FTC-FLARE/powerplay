@@ -11,22 +11,18 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @TeleOp(name="OpenCV Telemetry", group="MM")
 public class cameraTelemetry extends LinearOpMode {
-
-    int width = 320;
-    int height = 240;
-
     MM_EOCVTelemetry detector = new MM_EOCVTelemetry();
     OpenCvCamera camera;
+
+    private final int width = 320;
+    private final int height = 240;
 
     @Override
     public void runOpMode() {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
-        // Connect to the camera
-        // Use the SkystoneDetector pipeline
-        // processFrame() will be called to process the frame
         camera.setPipeline(detector);
-        // Remember to change the camera rotation
+
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
              @Override
              public void onOpened() {
@@ -35,7 +31,6 @@ public class cameraTelemetry extends LinearOpMode {
 
              @Override
              public void onError(int errorCode) {
-
              }
         });
 
@@ -49,7 +44,6 @@ public class cameraTelemetry extends LinearOpMode {
             telemetry.addData("Hue", detector.getMean1());
             telemetry.addData("Sat", detector.getMean2());
             telemetry.addData("Val", detector.getMean3());
-
             telemetry.addData("Frame Count", camera.getFrameCount());
             telemetry.update();
         }
