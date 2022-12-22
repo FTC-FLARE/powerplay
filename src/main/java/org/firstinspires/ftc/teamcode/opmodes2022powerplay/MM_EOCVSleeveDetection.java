@@ -9,9 +9,9 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 public class MM_EOCVSleeveDetection extends OpenCvPipeline {
 
-    private static int RED = 0;
-    private static int BLUE = 1;
-    private static int YELLOW = 2;
+    public static int RED = 0;
+    public static int BLUE = 1;
+    public static int YELLOW = 2;
 
     private int maxColor = RED;
 

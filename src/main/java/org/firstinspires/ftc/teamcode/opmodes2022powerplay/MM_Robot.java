@@ -44,10 +44,10 @@ public class MM_Robot {
     }
 
     public void sleevePark(int sleeveColor) {
-        if (sleeveColor == opMode.RED || sleeveColor == opMode.YELLOW) {
+        if (sleeveColor == MM_EOCVSleeveDetection.RED || sleeveColor == MM_EOCVSleeveDetection.YELLOW) {
             driveInches(5); //get away from wall
             double angleTarget = 90;
-            if (sleeveColor == opMode.YELLOW) {
+            if (sleeveColor == MM_EOCVSleeveDetection.YELLOW) {
                 angleTarget = -angleTarget;
                 opMode.telemetry.addLine("Traveling to Yellow");
             } else {
@@ -70,7 +70,6 @@ public class MM_Robot {
     public void runSlideToPosition(int level) {
         slide.startMoving(level);
         while (opMode.opModeIsActive() && !slide.reachedPosition()) {
-
         }
     }
 

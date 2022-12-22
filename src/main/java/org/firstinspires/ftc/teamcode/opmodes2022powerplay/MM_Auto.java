@@ -14,12 +14,10 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 @Config
 @Autonomous(name="MM_Auto", group="MM")
 public class MM_Auto extends MM_OpMode {
-    private MM_Robot robot = new MM_Robot(this);
+    private final MM_Robot robot = new MM_Robot(this);
 
     MM_EOCVSleeveDetection detector = new MM_EOCVSleeveDetection();
     OpenCvCamera camera;
-
-    private int maxColor = 0;
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -37,7 +35,7 @@ public class MM_Auto extends MM_OpMode {
         telemetry.update();
         waitForStart();
 
-        robot.collector.changePosition(robot.collector.CLOSED);
+        robot.collector.changePosition(MM_Collector.CLOSED);
         sleep(1000);
         robot.runSlideToPosition(LOW);
         telemetry.addData("Max Color", detector.getMaxColorString());

@@ -46,7 +46,7 @@ public class MM_Auto_Right extends MM_OpMode {
         telemetry.update();
 
         //red left
-        if (maxColor == YELLOW) {
+        if (maxColor == MM_EOCVSleeveDetection.YELLOW) {
             robot.driveInches(3.5);
             robot.drivetrain.rotateDegrees(-90);
             robot.driveInches(21);
@@ -57,7 +57,7 @@ public class MM_Auto_Right extends MM_OpMode {
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 3) {
             }
-            robot.runSlideToPosition(LOW_LOWER);
+            robot.runSlideToPosition(LOW_RELEASE);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
@@ -66,7 +66,7 @@ public class MM_Auto_Right extends MM_OpMode {
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
             robot.driveInches(-1.5);
-        } else if (maxColor == RED) {
+        } else if (maxColor == MM_EOCVSleeveDetection.RED) {
             robot.driveInches(5);//5
             robot.drivetrain.rotateDegrees(90);
             robot.driveInches(22);//22
@@ -77,7 +77,7 @@ public class MM_Auto_Right extends MM_OpMode {
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 3) {
             }
-            robot.runSlideToPosition(MEDIUM_LOWER);
+            robot.runSlideToPosition(MEDIUM_RELEASE);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
@@ -93,7 +93,7 @@ public class MM_Auto_Right extends MM_OpMode {
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 3) {
             }
-            robot.runSlideToPosition(MEDIUM_LOWER);
+            robot.runSlideToPosition(MEDIUM_RELEASE);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }

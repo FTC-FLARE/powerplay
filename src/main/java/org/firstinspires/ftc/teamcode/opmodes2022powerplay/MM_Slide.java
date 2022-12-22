@@ -22,16 +22,16 @@ public class MM_Slide {
 //    private boolean isHandled = false;
 
         //not accurate
-    enum slidePosition {
+    public enum slidePosition {
         COLLECT(0),
         STACK(145),
         GROUND(400),
-        LOW_LOWER(1550),
-        LOW(1750),
+        LOW_RELEASE(1550),
         PIVOT_POSITION(1600),
-        MEDIUM_LOWER(2650),
+        LOW(1750),
+        MEDIUM_RELEASE(2650),
         MEDIUM(2850),
-        HIGH_LOWER(3900),
+        HIGH_RELEASE(3900),
         HIGH(4000);
 
         public final int ticks;
@@ -129,21 +129,21 @@ public class MM_Slide {
         } else if (slideLevelTarget == opMode.LOW) {
             stackLevel = 0;
             return slidePosition.LOW.ticks;
-        } else if (slideLevelTarget == opMode.LOW_LOWER) {
+        } else if (slideLevelTarget == opMode.LOW_RELEASE) {
             stackLevel = 0;
-            return slidePosition.LOW_LOWER.ticks;
+            return slidePosition.LOW_RELEASE.ticks;
         } else if (slideLevelTarget == opMode.MEDIUM) {
             stackLevel = 0;
             return slidePosition.MEDIUM.ticks;
-        } else if (slideLevelTarget == opMode.MEDIUM_LOWER) {
+        } else if (slideLevelTarget == opMode.MEDIUM_RELEASE) {
             stackLevel = 0;
-            return slidePosition.MEDIUM_LOWER.ticks;
+            return slidePosition.MEDIUM_RELEASE.ticks;
         } else if (slideLevelTarget == opMode.HIGH) {
             stackLevel = 0;
             return slidePosition.HIGH.ticks;
-        } else if (slideLevelTarget == opMode.HIGH_LOWER) {
+        } else if (slideLevelTarget == opMode.HIGH_RELEASE) {
             stackLevel = 0;
-            return slidePosition.HIGH_LOWER.ticks;
+            return slidePosition.HIGH_RELEASE.ticks;
         } else {
             stackLevel = 0;
             return slidePosition.COLLECT.ticks;
