@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 public class MM_Drivetrain {
-    private MM_OpMode opMode;
+    private final MM_OpMode opMode;
 
     BNO055IMU imu;
 
@@ -31,14 +31,14 @@ public class MM_Drivetrain {
 
     private final ElapsedTime runtime = new ElapsedTime();
 
-    private static final double WHEEL_DIAMETER = 2;  // odometry wheels in inches
-    private static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
-    private static final double TICKS_PER_REVOLUTION = 8192;
-    private static final double TICKS_PER_INCH = (TICKS_PER_REVOLUTION / WHEEL_CIRCUMFERENCE);
-    private double STRAIGHTEN_P = .0780;
+    private static final double SECONDS_PER_DEGREE = 0.025;//??
+    private static final double STRAIGHTEN_P = .0780;
+    public static final double SLOW_MULTIPLIER = 0.65;
+    public static final double SUPER_SLOW_MULTIPLIER = 0.35;
     static final int FAST = 0;
     static final int SLOW = 1;
     static final int SUPER_SLOW = 2;
+
     private int slowMode = SLOW;
     private int previousSlowMode = SLOW;
 
@@ -57,8 +57,6 @@ public class MM_Drivetrain {
     private int backPriorEncoderTarget = 0;
 
     private double priorAngle = 0;
-    private static final double SECONDS_PER_DEGREE = 0.025;//??
-
 
     public MM_Drivetrain(MM_OpMode opMode) {
         this.opMode = opMode;
@@ -81,8 +79,17 @@ public class MM_Drivetrain {
         opMode.pRightDriveController.setInputRange(rightPriorEncoderTarget, rightTargetTicks);
         opMode.pLeftDriveController.setSetpoint(leftTargetTicks);
         opMode.pRightDriveController.setSetpoint(rightTargetTicks);
-        rightPriorEncoderTarget = rightTargetTicks;
         leftPriorEncoderTarget = leftTargetTicks;
+        rightPriorEncoderTarget = rightTargetTicks;
+    }
+
+    public boolean reachedPosition() { //this also sets the motor power
+        setStraightPower();
+        if (opMode.pLeftDriveController.reachedTarget() || opMode.pRightDriveController.reachedTarget()) {
+            stop();
+            return true;
+        }
+        return false;
     }
 
     private void setStraightPower() {
@@ -92,23 +99,9 @@ public class MM_Drivetrain {
         leftDrivePower = opMode.pLeftDriveController.calculatePower(leftCurrentTicks);
         rightDrivePower = opMode.pRightDriveController.calculatePower(rightCurrentTicks);
 
-        flPower = leftDrivePower;
-        frPower = rightDrivePower;
-        blPower = leftDrivePower;
-        brPower = rightDrivePower;
-
-        angleStraighten(leftDrivePower, rightDrivePower);
+        angleStraighten();
         normalize();
         setMotorPower(flPower, frPower, blPower, brPower);
-    }
-
-    public boolean reachedPosition() {
-        setStraightPower();
-        if (opMode.pLeftDriveController.reachedTarget() || opMode.pRightDriveController.reachedTarget()) {
-            stop();
-            return true;
-        }
-        return false;
     }
 
     public void driveWithSticks() {
@@ -126,38 +119,6 @@ public class MM_Drivetrain {
         setMotorPower(flPower, frPower, blPower, brPower);
 
         opMode.telemetry.addData("first heading", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
-
-    }
-
-    private void init() {
-        frontLeftDrive = opMode.hardwareMap.get(DcMotor.class, "FLMotor");
-        frontRightDrive = opMode.hardwareMap.get(DcMotor.class, "FRMotor");
-        backLeftDrive = opMode.hardwareMap.get(DcMotor.class, "BLMotor");
-        backRightDrive = opMode.hardwareMap.get(DcMotor.class, "BRMotor");
-
-        frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        initOdomServos();
-
-        leftEncoder = opMode.hardwareMap.get(DcMotorEx.class,"BRMotor"); // port 3
-        rightEncoder = opMode.hardwareMap.get(DcMotorEx.class, "FLMotor"); // port 0
-        backEncoder = opMode.hardwareMap.get(DcMotorEx.class, "BLMotor"); // port 2
-
-        switchEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        switchEncoderMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-
-        imu = opMode.hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
-
-
     }
 
     private void switchEncoderMode(DcMotor.RunMode runMode) {
@@ -198,10 +159,12 @@ public class MM_Drivetrain {
             brPower = brPower/max;
         }
     }
+
     private void handleSlowMode() {
         if (opMode.aPressed(opMode.GAMEPAD1) || opMode.rightBumperPressed(opMode.GAMEPAD1)){
             if (slowMode == FAST) {
                 slowMode = SLOW;
+
             } else if(slowMode == SLOW) {
                 slowMode = FAST;
             }else{ // must have been super-slow
@@ -216,30 +179,20 @@ public class MM_Drivetrain {
                 slowMode = SUPER_SLOW;
             }
         }
-        if (slowMode == SLOW) {
-            flPower = flPower * 0.65;
-            frPower = frPower * 0.65;
-            blPower = blPower * 0.65;
-            brPower = brPower * 0.65;
-        } else if (slowMode == SUPER_SLOW) {
-            flPower = flPower * 0.35;
-            frPower = frPower * 0.35;
-            blPower = blPower * 0.35;
-            brPower = brPower * 0.35;
-        }
-        opMode.telemetry.addData("Slowmode level", slowMode);
-    }
-    private void initOdomServos(){
-        if(opMode.getClass() == MM_TeleOp.class){
-            leftOdomLift = opMode.hardwareMap.get(Servo.class,"leftOdometryLift");
-            rightOdomLift = opMode.hardwareMap.get(Servo.class,"rightOdometryLift");
-            backOdomLift = opMode.hardwareMap.get(Servo.class,"backOdometryLift");
 
-//            positions will need to be changed after testing
-            leftOdomLift.setPosition(1);
-            rightOdomLift.setPosition(0);
-            backOdomLift.setPosition(1);
+        double speedFactor = 1;
+        if (slowMode == SLOW) {
+            speedFactor = SLOW_MULTIPLIER;
+        } else if (slowMode == SUPER_SLOW) {
+            speedFactor = SUPER_SLOW_MULTIPLIER;
         }
+
+        flPower *= speedFactor;
+        frPower *= speedFactor;
+        blPower *= speedFactor;
+        brPower *= speedFactor;
+
+        opMode.telemetry.addData("Slowmode level", slowMode);
     }
 
     public void rotateToAngle(double targetAngle){
@@ -277,15 +230,13 @@ public class MM_Drivetrain {
         backPriorEncoderTarget = backPriorEncoderTarget - backStartingTicks + backEncoder.getCurrentPosition();
     }
 
-    private void angleStraighten(double leftCalculatedPower, double rightCalculatedPower) {
+    private void angleStraighten() {
         double headingError = correctedAngle(priorAngle - imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
 
-        if (headingError != 0) {
-            flPower = flPower - (headingError * STRAIGHTEN_P * Math.abs(leftCalculatedPower));
-            frPower = frPower + (headingError * STRAIGHTEN_P * Math.abs(rightCalculatedPower));
-            blPower = blPower - (headingError * STRAIGHTEN_P * Math.abs(leftCalculatedPower));
-            brPower = brPower + (headingError * STRAIGHTEN_P * Math.abs(rightCalculatedPower));
-        }
+        flPower = leftDrivePower - (headingError * STRAIGHTEN_P * Math.abs(leftDrivePower));
+        frPower = rightDrivePower + (headingError * STRAIGHTEN_P * Math.abs(rightDrivePower));
+        blPower = leftDrivePower - (headingError * STRAIGHTEN_P * Math.abs(leftDrivePower));
+        brPower = rightDrivePower + (headingError * STRAIGHTEN_P * Math.abs(rightDrivePower));
     }
 
     private double correctedAngle(double angle) {
@@ -295,5 +246,46 @@ public class MM_Drivetrain {
             angle += 360;
         }
         return angle;
+    }
+
+    private void init() {
+        frontLeftDrive = opMode.hardwareMap.get(DcMotor.class, "FLMotor");
+        frontRightDrive = opMode.hardwareMap.get(DcMotor.class, "FRMotor");
+        backLeftDrive = opMode.hardwareMap.get(DcMotor.class, "BLMotor");
+        backRightDrive = opMode.hardwareMap.get(DcMotor.class, "BRMotor");
+
+        frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        initOdomServos();
+
+        leftEncoder = opMode.hardwareMap.get(DcMotorEx.class,"BRMotor"); // port 3
+        rightEncoder = opMode.hardwareMap.get(DcMotorEx.class, "FLMotor"); // port 0
+        backEncoder = opMode.hardwareMap.get(DcMotorEx.class, "BLMotor"); // port 2
+
+        switchEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        switchEncoderMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+
+        imu = opMode.hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+    }
+
+    private void initOdomServos(){
+        if(opMode.getClass() == MM_TeleOp.class){
+            leftOdomLift = opMode.hardwareMap.get(Servo.class,"leftOdometryLift");
+            rightOdomLift = opMode.hardwareMap.get(Servo.class,"rightOdometryLift");
+            backOdomLift = opMode.hardwareMap.get(Servo.class,"backOdometryLift");
+
+            leftOdomLift.setPosition(1);
+            rightOdomLift.setPosition(0);
+            backOdomLift.setPosition(1);
+        }
     }
 }
