@@ -3,8 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 public class MM_P_Controller {
-    // this gives us access to all opMode information
-    private LinearOpMode opMode;
+    private final LinearOpMode opMode;
 
     private double setpoint = 0;
     private double minInput = 0;
@@ -22,10 +21,10 @@ public class MM_P_Controller {
     public MM_P_Controller(LinearOpMode opMode, double pctThreshold, double pCoefficient){
         this.opMode = opMode;
 
-        //defining the state of this instance
         PCT_THRESHOLD = pctThreshold;
         P_COEFFICIENT = pCoefficient;
     }
+
     public double calculatePower(double currentInput){
         this.currentInput = currentInput;
         currentError = setpoint - currentInput;
@@ -45,11 +44,9 @@ public class MM_P_Controller {
         opMode.telemetry.addData("calculated power", power);
         return power;
     }
+
     public boolean reachedTarget(){
-        if ((Math.abs(currentError / inputRange) * 100) < PCT_THRESHOLD){
-            return true;
-        }
-        return false;
+        return (Math.abs(currentError / inputRange) * 100) < PCT_THRESHOLD;
     }
 
     public void setSetpoint(double setpoint) {
