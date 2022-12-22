@@ -39,7 +39,7 @@ public class MM_Auto_Left extends MM_OpMode {
 
         waitForStart();
 
-        robot.collector.changePosition(robot.collector.CLOSED);
+        robot.collector.changePosition(MM_Collector.CLOSED);
         sleep(1000);
         robot.runSlideToPosition(LOW);
         int maxColor = detector.getMaxColor();
@@ -62,7 +62,7 @@ public class MM_Auto_Left extends MM_OpMode {
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
-            robot.collector.changePosition(robot.collector.OPEN);
+            robot.collector.changePosition(MM_Collector.OPEN);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
@@ -83,7 +83,7 @@ public class MM_Auto_Left extends MM_OpMode {
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
-            robot.collector.changePosition(robot.collector.OPEN);
+            robot.collector.changePosition(MM_Collector.OPEN);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
@@ -99,7 +99,7 @@ public class MM_Auto_Left extends MM_OpMode {
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
-            robot.collector.changePosition(robot.collector.OPEN);
+            robot.collector.changePosition(MM_Collector.OPEN);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }

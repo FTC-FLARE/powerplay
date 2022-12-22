@@ -3,34 +3,37 @@ package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class MM_Turner{
+    private final MM_OpMode opMode;
     private Servo turner = null;
-
-    private MM_OpMode opMode;
-    private MM_Slide slide;
 
     final double FRONT = 0.885;
     final double BACK = 0;
 
+    private double position = FRONT;
+
     public MM_Turner(MM_OpMode opMode, MM_Slide slide) {
         this.opMode = opMode;
-        this.slide = slide;
-        init();
-    }
-
-    private void init() {
         turner = opMode.hardwareMap.get(Servo.class, "Turner");
-        turner.setPosition(FRONT);
+        changePosition(FRONT);
     }
 
-    public void runTurner() {
-        if (!slide.tooLowToPivot()) {
+    public void runTurner(boolean tooLowtoPivot) {
+        if (!tooLowtoPivot) {
             if (opMode.dpadLeftPressed(opMode.GAMEPAD2)) {
-                turner.setPosition(BACK);
+                changePosition(BACK);
             } else if (opMode.dpadRightPressed(opMode.GAMEPAD2)) {
-                turner.setPosition(FRONT);
+                changePosition(FRONT);
             }
         }
-
         opMode.telemetry.addData("Turner Position", turner.getPosition());
+    }
+
+    public void changePosition(double position) {
+        turner.setPosition(position);
+        this.position = position;
+    }
+
+    public double getPosition() {
+        return position;
     }
 }

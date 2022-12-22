@@ -6,8 +6,8 @@ public class MM_Collector {
     private final MM_OpMode opMode;
     private Servo grabber = null;
 
-    public final double CLOSED = 0.07; //0.185 - 0.09
-    public final double OPEN = 1.0;
+    public static final double CLOSED = 0.07; //0.185 - 0.09
+    public static final double OPEN = 1.0;
 
     private double position = OPEN;
 
@@ -19,7 +19,7 @@ public class MM_Collector {
 
     public void runCollector() {
         if (opMode.rightBumperPressed(opMode.GAMEPAD2)) {
-            if (position == OPEN) {
+            if (getPosition() == OPEN) {
                 changePosition(CLOSED);
             } else {
                 changePosition(OPEN);
@@ -31,5 +31,9 @@ public class MM_Collector {
     public void changePosition(double position){
         grabber.setPosition(position);
         this.position = position;
+    }
+
+    public double getPosition() {
+        return position;
     }
 }

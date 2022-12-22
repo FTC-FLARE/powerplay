@@ -74,7 +74,7 @@ public class MM_Slide {
         opMode.telemetry.addData("Slide", "Current: %d  Target: %d", slideCurrent, slideTarget);
         opMode.telemetry.addData("Top Stop", isTriggered(topStop));
         opMode.telemetry.addData("Stack Level (+1)", stackLevel + 1);
-        turner.runTurner();
+        turner.runTurner(tooLowToPivot());
     }
 
     public void positionRun() {
