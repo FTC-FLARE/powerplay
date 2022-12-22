@@ -2,11 +2,9 @@ package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 
 import com.qualcomm.robotcore.hardware.Servo;
 
-
 public class MM_Collector {
+    private final MM_OpMode opMode;
     private Servo grabber = null;
-
-    private MM_OpMode opMode;
 
     public final double CLOSED = 0.07; //0.185 - 0.09
     public final double OPEN = 1.0;
@@ -15,34 +13,23 @@ public class MM_Collector {
 
     public MM_Collector(MM_OpMode opMode) {
         this.opMode = opMode;
-        init();
-    }
-
-    private void init() {
         grabber = opMode.hardwareMap.get(Servo.class, "Grabber");
-        grabber.setPosition(OPEN);
+        changePosition(OPEN);
     }
 
     public void runCollector() {
-/*        if (opMode.rightBumperPressed(opMode.GAMEPAD2)) {
-            grabber.setPosition(CLOSED);
-        } else if (opMode.leftBumperPressed(opMode.GAMEPAD2)) {
-            grabber.setPosition(OPEN);
-        }*/
-
         if (opMode.rightBumperPressed(opMode.GAMEPAD2)) {
             if (position == OPEN) {
-                grabber.setPosition(CLOSED);
-                position = CLOSED;
+                changePosition(CLOSED);
             } else {
-                grabber.setPosition(OPEN);
-                position = OPEN;
+                changePosition(OPEN);
             }
         }
-
         opMode.telemetry.addData("Collector Position", grabber.getPosition());
     }
-    public void autoRunCollector(double position){
+
+    public void changePosition(double position){
         grabber.setPosition(position);
+        this.position = position;
     }
 }
