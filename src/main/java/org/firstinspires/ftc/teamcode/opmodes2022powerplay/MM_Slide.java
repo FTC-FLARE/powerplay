@@ -5,12 +5,11 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 public class MM_Slide {
+    private MM_OpMode opMode;
     private MM_Turner turner;
     private DcMotor slide = null;
     private DigitalChannel topStop;
     private DigitalChannel bottomStop;
-
-    private MM_OpMode opMode;
 
     private final double SLIDE_POWER = 0.6;
 
@@ -21,7 +20,7 @@ public class MM_Slide {
     private boolean headedUp = true;
 //    private boolean isHandled = false;
 
-        //not accurate
+    //not accurate
     public enum slidePosition {
         COLLECT(0),
         STACK(145),
@@ -46,24 +45,37 @@ public class MM_Slide {
         init();
     }
 
-    public void manualRun() {
-        if (isTriggered(bottomStop) && opMode.gamepad2.right_trigger <= .1 && slide.getCurrentPosition() > slideTarget) {  // disengage motor
+    public void control() {
+        if (isTriggered(bottomStop) && !(opMode.gamepad2.right_trigger > .1) && slide.getCurrentPosition() > slideTarget) {  // disengage motor
             slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             slideTarget = 0;
-//            isHandled = true;
         } else if (opMode.gamepad2.right_trigger > 0.1 && !isTriggered(topStop)) {
             slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             slide.setPower(SLIDE_POWER);
             slideTarget = slide.getCurrentPosition();
             stackLevel = 0;
-//            isHandled = false;
         } else if (opMode.gamepad2.left_trigger > 0.1 && !isTriggered(bottomStop)) {
             slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             slide.setPower(-SLIDE_POWER);
             slideTarget = slide.getCurrentPosition();
             stackLevel = 0;
-//            isHandled = false;
+        } else if (opMode.xPressed(opMode.GAMEPAD2)) {
+            setSlideTargetAndStart(opMode.COLLECT);
+        } else if (opMode.rightJoystickPressed(opMode.GAMEPAD2)) {
+            setSlideTargetAndStart(opMode.GROUND);
+        } else if (opMode.aPressed(opMode.GAMEPAD2)) {
+            setSlideTargetAndStart(opMode.LOW);
+        } else if (opMode.bPressed(opMode.GAMEPAD2)) {
+            setSlideTargetAndStart(opMode.MEDIUM);
+        } else if (opMode.yPressed(opMode.GAMEPAD2)) {
+            setSlideTargetAndStart(opMode.HIGH);
+        } else if (opMode.dpadDownPressed(opMode.GAMEPAD2)) {
+            stackLevel -= 1;
+            setSlideTargetAndStart(opMode.STACK);
+        } else if (opMode.dpadUpPressed(opMode.GAMEPAD2)) {
+            stackLevel += 1;
+            setSlideTargetAndStart(opMode.STACK);
         } else {  // hold current target
             slide.setTargetPosition(slideTarget); // replace these 3 lines w/ call to setSlideTargetAndStart()
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -80,26 +92,6 @@ public class MM_Slide {
     public void runSlideToPosition(int level) {
         startMoving(level);
         while (opMode.opModeIsActive() && !reachedPosition()) {
-        }
-    }
-
-    public void positionRun() {
-        if (opMode.xPressed(opMode.GAMEPAD2)) {
-             setSlideTargetAndStart(opMode.COLLECT);
-        } else if (opMode.rightJoystickPressed(opMode.GAMEPAD2)) {
-            setSlideTargetAndStart(opMode.GROUND);
-        } else if (opMode.aPressed(opMode.GAMEPAD2)) {
-            setSlideTargetAndStart(opMode.LOW);
-        } else if (opMode.bPressed(opMode.GAMEPAD2)) {
-            setSlideTargetAndStart(opMode.MEDIUM);
-        } else if (opMode.yPressed(opMode.GAMEPAD2)) {
-            setSlideTargetAndStart(opMode.HIGH);
-        } else if (opMode.dpadDownPressed(opMode.GAMEPAD2)) {
-            stackLevel -= 1;
-            setSlideTargetAndStart(opMode.STACK);
-        } else if (opMode.dpadUpPressed(opMode.GAMEPAD2)) {
-            stackLevel += 1;
-            setSlideTargetAndStart(opMode.STACK);
         }
     }
 
@@ -201,4 +193,3 @@ public class MM_Slide {
         bottomStop.setMode(DigitalChannel.Mode.INPUT);
     }
 }
-

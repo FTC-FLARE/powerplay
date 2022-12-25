@@ -19,8 +19,7 @@ public class MM_TeleOp extends MM_OpMode {
         while (opModeIsActive()) {
             updateController();
             robot.drivetrain.driveWithSticks();
-            robot.slide.manualRun();
-            robot.slide.positionRun();
+            robot.slide.control();
             robot.collector.runCollector();
             telemetry.update();
         }
@@ -34,5 +33,4 @@ public class MM_TeleOp extends MM_OpMode {
             gamepad2Current.copy(gamepad2);
         } catch(RobotCoreException e){}
     }
-
 }
