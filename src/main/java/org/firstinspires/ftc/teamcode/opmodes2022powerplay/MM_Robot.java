@@ -45,7 +45,7 @@ public class MM_Robot {
     }
 
     public void runSlideandDrive(int level, double inches, double timeoutTime) {
-        slide.startMoving(level);
+        slide.setSlideTargetAndStart(level);
         drivetrain.prepareToDrive(inches);
         boolean driveDone = false;
         boolean slideDone = false;

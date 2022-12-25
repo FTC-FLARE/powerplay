@@ -17,8 +17,6 @@ public class MM_Slide {
     private int slideTarget = 0;
     public int slideLevelTarget = 0;
     private int stackLevel = 0;
-    private boolean headedUp = true;
-//    private boolean isHandled = false;
 
     //not accurate
     public enum slidePosition {
@@ -47,9 +45,7 @@ public class MM_Slide {
 
     public void control() {
         if (isTriggered(bottomStop) && !(opMode.gamepad2.right_trigger > .1) && slide.getCurrentPosition() > slideTarget) {  // disengage motor
-            slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            slideTarget = 0;
+            stop();
         } else if (opMode.gamepad2.right_trigger > 0.1 && !isTriggered(topStop)) {
             slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             slide.setPower(SLIDE_POWER);
@@ -90,12 +86,12 @@ public class MM_Slide {
     }
 
     public void runSlideToPosition(int level) {
-        startMoving(level);
+        setSlideTargetAndStart(level);
         while (opMode.opModeIsActive() && !reachedPosition()) {
         }
     }
 
-    private void setSlideTargetAndStart(int slideLevelTarget) { //change parameter to ticks
+    public void setSlideTargetAndStart(int slideLevelTarget) { //change parameter to ticks
         slideTarget = getTicksForLevel(slideLevelTarget);
         this.slideLevelTarget = slideLevelTarget;
         slide.setTargetPosition(slideTarget);
@@ -103,15 +99,10 @@ public class MM_Slide {
         slide.setPower(SLIDE_POWER);
     }
 
-    public void startMoving(int slideLevelTarget) { // dont' need this?
-        setSlideTargetAndStart(slideLevelTarget);
-        if (slide.getCurrentPosition() < slideTarget) {
-            headedUp = true;
-        }
-    }
-
     private void stop() {
-        slide.setPower(0);
+        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slideTarget = 0;
     }
 
     private int getTicksForLevel(int slideLevelTarget) {
@@ -155,26 +146,24 @@ public class MM_Slide {
     public boolean reachedPosition() {
         if (!slide.isBusy()) {
             return true;
-        } else if (!headedUp && isTriggered(bottomStop)) {
+        } else if (isTriggered(bottomStop) && !isHeadedUp()) {
             stop();
             return true;
         }
         return false;
     }
 
-    private boolean isTriggered(DigitalChannel limitSwitch) {  // this can be improved
-        if (limitSwitch.getState() == true) {
-            return false;
-        }
-        return true;
+    private boolean isHeadedUp(){
+        return slideTarget > slide.getCurrentPosition();
+    }
+
+    private boolean isTriggered(DigitalChannel limitSwitch) {
+        return !limitSwitch.getState();
     }
 
     //the slide is too far down to flip the pivot/turner
-    public boolean tooLowToPivot() {  // if no additional logic is added, this can be improved
-        if (slide.getCurrentPosition() < slidePosition.PIVOT_POSITION.ticks) {  // was 1400
-            return true;
-        }
-        return false;
+    public boolean tooLowToPivot() {
+        return slide.getCurrentPosition() < slidePosition.PIVOT_POSITION.ticks;
     }
 
     private void init() {
