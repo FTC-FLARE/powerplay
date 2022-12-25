@@ -19,7 +19,7 @@ public class MM_TeleOp extends MM_OpMode {
         while (opModeIsActive()) {
             updateController();
             robot.drivetrain.driveWithSticks();
-            robot.slide.control();
+            robot.slide.driverControl();
             robot.collector.runCollector();
             telemetry.update();
         }
