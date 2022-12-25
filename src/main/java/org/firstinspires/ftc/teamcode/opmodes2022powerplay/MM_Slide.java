@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.util.Range;
 
 public class MM_Slide {
     private MM_OpMode opMode;
@@ -19,7 +20,7 @@ public class MM_Slide {
     private int stackLevel = 0;
 
     //not accurate
-    public enum slidePosition {
+    public enum SlidePosition {
         COLLECT(0),
         STACK(145),
         GROUND(400),
@@ -33,7 +34,7 @@ public class MM_Slide {
 
         public final int ticks;
 
-        slidePosition(int ticks) {
+        SlidePosition(int ticks) {
             this.ticks = ticks;
         }
     }
@@ -57,21 +58,21 @@ public class MM_Slide {
             slideTarget = slide.getCurrentPosition();
             stackLevel = 0;
         } else if (opMode.xPressed(opMode.GAMEPAD2)) {
-            setSlideTargetAndStart(opMode.COLLECT);
+            setInMotion(opMode.COLLECT);
         } else if (opMode.rightJoystickPressed(opMode.GAMEPAD2)) {
-            setSlideTargetAndStart(opMode.GROUND);
+            setInMotion(opMode.GROUND);
         } else if (opMode.aPressed(opMode.GAMEPAD2)) {
-            setSlideTargetAndStart(opMode.LOW);
+            setInMotion(opMode.LOW);
         } else if (opMode.bPressed(opMode.GAMEPAD2)) {
-            setSlideTargetAndStart(opMode.MEDIUM);
+            setInMotion(opMode.MEDIUM);
         } else if (opMode.yPressed(opMode.GAMEPAD2)) {
-            setSlideTargetAndStart(opMode.HIGH);
+            setInMotion(opMode.HIGH);
         } else if (opMode.dpadDownPressed(opMode.GAMEPAD2)) {
             stackLevel -= 1;
-            setSlideTargetAndStart(opMode.STACK);
+            setInMotion(opMode.STACK);
         } else if (opMode.dpadUpPressed(opMode.GAMEPAD2)) {
             stackLevel += 1;
-            setSlideTargetAndStart(opMode.STACK);
+            setInMotion(opMode.STACK);
         } else {  // hold current target
             slide.setTargetPosition(slideTarget); // replace these 3 lines w/ call to setSlideTargetAndStart()
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -85,15 +86,23 @@ public class MM_Slide {
         turner.runTurner(tooLowToPivot());
     }
 
-    public void runSlideToPosition(int level) {
-        setSlideTargetAndStart(level);
+    public void waitToReachPosition(int level) {
+        setInMotion(level);
         while (opMode.opModeIsActive() && !reachedPosition()) {
         }
     }
 
-    public void setSlideTargetAndStart(int slideLevelTarget) { //change parameter to ticks
+    public void setInMotion(int slideLevelTarget) { //change parameter to ticks
         slideTarget = getTicksForLevel(slideLevelTarget);
         this.slideLevelTarget = slideLevelTarget;
+
+        if (slideTarget == SlidePosition.STACK.ticks ) {
+            stackLevel = Range.clip(stackLevel, 0, 5);
+            slideTarget = SlidePosition.STACK.ticks * (stackLevel - 1);
+        } else {
+            stackLevel = 0;
+        }
+
         slide.setTargetPosition(slideTarget);
         slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slide.setPower(SLIDE_POWER);
@@ -111,31 +120,31 @@ public class MM_Slide {
                 stackLevel = 0;
                 return slideTarget;
             }
-            return slidePosition.COLLECT.ticks + (slidePosition.STACK.ticks * (stackLevel - 1));
+            return SlidePosition.COLLECT.ticks + (SlidePosition.STACK.ticks * (stackLevel - 1));
         } else if (slideLevelTarget == opMode.GROUND) {
             stackLevel = 0;
-            return slidePosition.GROUND.ticks;
+            return SlidePosition.GROUND.ticks;
         } else if (slideLevelTarget == opMode.LOW) {
             stackLevel = 0;
-            return slidePosition.LOW.ticks;
+            return SlidePosition.LOW.ticks;
         } else if (slideLevelTarget == opMode.LOW_RELEASE) {
             stackLevel = 0;
-            return slidePosition.LOW_RELEASE.ticks;
+            return SlidePosition.LOW_RELEASE.ticks;
         } else if (slideLevelTarget == opMode.MEDIUM) {
             stackLevel = 0;
-            return slidePosition.MEDIUM.ticks;
+            return SlidePosition.MEDIUM.ticks;
         } else if (slideLevelTarget == opMode.MEDIUM_RELEASE) {
             stackLevel = 0;
-            return slidePosition.MEDIUM_RELEASE.ticks;
+            return SlidePosition.MEDIUM_RELEASE.ticks;
         } else if (slideLevelTarget == opMode.HIGH) {
             stackLevel = 0;
-            return slidePosition.HIGH.ticks;
+            return SlidePosition.HIGH.ticks;
         } else if (slideLevelTarget == opMode.HIGH_RELEASE) {
             stackLevel = 0;
-            return slidePosition.HIGH_RELEASE.ticks;
+            return SlidePosition.HIGH_RELEASE.ticks;
         } else {
             stackLevel = 0;
-            return slidePosition.COLLECT.ticks;
+            return SlidePosition.COLLECT.ticks;
         }
     }
 
@@ -163,7 +172,7 @@ public class MM_Slide {
 
     //the slide is too far down to flip the pivot/turner
     public boolean tooLowToPivot() {
-        return slide.getCurrentPosition() < slidePosition.PIVOT_POSITION.ticks;
+        return slide.getCurrentPosition() < SlidePosition.PIVOT_POSITION.ticks;
     }
 
     private void init() {

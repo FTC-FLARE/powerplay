@@ -40,12 +40,12 @@ public class MM_Robot {
             drivetrain.driveInches(42);
             drivetrain.driveInches(-8);
         }
-        slide.runSlideToPosition(opMode.COLLECT);
+        slide.waitToReachPosition(opMode.COLLECT);
         opMode.telemetry.update();
     }
 
     public void runSlideandDrive(int level, double inches, double timeoutTime) {
-        slide.setSlideTargetAndStart(level);
+        slide.setInMotion(level);
         drivetrain.prepareToDrive(inches);
         boolean driveDone = false;
         boolean slideDone = false;
