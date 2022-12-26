@@ -103,6 +103,8 @@ public class MM_Slide {
         moveTowardTarget(slidePosition);
 
         while (opMode.opModeIsActive() && !reachedPosition()) {
+            opMode.telemetry.addData("Waiting for Slide", "Current: %d  Target: %d", slide.getCurrentPosition(), getSlideTarget());
+            opMode.telemetry.update();
         }
     }
 
@@ -122,7 +124,12 @@ public class MM_Slide {
     }
 
     private boolean inDangerZone() {
-        return isTriggered(bottomStop) && getSlideTarget() < slide.getCurrentPosition();
+        if (isTriggered(bottomStop) && getSlideTarget() < slide.getCurrentPosition()){
+            reset();
+            return true;
+        }
+
+        return false;
     }
 
     private boolean isTriggered(DigitalChannel limitSwitch) {
@@ -148,16 +155,20 @@ public class MM_Slide {
         slide = opMode.hardwareMap.get(DcMotor.class, "Slide");
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide.setDirection(DcMotorSimple.Direction.REVERSE);
-        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slide.setTargetPosition(0);
-        slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        slide.setPower(SLIDE_POWER);
+        reset();
 
         topStop = opMode.hardwareMap.get(DigitalChannel.class, "topStop");
         bottomStop = opMode.hardwareMap.get(DigitalChannel.class, "bottomStop");
 
         topStop.setMode(DigitalChannel.Mode.INPUT);  // are these 2 lines needed?
         bottomStop.setMode(DigitalChannel.Mode.INPUT);
+    }
+
+    private void reset() {
+        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide.setTargetPosition(0);
+        slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slide.setPower(SLIDE_POWER);
     }
 }
