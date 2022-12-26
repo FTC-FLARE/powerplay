@@ -42,7 +42,6 @@ public class MM_Auto extends MM_OpMode {
         telemetry.update();
 
         robot.sleevePark(detector.getMaxColor());
-
     }
 
     private void initCamera() {
