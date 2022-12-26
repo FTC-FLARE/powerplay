@@ -45,9 +45,8 @@ public class MM_Robot {
     }
 
     public void runSlideandDrive(MM_Slide.SlidePosition slidePosition, double inches, double timeoutTime) {
-        slide.setSlideTarget(slidePosition.ticks);
-        slide.startMoving();
         drivetrain.prepareToDrive(inches);
+        slide.moveTowardTarget(slidePosition);
         boolean driveDone = false;
         boolean slideDone = false;
         runtime.reset();
