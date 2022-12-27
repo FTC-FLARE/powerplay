@@ -3,26 +3,23 @@ package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.util.Range;
 
 public class MM_Slide {
+    private final MM_OpMode opMode;
     private MM_Turner turner;
     private DcMotor slide = null;
     private DigitalChannel topStop;
     private DigitalChannel bottomStop;
 
-    private MM_OpMode opMode;
+    private final static double SLIDE_POWER = 0.6;
+    private final static int MANUAL_INCREMENT = 150;
 
-    private final double SLIDE_POWER = 0.6;
-
-    private int slideCurrent = 0;
     private int slideTarget = 0;
-    public int slideLevelTarget = 0;
-    private int stackLevel = 0;
-    private boolean headedUp = true;
-//    private boolean isHandled = false;
+    private int stackLevel = 1;
 
-        //not accurate
-    public enum slidePosition {
+    public enum SlidePosition {
+        UNUSED(0),
         COLLECT(0),
         STACK(145),
         GROUND(400),
@@ -36,7 +33,7 @@ public class MM_Slide {
 
         public final int ticks;
 
-        slidePosition(int ticks) {
+        SlidePosition(int ticks) {
             this.ticks = ticks;
         }
     }
@@ -46,143 +43,103 @@ public class MM_Slide {
         init();
     }
 
-    public void manualRun() {
-        if (isTriggered(bottomStop) && opMode.gamepad2.right_trigger <= .1 && slide.getCurrentPosition() > slideTarget) {  // disengage motor
-            slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            slideTarget = 0;
-//            isHandled = true;
-        } else if (opMode.gamepad2.right_trigger > 0.1 && !isTriggered(topStop)) {
-            slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            slide.setPower(SLIDE_POWER);
-            slideTarget = slide.getCurrentPosition();
-            stackLevel = 0;
-//            isHandled = false;
+    public void driverControl() {
+        if (opMode.gamepad2.right_trigger > 0.1 && !isTriggered(topStop)) {
+            setSlideTarget(slide.getCurrentPosition() + MANUAL_INCREMENT);
+            stackLevel = 1;
         } else if (opMode.gamepad2.left_trigger > 0.1 && !isTriggered(bottomStop)) {
-            slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            slide.setPower(-SLIDE_POWER);
-            slideTarget = slide.getCurrentPosition();
-            stackLevel = 0;
-//            isHandled = false;
-        } else {  // hold current target
-            slide.setTargetPosition(slideTarget); // replace these 3 lines w/ call to setSlideTargetAndStart()
-            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            slide.setPower(SLIDE_POWER);
+            setSlideTarget(slide.getCurrentPosition() - MANUAL_INCREMENT);
+            stackLevel = 1;
+        } else {
+            checkSelectHeight();
         }
 
-        slideCurrent = slide.getCurrentPosition();
-        opMode.telemetry.addData("Slide", "Current: %d  Target: %d", slideCurrent, slideTarget);
+        if (inDangerZone() || getSlideTarget() < 0) {
+            setSlideTarget(0);
+        }
+
+        slide.setTargetPosition(getSlideTarget());
+
+        opMode.telemetry.addData("Slide", "Current: %d  Target: %d", slide.getCurrentPosition(), getSlideTarget());
         opMode.telemetry.addData("Top Stop", isTriggered(topStop));
-        opMode.telemetry.addData("Stack Level (+1)", stackLevel + 1);
+        opMode.telemetry.addData("Bottom Stop", isTriggered(bottomStop));
+        opMode.telemetry.addData("Stack Level", stackLevel);
         turner.runTurner(tooLowToPivot());
     }
 
-    public void runSlideToPosition(int level) {
-        startMoving(level);
+    public void waitToReachPosition(SlidePosition slidePosition) {
+        moveTowardTarget(slidePosition);
+
         while (opMode.opModeIsActive() && !reachedPosition()) {
+            opMode.telemetry.addData("Waiting for Slide", "Current: %d  Target: %d", slide.getCurrentPosition(), getSlideTarget());
+            opMode.telemetry.update();
         }
     }
 
-    public void positionRun() {
-        if (opMode.xPressed(opMode.GAMEPAD2)) {
-             setSlideTargetAndStart(opMode.COLLECT);
-        } else if (opMode.rightJoystickPressed(opMode.GAMEPAD2)) {
-            setSlideTargetAndStart(opMode.GROUND);
-        } else if (opMode.aPressed(opMode.GAMEPAD2)) {
-            setSlideTargetAndStart(opMode.LOW);
-        } else if (opMode.bPressed(opMode.GAMEPAD2)) {
-            setSlideTargetAndStart(opMode.MEDIUM);
-        } else if (opMode.yPressed(opMode.GAMEPAD2)) {
-            setSlideTargetAndStart(opMode.HIGH);
+    private void checkSelectHeight() {
+        if (opMode.dpadUpPressed(opMode.GAMEPAD2)) {
+            changeStack(1);
         } else if (opMode.dpadDownPressed(opMode.GAMEPAD2)) {
-            stackLevel -= 1;
-            setSlideTargetAndStart(opMode.STACK);
-        } else if (opMode.dpadUpPressed(opMode.GAMEPAD2)) {
-            stackLevel += 1;
-            setSlideTargetAndStart(opMode.STACK);
-        }
-    }
-
-    private void setSlideTargetAndStart(int slideLevelTarget) { //change parameter to ticks
-        slideTarget = getTicksForLevel(slideLevelTarget);
-        this.slideLevelTarget = slideLevelTarget;
-        slide.setTargetPosition(slideTarget);
-        slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        slide.setPower(SLIDE_POWER);
-    }
-
-    public void startMoving(int slideLevelTarget) { // dont' need this?
-        setSlideTargetAndStart(slideLevelTarget);
-        if (slide.getCurrentPosition() < slideTarget) {
-            headedUp = true;
-        }
-    }
-
-    private void stop() {
-        slide.setPower(0);
-    }
-
-    private int getTicksForLevel(int slideLevelTarget) {
-        if (slideLevelTarget == opMode.STACK) {
-            if (stackLevel < 1) {
-                stackLevel = 0;
-                return slideTarget;
-            }
-            return slidePosition.COLLECT.ticks + (slidePosition.STACK.ticks * (stackLevel - 1));
-        } else if (slideLevelTarget == opMode.GROUND) {
-            stackLevel = 0;
-            return slidePosition.GROUND.ticks;
-        } else if (slideLevelTarget == opMode.LOW) {
-            stackLevel = 0;
-            return slidePosition.LOW.ticks;
-        } else if (slideLevelTarget == opMode.LOW_RELEASE) {
-            stackLevel = 0;
-            return slidePosition.LOW_RELEASE.ticks;
-        } else if (slideLevelTarget == opMode.MEDIUM) {
-            stackLevel = 0;
-            return slidePosition.MEDIUM.ticks;
-        } else if (slideLevelTarget == opMode.MEDIUM_RELEASE) {
-            stackLevel = 0;
-            return slidePosition.MEDIUM_RELEASE.ticks;
-        } else if (slideLevelTarget == opMode.HIGH) {
-            stackLevel = 0;
-            return slidePosition.HIGH.ticks;
-        } else if (slideLevelTarget == opMode.HIGH_RELEASE) {
-            stackLevel = 0;
-            return slidePosition.HIGH_RELEASE.ticks;
+            changeStack(-1);
         } else {
-            stackLevel = 0;
-            return slidePosition.COLLECT.ticks;
+            SlidePosition selectedPosition = SlidePosition.UNUSED;
+            if (opMode.xPressed(opMode.GAMEPAD2)) {
+                selectedPosition = SlidePosition.COLLECT;
+            } else if (opMode.rightJoystickPressed(opMode.GAMEPAD2)) {
+                selectedPosition = SlidePosition.GROUND;
+            } else if (opMode.aPressed(opMode.GAMEPAD2)) {
+                selectedPosition = SlidePosition.LOW;
+            } else if (opMode.bPressed(opMode.GAMEPAD2)) {
+                selectedPosition = SlidePosition.MEDIUM;
+            } else if (opMode.yPressed(opMode.GAMEPAD2)) {
+                selectedPosition = SlidePosition.HIGH;
+            }
+
+            if (selectedPosition != SlidePosition.UNUSED) {
+                stackLevel = 1;
+                setSlideTarget(selectedPosition.ticks);
+            }
         }
     }
 
-    public int getSlideLevelTarget(int slideLevelTarget) {
-        return this.slideLevelTarget;
+    public void changeStack(int change){
+        stackLevel = Range.clip(stackLevel + change, 1, 5);
+        setSlideTarget(SlidePosition.STACK.ticks * (stackLevel - 1));
+    }
+
+    public void moveTowardTarget(SlidePosition slidePosition) {
+        setSlideTarget(slidePosition.ticks);
+        slide.setTargetPosition(getSlideTarget());
+    }
+
+    private boolean inDangerZone() {
+        if (isTriggered(bottomStop) && getSlideTarget() < slide.getCurrentPosition()) {
+            reset();
+            return true;
+        }
+
+        return false;
     }
 
     public boolean reachedPosition() {
-        if (!slide.isBusy()) {
-            return true;
-        } else if (!headedUp && isTriggered(bottomStop)) {
-            stop();
-            return true;
-        }
-        return false;
+        return !slide.isBusy() || inDangerZone();
     }
 
-    private boolean isTriggered(DigitalChannel limitSwitch) {  // this can be improved
-        if (limitSwitch.getState() == true) {
-            return false;
-        }
-        return true;
+    private boolean isTriggered(DigitalChannel limitSwitch) {
+        return !limitSwitch.getState();
     }
 
     //the slide is too far down to flip the pivot/turner
-    public boolean tooLowToPivot() {  // if no additional logic is added, this can be improved
-        if (slide.getCurrentPosition() < slidePosition.PIVOT_POSITION.ticks) {  // was 1400
-            return true;
-        }
-        return false;
+    public boolean tooLowToPivot() {
+        return slide.getCurrentPosition() < SlidePosition.PIVOT_POSITION.ticks;
+    }
+
+    public int getSlideTarget() {
+        return slideTarget;
+    }
+
+    public void setSlideTarget(int slideTarget) {
+        this.slideTarget = slideTarget;
     }
 
     private void init() {
@@ -191,14 +148,21 @@ public class MM_Slide {
         slide = opMode.hardwareMap.get(DcMotor.class, "Slide");
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide.setDirection(DcMotorSimple.Direction.REVERSE);
-        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        reset();
 
         topStop = opMode.hardwareMap.get(DigitalChannel.class, "topStop");
         bottomStop = opMode.hardwareMap.get(DigitalChannel.class, "bottomStop");
 
         topStop.setMode(DigitalChannel.Mode.INPUT);  // are these 2 lines needed?
         bottomStop.setMode(DigitalChannel.Mode.INPUT);
+    }
+
+    private void reset() {
+        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide.setTargetPosition(0);
+        slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slide.setPower(SLIDE_POWER);
     }
 }
 

@@ -40,13 +40,13 @@ public class MM_Robot {
             drivetrain.driveInches(42);
             drivetrain.driveInches(-8);
         }
-        slide.runSlideToPosition(opMode.COLLECT);
+        slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
         opMode.telemetry.update();
     }
 
-    public void runSlideandDrive(int level, double inches, double timeoutTime) {
-        slide.startMoving(level);
+    public void runSlideandDrive(MM_Slide.SlidePosition slidePosition, double inches, double timeoutTime) {
         drivetrain.prepareToDrive(inches);
+        slide.moveTowardTarget(slidePosition);
         boolean driveDone = false;
         boolean slideDone = false;
         runtime.reset();
@@ -55,7 +55,7 @@ public class MM_Robot {
             driveDone = drivetrain.reachedPosition();
             slideDone = slide.reachedPosition();
             opMode.telemetry.addData("inches target", inches);
-            opMode.telemetry.addData("slide target", level);
+            opMode.telemetry.addData("slide target", slidePosition);
             opMode.telemetry.update();
         }
     }

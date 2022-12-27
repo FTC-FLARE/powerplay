@@ -22,16 +22,6 @@ public abstract class MM_OpMode extends LinearOpMode {
     final int GAMEPAD1 = 0;
     final int GAMEPAD2 = 1;
 
-    final int COLLECT = 0;
-    final int GROUND = 1;
-    final int LOW = 2;
-    final int MEDIUM = 3;
-    final int HIGH = 4;
-    final int STACK = 5;
-    final int LOW_RELEASE = 6;
-    final int MEDIUM_RELEASE = 7;
-    final int HIGH_RELEASE = 8;
-
     public boolean aPressed(int gamepad) {
         if (gamepad == GAMEPAD1) {
             return gamepad1Current.a && !gamepad1Prior.a;

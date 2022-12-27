@@ -40,7 +40,7 @@ public class MM_Auto_Right extends MM_OpMode {
 
         robot.collector.changePosition(MM_Collector.CLOSED);
         sleep(1000);
-        robot.slide.runSlideToPosition(LOW);
+        robot.slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
         int maxColor = detector.getMaxColor();
         telemetry.addData("Max Color", detector.getMaxColorString());
         telemetry.update();
@@ -57,7 +57,7 @@ public class MM_Auto_Right extends MM_OpMode {
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 3) {
             }
-            robot.slide.runSlideToPosition(LOW_RELEASE);
+            robot.slide.waitToReachPosition(MM_Slide.SlidePosition.LOW_RELEASE);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
@@ -71,13 +71,13 @@ public class MM_Auto_Right extends MM_OpMode {
             robot.drivetrain.rotateToAngle(90);
             robot.drivetrain.driveInches(22);//22
             robot.drivetrain.rotateToAngle(0);
-            robot.runSlideandDrive(MEDIUM, 33, 5);// 34 medium
+            robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, 33, 5);// 34 medium
             robot.drivetrain.rotateToAngle(-90);
             robot.drivetrain.driveInches(2.3);//2.35
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 3) {
             }
-            robot.slide.runSlideToPosition(MEDIUM_RELEASE);
+            robot.slide.waitToReachPosition(MM_Slide.SlidePosition.MEDIUM_RELEASE);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
@@ -87,13 +87,13 @@ public class MM_Auto_Right extends MM_OpMode {
             }
             robot.drivetrain.driveInches(-1.7);
         } else {
-            robot.runSlideandDrive(MEDIUM, 39, 5);
+            robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, 39, 5);
             robot.drivetrain.rotateToAngle(90);
             robot.drivetrain.driveInches(3);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 3) {
             }
-            robot.slide.runSlideToPosition(MEDIUM_RELEASE);
+            robot.slide.waitToReachPosition(MM_Slide.SlidePosition.MEDIUM_RELEASE);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
@@ -104,7 +104,7 @@ public class MM_Auto_Right extends MM_OpMode {
             robot.drivetrain.driveInches(-2.5);
         }
         robot.drivetrain.rotateToAngle(0);
-        robot.slide.runSlideToPosition(COLLECT);
+        robot.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
 
 
 /*      red left 1
