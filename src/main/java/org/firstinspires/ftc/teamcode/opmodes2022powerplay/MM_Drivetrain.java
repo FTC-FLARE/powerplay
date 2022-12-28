@@ -219,11 +219,7 @@ public class MM_Drivetrain {
 
         } while (opMode.opModeIsActive() && !opMode.pTurnController.reachedTarget() && runtime.seconds() < timeOut);
 
-        if (opMode.pTurnController.reachedTarget()) {
-            opMode.telemetry.update();
-            stop();
-        }
-
+        stop();
         priorAngle = targetAngle;
         rightPriorEncoderTarget = rightPriorEncoderTarget - rightStartingTicks + rightEncoder.getCurrentPosition();
         leftPriorEncoderTarget = leftPriorEncoderTarget - leftStartingTicks + leftEncoder.getCurrentPosition();

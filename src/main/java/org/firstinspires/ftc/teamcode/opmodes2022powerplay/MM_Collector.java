@@ -32,6 +32,7 @@ public class MM_Collector {
         }
         opMode.telemetry.addData("Collector Position", grabber.getPosition());
     }
+
     public void runConeSaver() {
         if (opMode.leftBumperPressed(opMode.GAMEPAD2) && !opMode.robot.slide.tooLowToPivot()) {
             if (coneSaverPosition == 1) {
@@ -43,10 +44,12 @@ public class MM_Collector {
             }
         }
     }
+
     public void changePosition(double position){
         grabber.setPosition(position);
         this.position = position;
     }
+
     public double getPosition() {
         return position;
     }
