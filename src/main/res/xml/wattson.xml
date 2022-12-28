@@ -5,6 +5,7 @@
             <goBILDA5202SeriesMotor name="Slide" port="0" />
             <Servo name="Turner" port="0"/>
             <Servo name="Grabber" port="1"/>
+            <Servo name="Conesaver" port="5"/>
             <Servo name="leftOdometryLift" port="4"/>
             <Servo name="rightOdometryLift" port="2"/>
             <Servo name="backOdometryLift" port="3"/>
