@@ -57,7 +57,9 @@ public class MM_Slide {
         if (inDangerZone() || getSlideTarget() < 0) {
             setSlideTarget(0);
         }
-
+        if (turner.isMoving() && tooLowToPivot() && getSlideTarget() < SlidePosition.PIVOT_POSITION.ticks) {
+            setSlideTarget(SlidePosition.PIVOT_POSITION.ticks);
+        }
         slide.setTargetPosition(getSlideTarget());
 
         opMode.telemetry.addData("Slide", "Current: %d  Target: %d", slide.getCurrentPosition(), getSlideTarget());
