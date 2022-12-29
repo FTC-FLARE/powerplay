@@ -52,7 +52,7 @@ public class MM_Robot {
         runtime.reset();
 
         while (opMode.opModeIsActive() && (!driveDone || !slideDone) && runtime.seconds() < timeoutTime) {
-            driveDone = drivetrain.reachedPosition();
+            driveDone = drivetrain.reachedPositionDrive();
             slideDone = slide.reachedPosition();
             opMode.telemetry.addData("inches target", inches);
             opMode.telemetry.addData("slide target", slidePosition);
