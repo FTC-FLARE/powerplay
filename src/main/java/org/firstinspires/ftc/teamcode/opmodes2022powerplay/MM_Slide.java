@@ -23,7 +23,7 @@ public class MM_Slide {
         COLLECT(0),
         STACK(145),
         GROUND(400),
-        CONESAVE_POSITION(1100),
+        CONESAVE_POSITION(1250),
         LOW_RELEASE(1550),
         PIVOT_POSITION(1600),
         LOW(1750),
