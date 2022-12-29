@@ -23,6 +23,7 @@ public class MM_Slide {
         COLLECT(0),
         STACK(145),
         GROUND(400),
+        CONESAVE_POSITION(1100),
         LOW_RELEASE(1550),
         PIVOT_POSITION(1600),
         LOW(1750),
@@ -134,6 +135,10 @@ public class MM_Slide {
     //the slide is too far down to flip the pivot/turner
     public boolean tooLowToPivot() {
         return slide.getCurrentPosition() < SlidePosition.PIVOT_POSITION.ticks;
+    }
+
+    public boolean tooLowtoConesave() {
+        return slide.getCurrentPosition() < SlidePosition.CONESAVE_POSITION.ticks;
     }
 
     public int getSlideTarget() {

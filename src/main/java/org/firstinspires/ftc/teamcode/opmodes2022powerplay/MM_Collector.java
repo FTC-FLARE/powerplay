@@ -48,7 +48,7 @@ public class MM_Collector {
     }
 
     public void runConeSaver() {
-        if (opMode.robot.slide.tooLowToPivot()) {
+        if (opMode.robot.slide.tooLowtoConesave()) {
             coneSaver.setPosition(BACK);
             coneSaverPosition = BACK;
         } else if (!scored) {
