@@ -49,9 +49,7 @@ public class MM_Auto_Left extends MM_OpMode {
         //red left
         if (maxColor == MM_EOCVSleeveDetection.YELLOW) {
             robot.drivetrain.driveInches(5);
-            robot.drivetrain.rotateToAngle(-90);
-            robot.drivetrain.driveInches(22);
-            robot.drivetrain.rotateToAngle(0);
+            robot.drivetrain.strafeInches(20);
             robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, 34, 5);
             robot.drivetrain.rotateToAngle(90);
             robot.drivetrain.driveInches(2.35);
