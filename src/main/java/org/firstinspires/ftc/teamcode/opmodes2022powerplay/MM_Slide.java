@@ -23,7 +23,8 @@ public class MM_Slide {
         COLLECT(0),
         STACK(145),
         GROUND(400),
-        CONESAVE_POSITION(1350),
+        CONESAVE_POSITION_FRONT(1100),
+        CONESAVE_POSITION_BACK(1350),
         LOW_RELEASE(1550),
         PIVOT_POSITION(1600),
         LOW(1750),
@@ -138,7 +139,10 @@ public class MM_Slide {
     }
 
     public boolean tooLowtoConesave() {
-        return slide.getCurrentPosition() < SlidePosition.CONESAVE_POSITION.ticks;
+        if (turner.getPosition() > 0.4) {
+            return slide.getCurrentPosition() < SlidePosition.CONESAVE_POSITION_FRONT.ticks;
+        }
+        return slide.getCurrentPosition() < SlidePosition.CONESAVE_POSITION_BACK.ticks;
     }
 
     public int getSlideTarget() {
