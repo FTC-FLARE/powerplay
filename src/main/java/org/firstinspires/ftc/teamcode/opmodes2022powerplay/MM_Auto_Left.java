@@ -70,12 +70,10 @@ public class MM_Auto_Left extends MM_OpMode {
         } else if (maxColor == MM_EOCVSleeveDetection.RED) {
             robot.slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
             robot.drivetrain.driveInches(2);
-            robot.drivetrain.rotateToAngle(90);
-            robot.drivetrain.driveInches(24);
-            robot.drivetrain.rotateToAngle(0);
-            robot.drivetrain.driveInches(33.5);
+            robot.drivetrain.strafeInches(23);
+            robot.drivetrain.driveInches(36);
             robot.drivetrain.rotateToAngle(-90);
-            robot.drivetrain.driveInches(2.25);
+            robot.drivetrain.driveInches(2.5);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 3) {
             }
@@ -87,7 +85,7 @@ public class MM_Auto_Left extends MM_OpMode {
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
-            robot.drivetrain.driveInches(-1.75);
+            robot.drivetrain.driveInches(-2.15);
         } else {
             robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, 39.5, 5);
             robot.drivetrain.rotateToAngle(-90);

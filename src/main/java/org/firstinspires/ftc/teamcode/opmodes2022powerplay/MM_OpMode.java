@@ -8,7 +8,7 @@ public abstract class MM_OpMode extends LinearOpMode {
     public MM_P_Controller pTurnController = new MM_P_Controller(this, 1, TURN_P_COEFFICIENT);
     public MM_P_Controller pLeftDriveController = new MM_P_Controller(this,1.6, DRIVE_P_COEFFICIENT);
     public MM_P_Controller pRightDriveController = new MM_P_Controller(this,1.6, DRIVE_P_COEFFICIENT);
-    public MM_P_Controller pBackDriveController = new MM_P_Controller(this,1.6, STRAFE_P_COEFFICIENT);
+    public MM_P_Controller pBackDriveController = new MM_P_Controller(this,2.6, STRAFE_P_COEFFICIENT);
 
     public Gamepad gamepad1Current = new Gamepad();
     public Gamepad gamepad1Prior = new Gamepad();

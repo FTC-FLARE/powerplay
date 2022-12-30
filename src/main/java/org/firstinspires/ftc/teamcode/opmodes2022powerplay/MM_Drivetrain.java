@@ -134,7 +134,6 @@ public class MM_Drivetrain {
         blPower = leftDrivePower;
         brPower = rightDrivePower;
 
-        encoderCorrect(leftDrivePower, DRIVE);
         angleStraighten(STRAIGHTEN_P, leftDrivePower, rightDrivePower);
         normalize();
         setMotorPower(flPower, frPower, blPower, brPower);
