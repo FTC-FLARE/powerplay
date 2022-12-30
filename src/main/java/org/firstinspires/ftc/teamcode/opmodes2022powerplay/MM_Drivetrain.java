@@ -126,19 +126,25 @@ public class MM_Drivetrain {
         leftDrivePower = opMode.pLeftDriveController.calculatePower(leftCurrentTicks);
         rightDrivePower = opMode.pRightDriveController.calculatePower(rightCurrentTicks);
 
+        flPower = leftDrivePower;
+        frPower = rightDrivePower;
+        blPower = leftDrivePower;
+        brPower = rightDrivePower;
+
         angleStraighten(STRAIGHTEN_P, leftDrivePower, rightDrivePower);
         normalize();
         setMotorPower(flPower, frPower, blPower, brPower);
     }
 
     private void setStrafePower() {
-        backCurrentTicks = backEncoder.getCurrentPosition();
+        backCurrentTicks = -backEncoder.getCurrentPosition();
 
         double calculatedPower = opMode.pBackDriveController.calculatePower(backCurrentTicks);
-        flPower = calculatedPower;
-        frPower = -calculatedPower;
-        blPower = -calculatedPower;
-        brPower = calculatedPower;
+        opMode.telemetry.addData("calc power", calculatedPower);
+        flPower = -calculatedPower;
+        frPower = calculatedPower;
+        blPower = calculatedPower;
+        brPower = -calculatedPower;
 
         angleStraighten(STRAFE_P, calculatedPower, calculatedPower);
         normalize();

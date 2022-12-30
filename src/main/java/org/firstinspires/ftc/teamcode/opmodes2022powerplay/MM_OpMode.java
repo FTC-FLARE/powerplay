@@ -16,7 +16,7 @@ public abstract class MM_OpMode extends LinearOpMode {
     public Gamepad gamepad2Prior = new Gamepad();
 
     static final double DRIVE_P_COEFFICIENT = 0.00001598;
-    static final double STRAFE_P_COEFFICIENT = 0.000155;
+    static final double STRAFE_P_COEFFICIENT = 0.0000555;
     static final double TURN_P_COEFFICIENT = .015;
 
     final int GAMEPAD1 = 0;

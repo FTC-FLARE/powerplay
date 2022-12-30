@@ -10,8 +10,8 @@ public class MM_Robot {
 
     static final double MIN_DRIVE_SPEED = 0.24;
     static final double MAX_DRIVE_SPEED = 0.6;
-    static final double MIN_STRAFE_POWER = 0.0;
-    static final double MAX_STRAFE_POWER = 0.0;
+    static final double MIN_STRAFE_POWER = 0.263;
+    static final double MAX_STRAFE_POWER = 0.6;
     static final double MIN_ROTATE_POWER = 0.24;
     static final double MAX_ROTATE_POWER = 0.6;
 
