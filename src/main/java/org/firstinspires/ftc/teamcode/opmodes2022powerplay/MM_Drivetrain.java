@@ -34,11 +34,14 @@ public class MM_Drivetrain {
     private static final double SECONDS_PER_DEGREE = 0.025;//??
     private static final double STRAIGHTEN_P = .0780;
     private static final double STRAFE_P = .089;
+    private static final double CORRECTION_COEFFICIENT = 0.000055; //Gain per tick
     public static final double SLOW_MULTIPLIER = 0.65;
     public static final double SUPER_SLOW_MULTIPLIER = 0.35;
     static final int FAST = 0;
     static final int SLOW = 1;
     static final int SUPER_SLOW = 2;
+    static final int DRIVE = 0;
+    static final int STRAFE = 1;
 
     private int slowMode = SLOW;
     private int previousSlowMode = SLOW;
@@ -131,6 +134,7 @@ public class MM_Drivetrain {
         blPower = leftDrivePower;
         brPower = rightDrivePower;
 
+        encoderCorrect(leftDrivePower, DRIVE);
         angleStraighten(STRAIGHTEN_P, leftDrivePower, rightDrivePower);
         normalize();
         setMotorPower(flPower, frPower, blPower, brPower);
@@ -146,6 +150,7 @@ public class MM_Drivetrain {
         blPower = calculatedPower;
         brPower = -calculatedPower;
 
+        encoderCorrect(calculatedPower, STRAFE);
         angleStraighten(STRAFE_P, calculatedPower, calculatedPower);
         normalize();
         setMotorPower(flPower, frPower, blPower, brPower);
@@ -271,6 +276,30 @@ public class MM_Drivetrain {
         rightPriorEncoderTarget = rightPriorEncoderTarget - rightStartingTicks + rightEncoder.getCurrentPosition();
         leftPriorEncoderTarget = leftPriorEncoderTarget - leftStartingTicks + leftEncoder.getCurrentPosition();
         backPriorEncoderTarget = backPriorEncoderTarget - backStartingTicks + backEncoder.getCurrentPosition();
+    }
+
+    private void encoderCorrect(double calculatedPower, int movement) { //TODO RENAME
+        if (movement == STRAFE) {
+            leftCurrentTicks = leftEncoder.getCurrentPosition();
+            rightCurrentTicks = rightEncoder.getCurrentPosition();
+
+            double leftError = leftPriorEncoderTarget - leftCurrentTicks;
+            double rightError =  rightPriorEncoderTarget - rightCurrentTicks;
+            //modeled after straighten
+            flPower = flPower + (leftError * CORRECTION_COEFFICIENT * Math.abs(calculatedPower));
+            frPower = frPower + (rightError * CORRECTION_COEFFICIENT * Math.abs(calculatedPower));
+            blPower = blPower + (leftError * CORRECTION_COEFFICIENT * Math.abs(calculatedPower));
+            brPower = brPower + (rightError * CORRECTION_COEFFICIENT * Math.abs(calculatedPower));
+        } else {
+            backCurrentTicks = -backEncoder.getCurrentPosition();
+
+            double backError = backPriorEncoderTarget - backCurrentTicks;
+
+            flPower = flPower - (backError * CORRECTION_COEFFICIENT * Math.abs(calculatedPower));
+            frPower = frPower + (backError * CORRECTION_COEFFICIENT * Math.abs(calculatedPower));
+            blPower = blPower - (backError * CORRECTION_COEFFICIENT * Math.abs(calculatedPower));
+            brPower = brPower + (backError * CORRECTION_COEFFICIENT * Math.abs(calculatedPower));
+        }
     }
 
     private void angleStraighten(double pCoefficient, double leftCalculated, double rightCalculated) {

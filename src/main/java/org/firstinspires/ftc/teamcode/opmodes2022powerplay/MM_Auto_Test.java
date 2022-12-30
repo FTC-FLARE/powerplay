@@ -35,7 +35,7 @@ public class MM_Auto_Test extends MM_OpMode {
         telemetry.update();
         waitForStart();
 
-        robot.drivetrain.strafeInches(48);
+        robot.drivetrain.driveInches(24);
     }
 
     private void initCamera() {
