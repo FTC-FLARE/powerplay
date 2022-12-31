@@ -75,6 +75,16 @@ public class MM_Drivetrain {
             opMode.telemetry.update();
         }
     }
+
+    public void microscopicDriveInches(double inches) {
+        prepareToDrive(inches);
+        runtime.reset();
+        while (opMode.opModeIsActive() && runtime.seconds() < 2 && !reachedPositionMicroscopicDrive()) {
+            opMode.telemetry.addData("inches target", inches);
+            opMode.telemetry.update();
+        }
+    }
+
     public void strafeInches(double inches) {
         prepareToStrafe(inches);
         runtime.reset();
@@ -113,6 +123,15 @@ public class MM_Drivetrain {
         return false;
     }
 
+    public boolean reachedPositionMicroscopicDrive() {
+        setMicroscopicStraightPower();
+        if (Math.abs(leftEncoder.getCurrentPosition() - leftPriorEncoderTarget) < 200 || Math.abs(rightEncoder.getCurrentPosition() - rightPriorEncoderTarget) < 200) {
+            stop();
+            return true;
+        }
+        return false;
+    }
+
     public boolean reachedPositionStrafe() {
         setStrafePower();
         if (opMode.pBackDriveController.reachedTarget()) {
@@ -135,6 +154,26 @@ public class MM_Drivetrain {
         brPower = rightDrivePower;
 
         angleStraighten(STRAIGHTEN_P, leftDrivePower, rightDrivePower);
+        normalize();
+        setMotorPower(flPower, frPower, blPower, brPower);
+    }
+
+    private void setMicroscopicStraightPower() {
+        leftCurrentTicks = leftEncoder.getCurrentPosition();
+        rightCurrentTicks = rightEncoder.getCurrentPosition();
+
+        if (leftCurrentTicks > leftPriorEncoderTarget) {
+            flPower = -0.16;
+            frPower = -0.16;
+            blPower = -0.16;
+            brPower = -0.16;
+        } else {
+            flPower = 0.16;
+            frPower = 0.16;
+            blPower = 0.16;
+            brPower = 0.16;
+        }
+        angleStraighten(STRAIGHTEN_P, flPower, frPower);
         normalize();
         setMotorPower(flPower, frPower, blPower, brPower);
     }

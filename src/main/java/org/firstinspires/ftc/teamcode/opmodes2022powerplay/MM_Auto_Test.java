@@ -36,11 +36,12 @@ public class MM_Auto_Test extends MM_OpMode {
         waitForStart();
 
         robot.slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
-        robot.drivetrain.driveInches(3);
-        robot.drivetrain.strafeInches(23.2);
-        robot.drivetrain.driveInches(38);
+        robot.drivetrain.microscopicDriveInches(3);
+        robot.drivetrain.strafeInches(23);
+        robot.drivetrain.driveInches(41.75);
+        robot.drivetrain.microscopicDriveInches(0);
         robot.drivetrain.rotateToAngle(60);
-
+        robot.drivetrain.microscopicDriveInches(-2.5);
 
     }
 
