@@ -8,8 +8,10 @@ public class MM_Collector {
     private Servo grabber = null;
     private Servo coneSaver = null;
 
+//    collector positions
     public static final double CLOSED = 0.07; //0.185 - 0.09
     public static final double OPEN = 1.0;
+//    cone saver positions
     private static final int BACK = 1;
     private static final int FRONT = 0;
 
@@ -57,18 +59,16 @@ public class MM_Collector {
         }
     }
 
-/*            if (opMode.leftBumperPressed(opMode.GAMEPAD2) && !opMode.robot.slide.tooLowToPivot()) {
-        if (coneSaverPosition == CONESAVER_CLOSED) {
-            coneSaver.setPosition(CONESAVER_OPEN);
-            coneSaverPosition = CONESAVER_OPEN;
-        } else {
-            coneSaver.setPosition(CONESAVER_OPEN);
-            coneSaverPosition = CONESAVER_CLOSED;
-        }
-    }*/
     public void changePosition(double position){
         grabber.setPosition(position);
         this.position = position;
+    }
+    public void autoRunCollector(){
+        if (grabber.getPosition() == OPEN){
+            changePosition(CLOSED);
+        } else {
+            changePosition(OPEN);
+        }
     }
 
     public double getPosition() {

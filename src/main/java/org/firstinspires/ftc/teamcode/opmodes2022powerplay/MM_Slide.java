@@ -18,6 +18,9 @@ public class MM_Slide {
     private int slideTarget = 0;
     private int stackLevel = 1;
 
+    private int autoStacklevel = 5;
+
+
     public enum SlidePosition {
         UNUSED(0),
         COLLECT(0),
@@ -32,6 +35,8 @@ public class MM_Slide {
         HIGH(4000);
 
         public final int ticks;
+
+
 
         SlidePosition(int ticks) {
             this.ticks = ticks;
@@ -143,7 +148,9 @@ public class MM_Slide {
     public void setSlideTarget(int slideTarget) {
         this.slideTarget = slideTarget;
     }
-
+    public void runCollector(){
+        slide.setTargetPosition(getSlideTarget());
+    }
     private void init() {
         turner = new MM_Turner(opMode, this);
 

@@ -59,6 +59,21 @@ public class MM_Robot {
             opMode.telemetry.update();
         }
     }
+    //    feel free to refactor any names
+    public void autoStackCollect(int stackLevel){
+        slide.setSlideTarget(MM_Slide.SlidePosition.STACK.ticks * (stackLevel - 1));
+        slide.runCollector();
+        while (opMode.opModeIsActive() && !slide.reachedPosition()) {
+            opMode.telemetry.update();
+        }
+        collector.changePosition(MM_Collector.CLOSED);
+        runtime.reset();
+        while (opMode.opModeIsActive() && runtime.seconds() < 2) {
+            opMode.telemetry.update();
+        }
+
+    }
+
 
     public void init(){
         drivetrain = new MM_Drivetrain(opMode);
