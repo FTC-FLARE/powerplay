@@ -59,6 +59,39 @@ public class MM_Robot {
             opMode.telemetry.update();
         }
     }
+    //    feel free to refactor any names
+    public void autoStackCollect(int stackLevel){
+        slide.setSlideTarget(MM_Slide.SlidePosition.STACK.ticks * (stackLevel - 1));
+        slide.runCollector();
+        while (opMode.opModeIsActive() && !slide.reachedPosition()) {
+            opMode.telemetry.update();
+        }
+        collector.autoRunCollector();
+        runtime.reset();
+        while (opMode.opModeIsActive() && runtime.seconds() < 1) {
+            opMode.telemetry.update();
+        }
+
+    }
+
+    public void autoScore(){
+        slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
+        slide.turner.changeTurnerPosition(slide.turner.BACK);
+        runtime.reset();
+        while (opMode.opModeIsActive() && runtime.seconds() < 2) {
+        }
+        slide.waitToReachPosition(MM_Slide.SlidePosition.LOW_RELEASE);
+        collector.autoRunCollector();
+        runtime.reset();
+        while (opMode.opModeIsActive() && runtime.seconds() < 2){
+        }
+        slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
+
+        slide.turner.changeTurnerPosition(slide.turner.FRONT);
+        runtime.reset();
+        while (opMode.opModeIsActive() && runtime.seconds() < 2){
+        }
+    }
 
     public void init(){
         drivetrain = new MM_Drivetrain(opMode);

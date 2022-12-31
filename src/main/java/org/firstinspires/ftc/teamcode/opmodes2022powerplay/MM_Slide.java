@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.Range;
 
 public class MM_Slide {
     private final MM_OpMode opMode;
-    private MM_Turner turner;
+    public MM_Turner turner;
     private DcMotor slide = null;
     private DigitalChannel topStop;
     private DigitalChannel bottomStop;
@@ -17,6 +17,9 @@ public class MM_Slide {
 
     private int slideTarget = 0;
     private int stackLevel = 1;
+
+    private int autoStacklevel = 5;
+
 
     public enum SlidePosition {
         UNUSED(0),
@@ -34,6 +37,8 @@ public class MM_Slide {
         HIGH(4000);
 
         public final int ticks;
+
+
 
         SlidePosition(int ticks) {
             this.ticks = ticks;
@@ -151,6 +156,17 @@ public class MM_Slide {
 
     public void setSlideTarget(int slideTarget) {
         this.slideTarget = slideTarget;
+    }
+    public void runCollector(){
+        slide.setTargetPosition(getSlideTarget());
+    }
+    public void autoScore(){
+        waitToReachPosition(SlidePosition.LOW);
+        turner.changePosition(turner.BACK);
+        waitToReachPosition(SlidePosition.LOW_RELEASE);
+//        collector release
+        waitToReachPosition(SlidePosition.LOW);
+        turner.changePosition(turner.FRONT);
     }
 
     private void init() {

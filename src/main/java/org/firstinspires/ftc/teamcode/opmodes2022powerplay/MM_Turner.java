@@ -51,6 +51,10 @@ public class MM_Turner{
         isMoving = true;
     }
 
+    public void changeTurnerPosition(double position){
+        turner.setPosition(position);
+    }
+
     public double getPosition() {
         return currentPosition;
     }
