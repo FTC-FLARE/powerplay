@@ -16,7 +16,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 public class MM_Auto_Test extends MM_OpMode {
     private final MM_Robot robot = new MM_Robot(this);
 
-    MM_EOCVSleeveDetection detector = new MM_EOCVSleeveDetection();
+    MM_EOCVDetection detector = new MM_EOCVDetection();
     OpenCvCamera camera;
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -28,24 +28,30 @@ public class MM_Auto_Test extends MM_OpMode {
         telemetry.addData("Status", "Wait for initialization");
         telemetry.update();
 
-        //initCamera();
+        firstInitCamera();
+
         robot.init();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
 
+        robot.collector.changePosition(MM_Collector.CLOSED);
+        sleep(500);
         robot.slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
         robot.drivetrain.microscopicDriveInches(3);
         robot.drivetrain.strafeInches(23);
-        robot.drivetrain.driveInches(41.75);
+        robot.drivetrain.driveInches(41.3);
         robot.drivetrain.microscopicDriveInches(0);
         robot.drivetrain.rotateToAngle(60);
         robot.drivetrain.microscopicDriveInches(-2.5);
-
+        detector.changeMode();
+        detector.setConeColor(1); //BLUE
+        if (detector.goodToCollect() && robot.drivetrain.withinJunctionRange()) {
+        }
     }
 
-    private void initCamera() {
+    private void firstInitCamera() {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
         // Connect to the camera

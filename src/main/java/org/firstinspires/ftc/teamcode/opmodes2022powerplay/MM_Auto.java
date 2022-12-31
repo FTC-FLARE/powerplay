@@ -16,7 +16,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 public class MM_Auto extends MM_OpMode {
     private final MM_Robot robot = new MM_Robot(this);
 
-    MM_EOCVSleeveDetection detector = new MM_EOCVSleeveDetection();
+    MM_EOCVDetection detector = new MM_EOCVDetection();
     OpenCvCamera camera;
 
     private ElapsedTime runtime = new ElapsedTime();

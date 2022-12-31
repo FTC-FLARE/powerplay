@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -20,7 +19,7 @@ public class cameraOpMode extends LinearOpMode {
     int width = 320;
     int height = 240;
 
-    MM_EOCVSleeveDetection detector = new MM_EOCVSleeveDetection();
+    MM_EOCVDetection detector = new MM_EOCVDetection();
     OpenCvCamera camera;
 
     @Override
@@ -47,13 +46,15 @@ public class cameraOpMode extends LinearOpMode {
         FtcDashboard.getInstance().startCameraStream(camera, 0);
         telemetry.addLine("Waiting for start");
         telemetry.update();
+        detector.changeMode();
+        detector.setConeColor(1);
         waitForStart();
 
         while (opModeIsActive()) {
-            telemetry.addData("columns", detector.columns());
+            //telemetry.addData("columns", detector.columns());
             telemetry.addData("mean", detector.getMean());
             telemetry.addData("Frame Count", camera.getFrameCount());
-            telemetry.addData("Max Color", getMax());
+            //telemetry.addData("Max Color", getMax());
             telemetry.update();
         }
     }

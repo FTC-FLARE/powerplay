@@ -16,6 +16,8 @@
             <goBILDA5202SeriesMotor name="BLMotor" port="2" />
             <goBILDA5202SeriesMotor name="BRMotor" port="3" />
             <LynxEmbeddedIMU name="imu" port="0" bus="0" />
+            <Servo name="distanceServo" port="0"/>
+            <REV_VL53L0X_RANGE_SENSOR name="distance" port="0" bus="0" />
             <DigitalDevice name="topStop" port="0"/>
             <DigitalDevice name="bottomStop" port="2"/>
         </LynxModule>

@@ -16,7 +16,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 public class MM_Auto_Right extends MM_OpMode {
     private MM_Robot robot = new MM_Robot(this);
 
-    MM_EOCVSleeveDetection detector = new MM_EOCVSleeveDetection();
+    MM_EOCVDetection detector = new MM_EOCVDetection();
     OpenCvCamera camera;
 
     public static int INCHES = 48;
@@ -46,7 +46,7 @@ public class MM_Auto_Right extends MM_OpMode {
         telemetry.update();
 
         //red left
-        if (maxColor == MM_EOCVSleeveDetection.YELLOW) {
+        if (maxColor == MM_EOCVDetection.YELLOW) {
             robot.drivetrain.driveInches(3.5);
             robot.drivetrain.rotateToAngle(-90);
             robot.drivetrain.driveInches(21);
@@ -66,7 +66,7 @@ public class MM_Auto_Right extends MM_OpMode {
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
             robot.drivetrain.driveInches(-1.5);
-        } else if (maxColor == MM_EOCVSleeveDetection.RED) {
+        } else if (maxColor == MM_EOCVDetection.RED) {
             robot.drivetrain.driveInches(5);//5
             robot.drivetrain.rotateToAngle(90);
             robot.drivetrain.driveInches(22);//22

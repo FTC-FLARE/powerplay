@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -12,12 +13,13 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 
+@Disabled
 @Config
 @Autonomous(name="MM_Auto_Left_Strafe", group="MM")
 public class MM_Auto_Left_Strafe extends MM_OpMode {
     private MM_Robot robot = new MM_Robot(this);
 
-    MM_EOCVSleeveDetection detector = new MM_EOCVSleeveDetection();
+    MM_EOCVDetection detector = new MM_EOCVDetection();
     OpenCvCamera camera;
 
     public static int INCHES = 48;
@@ -47,7 +49,7 @@ public class MM_Auto_Left_Strafe extends MM_OpMode {
         telemetry.update();
 
         //red left
-        if (maxColor == MM_EOCVSleeveDetection.YELLOW) {
+        if (maxColor == MM_EOCVDetection.YELLOW) {
             robot.drivetrain.driveInches(5);
             robot.drivetrain.strafeInches(20);
             robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, 34, 5);
@@ -65,7 +67,7 @@ public class MM_Auto_Left_Strafe extends MM_OpMode {
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
             robot.drivetrain.driveInches(-2.5);
-        } else if (maxColor == MM_EOCVSleeveDetection.RED) {
+        } else if (maxColor == MM_EOCVDetection.RED) {
             robot.slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
             robot.drivetrain.driveInches(2);
             robot.drivetrain.strafeInches(23);

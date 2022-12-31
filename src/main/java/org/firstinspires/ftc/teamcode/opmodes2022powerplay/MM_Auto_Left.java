@@ -17,7 +17,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 public class MM_Auto_Left extends MM_OpMode {
     private MM_Robot robot = new MM_Robot(this);
 
-    MM_EOCVSleeveDetection detector = new MM_EOCVSleeveDetection();
+    MM_EOCVDetection detectorOne = new MM_EOCVDetection();
     OpenCvCamera camera;
 
     public static int INCHES = 48;
@@ -31,7 +31,7 @@ public class MM_Auto_Left extends MM_OpMode {
         telemetry.addData("Status", "Wait for initialization");
         telemetry.update();
 
-        initCamera();
+        firstInitCamera();
         robot.init();
 
         telemetry.addData("Status", "Initialized");
@@ -42,12 +42,12 @@ public class MM_Auto_Left extends MM_OpMode {
         robot.collector.changePosition(MM_Collector.CLOSED);
         sleep(1000);
         robot.slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
-        int maxColor = detector.getMaxColor();
-        telemetry.addData("Max Color", detector.getMaxColorString());
+        int maxColor = detectorOne.getMaxColor();
+        telemetry.addData("Max Color", detectorOne.getMaxColorString());
         telemetry.update();
 
         //red left
-        if (maxColor == MM_EOCVSleeveDetection.YELLOW) {
+        if (maxColor == MM_EOCVDetection.YELLOW) {
             robot.drivetrain.driveInches(5);
             robot.drivetrain.rotateToAngle(-90);
             robot.drivetrain.driveInches(22);
@@ -67,7 +67,7 @@ public class MM_Auto_Left extends MM_OpMode {
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
             robot.drivetrain.driveInches(-2.5);
-        } else if (maxColor == MM_EOCVSleeveDetection.RED) {
+        } else if (maxColor == MM_EOCVDetection.RED) {
             robot.slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
             robot.drivetrain.driveInches(2);
             robot.drivetrain.rotateToAngle(90);
@@ -151,13 +151,13 @@ public class MM_Auto_Left extends MM_OpMode {
 //        robot.runSlideandDrive(HIGH, 24, 7);
     }
 
-    private void initCamera() {
+    private void firstInitCamera() {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
         // Connect to the camera
         // Use the SkystoneDetector pipeline
         // processFrame() will be called to process the frame
-        camera.setPipeline(detector);
+        camera.setPipeline(detectorOne);
         // Remember to change the camera rotation
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override

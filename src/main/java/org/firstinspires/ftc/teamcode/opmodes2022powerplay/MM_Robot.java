@@ -22,10 +22,10 @@ public class MM_Robot {
     }
 
     public void sleevePark(int sleeveColor) {
-        if (sleeveColor == MM_EOCVSleeveDetection.RED || sleeveColor == MM_EOCVSleeveDetection.YELLOW) {
+        if (sleeveColor == MM_EOCVDetection.RED || sleeveColor == MM_EOCVDetection.YELLOW) {
             drivetrain.driveInches(5); //get away from wall
             double angleTarget = 90;
-            if (sleeveColor == MM_EOCVSleeveDetection.YELLOW) {
+            if (sleeveColor == MM_EOCVDetection.YELLOW) {
                 angleTarget = -angleTarget;
                 opMode.telemetry.addLine("Traveling to Yellow");
             } else {

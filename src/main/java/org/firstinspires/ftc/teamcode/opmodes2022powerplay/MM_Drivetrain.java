@@ -1,15 +1,18 @@
 package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class MM_Drivetrain {
     private final MM_OpMode opMode;
@@ -28,6 +31,9 @@ public class MM_Drivetrain {
     private Servo leftOdomLift = null;
     private Servo rightOdomLift = null;
     private Servo backOdomLift = null;
+    private Servo distanceServo = null;
+
+    private DistanceSensor distance = null;
 
     private final ElapsedTime runtime = new ElapsedTime();
 
@@ -362,6 +368,10 @@ public class MM_Drivetrain {
         return angle;
     }
 
+    public boolean withinJunctionRange() {
+        return distance.getDistance(DistanceUnit.INCH) < 11;
+    }
+
     private void init() {
         frontLeftDrive = opMode.hardwareMap.get(DcMotor.class, "FLMotor");
         frontRightDrive = opMode.hardwareMap.get(DcMotor.class, "FRMotor");
@@ -376,7 +386,7 @@ public class MM_Drivetrain {
         frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        initOdomServos();
+        initServos();
 
         leftEncoder = opMode.hardwareMap.get(DcMotorEx.class,"BRMotor"); // port 3
         rightEncoder = opMode.hardwareMap.get(DcMotorEx.class, "FLMotor"); // port 0
@@ -389,9 +399,12 @@ public class MM_Drivetrain {
 
         imu = opMode.hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
+
+        distance = opMode.hardwareMap.get(DistanceSensor.class, "distance");
     }
 
-    private void initOdomServos(){
+    private void initServos(){
+        distanceServo = opMode.hardwareMap.get(Servo.class, "distanceServo");
         if(opMode.getClass() == MM_TeleOp.class){
             leftOdomLift = opMode.hardwareMap.get(Servo.class,"leftOdometryLift");
             rightOdomLift = opMode.hardwareMap.get(Servo.class,"rightOdometryLift");
@@ -400,6 +413,9 @@ public class MM_Drivetrain {
             leftOdomLift.setPosition(1);
             rightOdomLift.setPosition(0);
             backOdomLift.setPosition(1);
+            distanceServo.setPosition(1);
+        } else {
+            distanceServo.setPosition(0);
         }
     }
 }
