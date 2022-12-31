@@ -9,7 +9,7 @@ public class MM_Turner{
 
     final double FRONT = 0.885;
     final double BACK = 0;
-    static final double BACK_TURN_INCREMENT = -0.01;
+    static final double BACK_TURN_INCREMENT = -0.020;
     static final double FRONT_TURN_INCREMENT = 0.025;
 
     private boolean isMoving = false;

@@ -33,11 +33,15 @@ public class MM_Drivetrain {
 
     private static final double SECONDS_PER_DEGREE = 0.025;//??
     private static final double STRAIGHTEN_P = .0780;
+    private static final double STRAFE_P = .089;
+    private static final double CORRECTION_COEFFICIENT = 0.000055; //Gain per tick
     public static final double SLOW_MULTIPLIER = 0.65;
     public static final double SUPER_SLOW_MULTIPLIER = 0.35;
     static final int FAST = 0;
     static final int SLOW = 1;
     static final int SUPER_SLOW = 2;
+    static final int DRIVE = 0;
+    static final int STRAFE = 1;
 
     private int slowMode = SLOW;
     private int previousSlowMode = SLOW;
@@ -62,10 +66,29 @@ public class MM_Drivetrain {
         this.opMode = opMode;
         init();
     }
+
     public void driveInches(double inches) {
         prepareToDrive(inches);
         runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 5 && !reachedPosition()) {
+        while (opMode.opModeIsActive() && runtime.seconds() < 5 && !reachedPositionDrive()) {
+            opMode.telemetry.addData("inches target", inches);
+            opMode.telemetry.update();
+        }
+    }
+
+    public void microscopicDriveInches(double inches) {
+        prepareToDrive(inches);
+        runtime.reset();
+        while (opMode.opModeIsActive() && runtime.seconds() < 2 && !reachedPositionMicroscopicDrive()) {
+            opMode.telemetry.addData("inches target", inches);
+            opMode.telemetry.update();
+        }
+    }
+
+    public void strafeInches(double inches) {
+        prepareToStrafe(inches);
+        runtime.reset();
+        while (opMode.opModeIsActive() && runtime.seconds() < 5 && !reachedPositionStrafe()) {
             opMode.telemetry.addData("inches target", inches);
             opMode.telemetry.update();
         }
@@ -83,9 +106,35 @@ public class MM_Drivetrain {
         rightPriorEncoderTarget = rightTargetTicks;
     }
 
-    public boolean reachedPosition() { //this also sets the motor power
+    public void prepareToStrafe(double inches) {
+        int backTargetTicks = backPriorEncoderTarget + MM_Util.inchesToTicks(inches);
+
+        opMode.pBackDriveController.setInputRange(backPriorEncoderTarget, backTargetTicks);
+        opMode.pBackDriveController.setSetpoint(backTargetTicks);
+        backPriorEncoderTarget = backTargetTicks;
+    }
+
+    public boolean reachedPositionDrive() { //this also sets the motor power
         setStraightPower();
         if (opMode.pLeftDriveController.reachedTarget() || opMode.pRightDriveController.reachedTarget()) {
+            stop();
+            return true;
+        }
+        return false;
+    }
+
+    public boolean reachedPositionMicroscopicDrive() {
+        setMicroscopicStraightPower();
+        if (Math.abs(leftEncoder.getCurrentPosition() - leftPriorEncoderTarget) < 200 || Math.abs(rightEncoder.getCurrentPosition() - rightPriorEncoderTarget) < 200) {
+            stop();
+            return true;
+        }
+        return false;
+    }
+
+    public boolean reachedPositionStrafe() {
+        setStrafePower();
+        if (opMode.pBackDriveController.reachedTarget()) {
             stop();
             return true;
         }
@@ -99,7 +148,48 @@ public class MM_Drivetrain {
         leftDrivePower = opMode.pLeftDriveController.calculatePower(leftCurrentTicks);
         rightDrivePower = opMode.pRightDriveController.calculatePower(rightCurrentTicks);
 
-        angleStraighten();
+        flPower = leftDrivePower;
+        frPower = rightDrivePower;
+        blPower = leftDrivePower;
+        brPower = rightDrivePower;
+
+        angleStraighten(STRAIGHTEN_P, leftDrivePower, rightDrivePower);
+        normalize();
+        setMotorPower(flPower, frPower, blPower, brPower);
+    }
+
+    private void setMicroscopicStraightPower() {
+        leftCurrentTicks = leftEncoder.getCurrentPosition();
+        rightCurrentTicks = rightEncoder.getCurrentPosition();
+
+        if (leftCurrentTicks > leftPriorEncoderTarget) {
+            flPower = -0.16;
+            frPower = -0.16;
+            blPower = -0.16;
+            brPower = -0.16;
+        } else {
+            flPower = 0.16;
+            frPower = 0.16;
+            blPower = 0.16;
+            brPower = 0.16;
+        }
+        angleStraighten(STRAIGHTEN_P, flPower, frPower);
+        normalize();
+        setMotorPower(flPower, frPower, blPower, brPower);
+    }
+
+    private void setStrafePower() {
+        backCurrentTicks = -backEncoder.getCurrentPosition();
+
+        double calculatedPower = opMode.pBackDriveController.calculatePower(backCurrentTicks);
+        opMode.telemetry.addData("calc power", calculatedPower);
+        flPower = -calculatedPower;
+        frPower = calculatedPower;
+        blPower = calculatedPower;
+        brPower = -calculatedPower;
+
+        encoderCorrect(calculatedPower, STRAFE);
+        angleStraighten(STRAFE_P, calculatedPower, calculatedPower);
         normalize();
         setMotorPower(flPower, frPower, blPower, brPower);
     }
@@ -226,13 +316,41 @@ public class MM_Drivetrain {
         backPriorEncoderTarget = backPriorEncoderTarget - backStartingTicks + backEncoder.getCurrentPosition();
     }
 
-    private void angleStraighten() {
+    private void encoderCorrect(double calculatedPower, int movement) { //TODO RENAME
+        if (movement == STRAFE) {
+            leftCurrentTicks = leftEncoder.getCurrentPosition();
+            rightCurrentTicks = rightEncoder.getCurrentPosition();
+
+            double leftError = leftPriorEncoderTarget - leftCurrentTicks;
+            double rightError =  rightPriorEncoderTarget - rightCurrentTicks;
+            //modeled after straighten
+            flPower = flPower + (leftError * CORRECTION_COEFFICIENT * Math.abs(calculatedPower));
+            frPower = frPower + (rightError * CORRECTION_COEFFICIENT * Math.abs(calculatedPower));
+            blPower = blPower + (leftError * CORRECTION_COEFFICIENT * Math.abs(calculatedPower));
+            brPower = brPower + (rightError * CORRECTION_COEFFICIENT * Math.abs(calculatedPower));
+        } else {
+            backCurrentTicks = -backEncoder.getCurrentPosition();
+
+            double backError = backPriorEncoderTarget - backCurrentTicks;
+
+            flPower = flPower - (backError * CORRECTION_COEFFICIENT * Math.abs(calculatedPower));
+            frPower = frPower + (backError * CORRECTION_COEFFICIENT * Math.abs(calculatedPower));
+            blPower = blPower - (backError * CORRECTION_COEFFICIENT * Math.abs(calculatedPower));
+            brPower = brPower + (backError * CORRECTION_COEFFICIENT * Math.abs(calculatedPower));
+        }
+    }
+
+    private void angleStraighten(double pCoefficient, double leftCalculated, double rightCalculated) {
         double headingError = correctedAngle(priorAngle - imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
 
-        flPower = leftDrivePower - (headingError * STRAIGHTEN_P * Math.abs(leftDrivePower));
-        frPower = rightDrivePower + (headingError * STRAIGHTEN_P * Math.abs(rightDrivePower));
-        blPower = leftDrivePower - (headingError * STRAIGHTEN_P * Math.abs(leftDrivePower));
-        brPower = rightDrivePower + (headingError * STRAIGHTEN_P * Math.abs(rightDrivePower));
+        flPower = flPower - (headingError * pCoefficient * Math.abs(leftCalculated));
+        frPower = frPower + (headingError * pCoefficient * Math.abs(rightCalculated));
+        blPower = blPower - (headingError * pCoefficient * Math.abs(leftCalculated));
+        brPower = brPower + (headingError * pCoefficient * Math.abs(rightCalculated));
+    }
+
+    public double getHeading() {
+        return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
     }
 
     private double correctedAngle(double angle) {

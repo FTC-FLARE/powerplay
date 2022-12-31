@@ -11,16 +11,13 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-
 @Config
-@Autonomous(name="MM_Auto_Left", group="MM")
-public class MM_Auto_Left extends MM_OpMode {
+@Autonomous(name="MM_Auto_Right_Strafe", group="MM")
+public class MM_Auto_Right_Strafe extends MM_OpMode {
     private MM_Robot robot = new MM_Robot(this);
 
     MM_EOCVSleeveDetection detector = new MM_EOCVSleeveDetection();
     OpenCvCamera camera;
-
-    public static int INCHES = 48;
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -48,13 +45,45 @@ public class MM_Auto_Left extends MM_OpMode {
 
         //red left
         if (maxColor == MM_EOCVSleeveDetection.YELLOW) {
-            robot.drivetrain.driveInches(5);
-            robot.drivetrain.rotateToAngle(-90);
+            robot.drivetrain.driveInches(3.5);
             robot.drivetrain.driveInches(22);
-            robot.drivetrain.rotateToAngle(0);
-            robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, 34, 5);
+            robot.drivetrain.driveInches(35.25);
             robot.drivetrain.rotateToAngle(90);
-            robot.drivetrain.driveInches(2.35);
+            robot.drivetrain.driveInches(.75);
+            runtime.reset();
+            while (opModeIsActive() && runtime.seconds() < 3) {
+            }
+            robot.slide.waitToReachPosition(MM_Slide.SlidePosition.LOW_RELEASE);
+            runtime.reset();
+            while (opModeIsActive() && runtime.seconds() < 1) {
+            }
+            robot.collector.changePosition(MM_Collector.OPEN);
+            runtime.reset();
+            while (opModeIsActive() && runtime.seconds() < 1) {
+            }
+            robot.drivetrain.driveInches(-1.5);
+        } else if (maxColor == MM_EOCVSleeveDetection.RED) {
+            robot.drivetrain.driveInches(5);//5
+            robot.drivetrain.strafeInches(20);//22
+            robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, 33, 5);// 34 medium
+            robot.drivetrain.rotateToAngle(-90);
+            robot.drivetrain.driveInches(2.3);//2.35
+            runtime.reset();
+            while (opModeIsActive() && runtime.seconds() < 3) {
+            }
+            robot.slide.waitToReachPosition(MM_Slide.SlidePosition.MEDIUM_RELEASE);
+            runtime.reset();
+            while (opModeIsActive() && runtime.seconds() < 1) {
+            }
+            robot.collector.changePosition(MM_Collector.OPEN);
+            runtime.reset();
+            while (opModeIsActive() && runtime.seconds() < 1) {
+            }
+            robot.drivetrain.driveInches(-1.7);
+        } else {
+            robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, 39, 5);
+            robot.drivetrain.rotateToAngle(90);
+            robot.drivetrain.driveInches(3);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 3) {
             }
@@ -67,43 +96,6 @@ public class MM_Auto_Left extends MM_OpMode {
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
             robot.drivetrain.driveInches(-2.5);
-        } else if (maxColor == MM_EOCVSleeveDetection.RED) {
-            robot.slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
-            robot.drivetrain.driveInches(2);
-            robot.drivetrain.rotateToAngle(90);
-            robot.drivetrain.driveInches(24);
-            robot.drivetrain.rotateToAngle(0);
-            robot.drivetrain.driveInches(33.5);
-            robot.drivetrain.rotateToAngle(-90);
-            robot.drivetrain.driveInches(2.25);
-            runtime.reset();
-            while (opModeIsActive() && runtime.seconds() < 3) {
-            }
-            robot.slide.waitToReachPosition(MM_Slide.SlidePosition.LOW_RELEASE);
-            runtime.reset();
-            while (opModeIsActive() && runtime.seconds() < 1) {
-            }
-            robot.collector.changePosition(MM_Collector.OPEN);
-            runtime.reset();
-            while (opModeIsActive() && runtime.seconds() < 1) {
-            }
-            robot.drivetrain.driveInches(-1.75);
-        } else {
-            robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, 39.5, 5);
-            robot.drivetrain.rotateToAngle(-90);
-            robot.drivetrain.driveInches(1.75);
-            runtime.reset();
-            while (opModeIsActive() && runtime.seconds() < 3) {
-            }
-            robot.slide.waitToReachPosition(MM_Slide.SlidePosition.MEDIUM_RELEASE);
-            runtime.reset();
-            while (opModeIsActive() && runtime.seconds() < 1) {
-            }
-            robot.collector.changePosition(MM_Collector.OPEN);
-            runtime.reset();
-            while (opModeIsActive() && runtime.seconds() < 1) {
-            }
-            robot.drivetrain.driveInches(-2.75);
         }
         robot.drivetrain.rotateToAngle(0);
         robot.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
