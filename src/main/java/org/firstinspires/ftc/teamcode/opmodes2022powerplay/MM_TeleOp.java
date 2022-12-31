@@ -3,6 +3,10 @@ package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.exception.RobotCoreException;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+
 @TeleOp(name="TeleOp", group="MM")
 public class MM_TeleOp extends MM_OpMode {
 
@@ -21,6 +25,7 @@ public class MM_TeleOp extends MM_OpMode {
             robot.drivetrain.driveWithSticks();
             robot.slide.driverControl();
             robot.collector.runCollector();
+            telemetry.addData("Heading", robot.drivetrain.getHeading());
             telemetry.update();
         }
     }

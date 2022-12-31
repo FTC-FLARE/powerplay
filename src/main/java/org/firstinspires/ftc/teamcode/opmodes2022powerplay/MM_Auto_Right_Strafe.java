@@ -12,8 +12,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Config
-@Autonomous(name="MM_Auto_Right", group="MM")
-public class MM_Auto_Right extends MM_OpMode {
+@Autonomous(name="MM_Auto_Right_Strafe", group="MM")
+public class MM_Auto_Right_Strafe extends MM_OpMode {
     private MM_Robot robot = new MM_Robot(this);
 
     MM_EOCVSleeveDetection detector = new MM_EOCVSleeveDetection();

@@ -310,6 +310,10 @@ public class MM_Drivetrain {
         brPower = brPower + (headingError * pCoefficient * Math.abs(rightCalculated));
     }
 
+    public double getHeading() {
+        return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+    }
+
     private double correctedAngle(double angle) {
         if (angle > 180) {
             angle -= 360;
