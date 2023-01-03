@@ -59,6 +59,22 @@ public class MM_Robot {
             opMode.telemetry.update();
         }
     }
+    public void microscopicRunSlideandDrive(MM_Slide.SlidePosition slidePosition, double inches, double timeoutTime) {
+        drivetrain.prepareToDrive(inches);
+        slide.moveTowardTarget(slidePosition);
+        boolean driveDone = false;
+        boolean slideDone = false;
+        runtime.reset();
+
+        while (opMode.opModeIsActive() && (!driveDone || !slideDone) && runtime.seconds() < timeoutTime) {
+            driveDone = drivetrain.reachedPositionMicroscopicDrive();
+            slideDone = slide.reachedPosition();
+            opMode.telemetry.addData("inches target", inches);
+            opMode.telemetry.addData("slide target", slidePosition);
+            opMode.telemetry.update();
+        }
+    }
+
     //    feel free to refactor any names
     public void autoStackCollect(int stackLevel){
         slide.setSlideTarget(MM_Slide.SlidePosition.STACK.ticks * (stackLevel - 1));
@@ -68,7 +84,7 @@ public class MM_Robot {
         }
         collector.autoRunCollector();
         runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 1) {
+        while (opMode.opModeIsActive() && runtime.seconds() < 0.8) {
             opMode.telemetry.update();
         }
 

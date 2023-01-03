@@ -131,7 +131,7 @@ public class MM_Drivetrain {
 
     public boolean reachedPositionMicroscopicDrive() {
         setMicroscopicStraightPower();
-        if (Math.abs(leftEncoder.getCurrentPosition() - leftPriorEncoderTarget) < 200 || Math.abs(rightEncoder.getCurrentPosition() - rightPriorEncoderTarget) < 200) {
+        if (Math.abs(leftEncoder.getCurrentPosition() - leftPriorEncoderTarget) < 175 || Math.abs(rightEncoder.getCurrentPosition() - rightPriorEncoderTarget) < 175) {
             stop();
             return true;
         }

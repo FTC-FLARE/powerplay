@@ -47,6 +47,12 @@ public class MM_Auto_Test extends MM_OpMode {
         robot.drivetrain.microscopicDriveInches(-2.5);
         detector.changeMode();
         detector.setConeColor(1); //BLUE
+        robot.autoScore();
+        robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 6, 5);
+        robot.autoStackCollect(5);
+        robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW, -6, 5);
+        robot.autoScore();
+        robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 6, 5);
         if (detector.goodToCollect() && robot.drivetrain.withinJunctionRange()) {
         }
     }
