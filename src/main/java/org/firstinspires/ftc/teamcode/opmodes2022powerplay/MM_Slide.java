@@ -117,8 +117,15 @@ public class MM_Slide {
     }
 
     public void moveTowardTarget(SlidePosition slidePosition) {
+        moveTowardTarget(slidePosition, false);
+    }
+
+    public void moveTowardTarget(SlidePosition slidePosition, boolean flipTurner) {
         setSlideTarget(slidePosition.ticks);
         slide.setTargetPosition(getSlideTarget());
+        if (flipTurner) {
+            turner.setTarget();
+        }
     }
 
     private boolean inDangerZone() {
@@ -162,11 +169,11 @@ public class MM_Slide {
     }
     public void autoScore(){
         waitToReachPosition(SlidePosition.LOW);
-        turner.changePosition(turner.BACK);
+        turner.startMoving(turner.BACK);
         waitToReachPosition(SlidePosition.LOW_RELEASE);
 //        collector release
         waitToReachPosition(SlidePosition.LOW);
-        turner.changePosition(turner.FRONT);
+        turner.startMoving(turner.FRONT);
     }
 
     private void init() {

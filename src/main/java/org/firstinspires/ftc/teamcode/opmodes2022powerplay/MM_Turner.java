@@ -12,8 +12,10 @@ public class MM_Turner{
     static final double BACK_TURN_INCREMENT = -0.020;
     static final double FRONT_TURN_INCREMENT = 0.025;
 
+    private boolean turnerDone = false;
     private boolean isMoving = false;
     private double currentPosition = FRONT;
+    private double targetPosition = FRONT;
     private double turnIncrement = BACK_TURN_INCREMENT;
 
     public MM_Turner(MM_OpMode opMode, MM_Slide slide) {
@@ -25,9 +27,9 @@ public class MM_Turner{
     public void runTurner(boolean tooLowToPivot) {
         if (!tooLowToPivot) {
             if (opMode.dpadLeftPressed(opMode.GAMEPAD2)) {
-                changePosition(BACK);
+                startMoving(BACK);
             } else if (opMode.dpadRightPressed(opMode.GAMEPAD2)) {
-                changePosition(FRONT);
+                startMoving(FRONT);
             }
         }
 
@@ -42,7 +44,7 @@ public class MM_Turner{
         opMode.telemetry.addData("Turner Position", currentPosition);
     }
 
-    public void changePosition(double position) {
+    public void startMoving(double position) {
         if (position == BACK) {
             turnIncrement = BACK_TURN_INCREMENT;
         } else {
@@ -53,6 +55,22 @@ public class MM_Turner{
 
     public void changeTurnerPosition(double position){
         turner.setPosition(position);
+    }
+
+    public boolean reachedPosition(boolean tooLowToPivot) {
+        if (currentPosition != targetPosition && !tooLowToPivot) {
+            turner.setPosition(targetPosition);
+            currentPosition = targetPosition;
+        }
+        return currentPosition == targetPosition;
+    }
+
+    public void setTarget() {
+        if (currentPosition == FRONT) {
+            targetPosition = BACK;
+        } else {
+            targetPosition = FRONT;
+        }
     }
 
     public double getPosition() {
