@@ -64,7 +64,9 @@ public class MM_Robot {
             while (opMode.opModeIsActive() && (!driveDone || !slideDone || !turnerDone) && runtime.seconds() < timeoutTime) {
                 driveDone = drivetrain.reachedPositionDrive();
                 slideDone = slide.reachedPosition();
-                turnerDone = slide.turner.reachedPosition(slide.tooLowToPivot());
+                if (!turnerDone) {
+                    turnerDone = slide.turner.reachedPosition(slide.tooLowToPivot());
+                }
                 opMode.telemetry.addData("inches target", inches);
                 opMode.telemetry.addData("slide target", slidePosition);
                 opMode.telemetry.update();
@@ -96,7 +98,9 @@ public class MM_Robot {
             while (opMode.opModeIsActive() && (!driveDone || !slideDone || !turnerDone) && runtime.seconds() < timeoutTime) {
                 driveDone = drivetrain.reachedPositionMicroscopicDrive();
                 slideDone = slide.reachedPosition();
-                turnerDone = slide.turner.reachedPosition(slide.tooLowToPivot());
+                if (!turnerDone) {
+                    turnerDone = slide.turner.reachedPosition(slide.tooLowToPivot());
+                }
                 opMode.telemetry.addData("inches target", inches);
                 opMode.telemetry.addData("slide target", slidePosition);
                 opMode.telemetry.update();
