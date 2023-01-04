@@ -36,6 +36,7 @@ public class MM_Auto_Test extends MM_OpMode {
         telemetry.update();
         waitForStart();
 
+        robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, 24, 5, true);
         robot.collector.changePosition(MM_Collector.CLOSED);
         sleep(500);
         robot.slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);

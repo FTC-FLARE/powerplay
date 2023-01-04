@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 public class MM_Turner{
@@ -12,6 +13,7 @@ public class MM_Turner{
     static final double BACK_TURN_INCREMENT = -0.020;
     static final double FRONT_TURN_INCREMENT = 0.025;
 
+    private ElapsedTime timer = new ElapsedTime();
     private boolean turnerDone = false;
     private boolean isMoving = false;
     private double currentPosition = FRONT;
@@ -61,8 +63,13 @@ public class MM_Turner{
         if (currentPosition != targetPosition && !tooLowToPivot) {
             turner.setPosition(targetPosition);
             currentPosition = targetPosition;
+            timer.reset();
+        } else if (targetPosition == currentPosition) {
+            if (timer.seconds() > 0.6) {
+                return true;
+            }
         }
-        return currentPosition == targetPosition;
+        return false;
     }
 
     public void setTarget() {
