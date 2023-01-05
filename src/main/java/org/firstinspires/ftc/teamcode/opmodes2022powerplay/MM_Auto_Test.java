@@ -48,12 +48,13 @@ public class MM_Auto_Test extends MM_OpMode {
         detector.changeMode();
         detector.setConeColor(1); //BLUE
         robot.autoScore(false);
+        robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 6, 5);
         if (detector.goodToCollect() && robot.drivetrain.withinJunctionRange()) {
-            robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 6, 5);
             robot.autoStackCollect(5);
             robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW, -6, 5);
             robot.autoScore(true);
         }
+        robot.sleevePark(detector.getMaxColor(),true);
     }
 
     private void firstInitCamera() {

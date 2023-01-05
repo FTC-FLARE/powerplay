@@ -21,27 +21,40 @@ public class MM_Robot {
         this.opMode = opMode;
     }
 
-    public void sleevePark(int sleeveColor) {
-        if (sleeveColor == MM_EOCVDetection.RED || sleeveColor == MM_EOCVDetection.YELLOW) {
-            drivetrain.driveInches(5); //get away from wall
-            double angleTarget = 90;
-            if (sleeveColor == MM_EOCVDetection.YELLOW) {
-                angleTarget = -angleTarget;
-                opMode.telemetry.addLine("Traveling to Yellow");
-            } else {
-                opMode.telemetry.addLine("Traveling to Red");
-            }
-            drivetrain.rotateToAngle(angleTarget);
-            drivetrain.driveInches(24);
+    public void sleevePark(int sleeveColor, boolean secondCone) {
+        if(secondCone){
+            microscopicRunSlideandDrive(MM_Slide.SlidePosition.COLLECT,3, 5);
             drivetrain.rotateToAngle(0);
-            drivetrain.driveInches(31);
-        } else {
-            opMode.telemetry.addLine("Traveling to Blue");
-            drivetrain.driveInches(42);
-            drivetrain.driveInches(-8);
+
+            if (sleeveColor == MM_EOCVDetection.BLUE){
+                drivetrain.strafeInches(24);
+            }else if (sleeveColor == MM_EOCVDetection.YELLOW){
+                drivetrain.strafeInches(40);
+            }
+
+        }else{
+            if (sleeveColor == MM_EOCVDetection.RED || sleeveColor == MM_EOCVDetection.YELLOW) {
+                drivetrain.driveInches(5); //get away from wall
+                double angleTarget = 90;
+                if (sleeveColor == MM_EOCVDetection.YELLOW) {
+                    angleTarget = -angleTarget;
+                    opMode.telemetry.addLine("Traveling to Yellow");
+                } else {
+                    opMode.telemetry.addLine("Traveling to Red");
+                }
+                drivetrain.rotateToAngle(angleTarget);
+                drivetrain.driveInches(24);
+                drivetrain.rotateToAngle(0);
+                drivetrain.driveInches(31);
+            } else {
+                opMode.telemetry.addLine("Traveling to Blue");
+                drivetrain.driveInches(42);
+                drivetrain.driveInches(-8);
+            }
+            slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
+            opMode.telemetry.update();
+
         }
-        slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
-        opMode.telemetry.update();
     }
 
     public void runSlideandDrive(MM_Slide.SlidePosition slidePosition, double inches, double timeoutTime) {
