@@ -16,6 +16,7 @@ public class MM_EOCVDetection extends OpenCvPipeline {
     private int maxColor = RED;
     private int mode = 1;
     private int coneColor = RED;
+    private int higherMean = 0;
 
     private Mat max = new Mat();
     private Mat cropped =  new Mat();
@@ -52,11 +53,21 @@ public class MM_EOCVDetection extends OpenCvPipeline {
                 }
                 loopCount += 1;
             }
-        } else {
+        } else if (mode == 2) {
             Mat thresh = new Mat();
             Core.inRange(mat, lowerBoundColorCone(coneColor), upperBoundColorCone(coneColor), thresh);
             cropped = new Mat(thresh, new Range(65, 165), new Range(150, 230));
             max = cropped;
+        } else {
+            Mat thresh = new Mat();
+            Core.inRange(mat, lowerBoundColorCone(coneColor), upperBoundColorCone(coneColor), thresh);
+            Mat left = new Mat(thresh, new Range(65, 165), new Range(150, 190));
+            Mat right = new Mat(thresh, new Range(65, 165), new Range(190, 230));
+            if (Core.mean(left).val[0] > Core.mean(right).val[0]) {
+                higherMean = -1; //val for left;
+            } else {
+
+            }
         }
         return max;
     }
@@ -67,12 +78,8 @@ public class MM_EOCVDetection extends OpenCvPipeline {
         return Core.mean(max).val[0];
     }
 
-    public void changeMode() {
-        if (mode == 1) {
-            mode = 2;
-        } else {
-            mode = 1;
-        }
+    public void changeMode(int mode) {
+        this.mode =  mode;
     }
 
     public void setConeColor(int coneColor) {
@@ -81,6 +88,10 @@ public class MM_EOCVDetection extends OpenCvPipeline {
 
     public boolean goodToCollect() {
         return Core.mean(max).val[0] > 120;
+    }
+
+    public int getHigherMean() {
+        return higherMean;
     }
 
     private Scalar upperBoundColorSleeve(int color) {

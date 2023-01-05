@@ -46,7 +46,7 @@ public class cameraOpMode extends LinearOpMode {
         FtcDashboard.getInstance().startCameraStream(camera, 0);
         telemetry.addLine("Waiting for start");
         telemetry.update();
-        detector.changeMode();
+        detector.changeMode(2);
         detector.setConeColor(1);
         waitForStart();
 
