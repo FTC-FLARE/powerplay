@@ -55,7 +55,7 @@ public class MM_EOCVDetection extends OpenCvPipeline {
         } else {
             Mat thresh = new Mat();
             Core.inRange(mat, lowerBoundColorCone(coneColor), upperBoundColorCone(coneColor), thresh);
-            cropped = new Mat(thresh, new Range(65, 165), new Range(120, 200));
+            cropped = new Mat(thresh, new Range(65, 165), new Range(150, 230));
             max = cropped;
         }
         return max;

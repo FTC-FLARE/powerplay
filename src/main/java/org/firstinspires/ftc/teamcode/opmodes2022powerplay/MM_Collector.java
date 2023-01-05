@@ -67,7 +67,23 @@ public class MM_Collector {
         if (grabber.getPosition() == OPEN){
             changePosition(CLOSED);
         } else {
+            if (coneSaverPosition == FRONT) {
+                coneSaver.setPosition(BACK);
+                timer.reset();
+                while (timer.seconds() < 0.2) {
+                }
+            }
             changePosition(OPEN);
+        }
+    }
+
+    public void flipConeSaver() {
+        if (coneSaver.getPosition() == FRONT) {
+            coneSaver.setPosition(BACK);
+            coneSaverPosition = BACK;
+        } else {
+            coneSaver.setPosition(FRONT);
+            coneSaverPosition = FRONT;
         }
     }
 

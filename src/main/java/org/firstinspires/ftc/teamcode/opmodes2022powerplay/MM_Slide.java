@@ -31,6 +31,7 @@ public class MM_Slide {
         LOW_RELEASE(1550),
         PIVOT_POSITION(1600),
         LOW(1750),
+        LOW_HIGH(1900),
         MEDIUM_RELEASE(2650),
         MEDIUM(2850),
         HIGH_RELEASE(3900),

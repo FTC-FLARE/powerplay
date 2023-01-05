@@ -39,6 +39,7 @@ public class MM_Auto_Test extends MM_OpMode {
         robot.collector.changePosition(MM_Collector.CLOSED);
         sleep(500);
         robot.slide.waitToReachPosition(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT);
+        robot.collector.flipConeSaver();
         robot.drivetrain.microscopicDriveInches(3);
         robot.drivetrain.strafeInches(23);
         robot.runSlideandDrive(MM_Slide.SlidePosition.LOW , 41.3, 20);
@@ -47,14 +48,19 @@ public class MM_Auto_Test extends MM_OpMode {
         robot.drivetrain.microscopicDriveInches(-2.5);
         detector.changeMode();
         detector.setConeColor(1); //BLUE
-        robot.autoScore(false);
-        robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 6, 5);
-        if (detector.goodToCollect() && robot.drivetrain.withinJunctionRange()) {
-            robot.autoStackCollect(5);
-            robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW, -6, 5);
-            robot.autoScore(true);
+        if (!robot.drivetrain.withinJunctionRange()) {
+            robot.drivetrain.correctForJunction();
         }
-        robot.sleevePark(detector.getMaxColor(),true);
+        robot.autoScore(false);
+        if (detector.goodToCollect()) {
+            robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 6, 5);
+            robot.autoStackCollect(5);
+            robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -6, 5);
+            robot.autoScore(true);
+            robot.drivetrain.microscopicDriveInches(3);
+            robot.sleevePark(2, true);
+
+        }
     }
 
     private void firstInitCamera() {

@@ -37,6 +37,8 @@ public class MM_Drivetrain {
 
     private final ElapsedTime runtime = new ElapsedTime();
 
+    private static final int RIGHT = 1;
+    private static final int LEFT = -1;
     private static final double SECONDS_PER_DEGREE = 0.025;//??
     private static final double STRAIGHTEN_P = .0780;
     private static final double STRAFE_P = .089;
@@ -369,7 +371,40 @@ public class MM_Drivetrain {
     }
 
     public boolean withinJunctionRange() {
-        return distance.getDistance(DistanceUnit.INCH) < 11;
+        return distance.getDistance(DistanceUnit.INCH) < 4;
+    }
+
+    public void correctForJunction() {
+        double startingDistance = distance.getDistance(DistanceUnit.INCH);
+        if (startingDistance > 4) {
+            strafe(RIGHT);
+            runtime.reset();
+            double currentDistance = distance.getDistance(DistanceUnit.INCH);
+            while (currentDistance > 4) {
+                currentDistance = distance.getDistance(DistanceUnit.INCH);
+                if (runtime.seconds() > 1) {
+                    if (currentDistance > startingDistance) {
+                        strafe(LEFT);
+                    }
+                }
+                if (runtime.seconds() > 3) {
+                    currentDistance = 0;
+                    //set an abort variable
+                }
+            }
+            stop();
+        }
+    }
+
+    public void strafe(int direction) {
+        //left is negative
+        double power = 0.26 * direction;
+        flPower = power;
+        frPower = -power;
+        blPower = -power;
+        brPower = power;
+        angleStraighten(STRAIGHTEN_P, power, power);
+        setMotorPower(flPower, frPower, blPower, brPower);
     }
 
     private void init() {

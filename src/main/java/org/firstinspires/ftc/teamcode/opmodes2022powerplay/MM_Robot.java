@@ -23,13 +23,13 @@ public class MM_Robot {
 
     public void sleevePark(int sleeveColor, boolean secondCone) {
         if(secondCone){
-            microscopicRunSlideandDrive(MM_Slide.SlidePosition.COLLECT,3, 5);
             drivetrain.rotateToAngle(0);
+            microscopicRunSlideandDrive(MM_Slide.SlidePosition.COLLECT,5, 5);
 
             if (sleeveColor == MM_EOCVDetection.BLUE){
-                drivetrain.strafeInches(24);
+                drivetrain.strafeInches(-22);
             }else if (sleeveColor == MM_EOCVDetection.YELLOW){
-                drivetrain.strafeInches(40);
+                drivetrain.strafeInches(-46);
             }
 
         }else{
@@ -147,7 +147,6 @@ public class MM_Robot {
     }
 
     public void autoScore(boolean flipfirst){
-        slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
         if (flipfirst){
             slide.turner.changeTurnerPosition(slide.turner.BACK);
             runtime.reset();
