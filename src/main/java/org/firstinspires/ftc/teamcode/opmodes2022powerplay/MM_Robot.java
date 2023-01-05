@@ -55,6 +55,8 @@ public class MM_Robot {
         } else {
             slide.moveTowardTarget(slidePosition);
         }
+        slide.turner.changeTurnerPosition(0);
+
         boolean driveDone = false;
         boolean slideDone = false;
         runtime.reset();
@@ -131,22 +133,24 @@ public class MM_Robot {
 
     }
 
-    public void autoScore(){
+    public void autoScore(boolean flipfirst){
         slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
-        slide.turner.changeTurnerPosition(slide.turner.BACK);
-        runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 2) {
+        if (flipfirst){
+            slide.turner.changeTurnerPosition(slide.turner.BACK);
+            runtime.reset();
+            while (opMode.opModeIsActive() && runtime.seconds() < 1.5) {
+            }
         }
         slide.waitToReachPosition(MM_Slide.SlidePosition.LOW_RELEASE);
         collector.autoRunCollector();
         runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 2){
+        while (opMode.opModeIsActive() && runtime.seconds() < 1.5){
         }
         slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
 
         slide.turner.changeTurnerPosition(slide.turner.FRONT);
         runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 2){
+        while (opMode.opModeIsActive() && runtime.seconds() < 1.5){
         }
     }
 
