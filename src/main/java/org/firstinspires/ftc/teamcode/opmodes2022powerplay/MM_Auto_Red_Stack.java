@@ -12,8 +12,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Config
-@Autonomous(name="MM_Auto_Test", group="MM")
-public class MM_Auto_Test extends MM_OpMode {
+@Autonomous(name="MM_Auto_Red_Stack", group="MM")
+public class MM_Auto_Red_Stack extends MM_OpMode {
     private final MM_Robot robot = new MM_Robot(this);
 
     MM_EOCVDetection detector = new MM_EOCVDetection();
@@ -28,7 +28,7 @@ public class MM_Auto_Test extends MM_OpMode {
         telemetry.addData("Status", "Wait for initialization");
         telemetry.update();
 
-        firstInitCamera();
+        initCamera();
 
         robot.init();
 
@@ -40,6 +40,9 @@ public class MM_Auto_Test extends MM_OpMode {
         sleep(500);
         robot.slide.waitToReachPosition(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT);
         robot.collector.flipConeSaver();
+        int maxColor = detector.getMaxColor();
+        telemetry.addData("Max Color", detector.getMaxColorString());
+        telemetry.update();
         robot.drivetrain.microscopicDriveInches(3);
         robot.drivetrain.strafeInches(23);
         robot.slide.turner.changeTurnerPosition(0);
@@ -51,7 +54,7 @@ public class MM_Auto_Test extends MM_OpMode {
         boolean score = true;
         if (!robot.drivetrain.withinJunctionRange()) {
             detector.changeMode(3);
-            detector.setConeColor(1); //BLUE
+            detector.setConeColor(0);
             score = robot.drivetrain.correctForJunction(detector.getHigherMean());
         }
         if (score) {
@@ -63,10 +66,10 @@ public class MM_Auto_Test extends MM_OpMode {
                 robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -6, 5);
                 robot.autoScore(true);
                 robot.drivetrain.microscopicDriveInches(3);
-                robot.sleevePark(2, true);
+                robot.sleevePark(maxColor, true);
             } else {
                 robot.drivetrain.microscopicDriveInches(3);
-                robot.sleevePark(2, true);
+                robot.sleevePark(maxColor, true);
             }
         } else {
             robot.slide.turner.changeTurnerPosition(0.885);
@@ -75,7 +78,7 @@ public class MM_Auto_Test extends MM_OpMode {
 
     }
 
-    private void firstInitCamera() {
+    private void initCamera() {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
         // Connect to the camera

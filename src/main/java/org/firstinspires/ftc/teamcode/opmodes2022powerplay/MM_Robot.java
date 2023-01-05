@@ -68,7 +68,6 @@ public class MM_Robot {
         } else {
             slide.moveTowardTarget(slidePosition);
         }
-        slide.turner.changeTurnerPosition(0);
 
         boolean driveDone = false;
         boolean slideDone = false;

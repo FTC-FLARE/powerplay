@@ -66,7 +66,7 @@ public class MM_EOCVDetection extends OpenCvPipeline {
             if (Core.mean(left).val[0] > Core.mean(right).val[0]) {
                 higherMean = -1; //val for left;
             } else {
-
+                higherMean = 1;
             }
         }
         return max;

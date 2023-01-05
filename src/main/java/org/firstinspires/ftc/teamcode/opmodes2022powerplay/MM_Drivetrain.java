@@ -374,7 +374,7 @@ public class MM_Drivetrain {
         return distance.getDistance(DistanceUnit.INCH) < 4;
     }
 
-    public void correctForJunction(int direction) {
+    public boolean correctForJunction(int direction) {
         strafe(direction);
         runtime.reset();
         double startingDistance = distance.getDistance(DistanceUnit.INCH);
@@ -387,11 +387,12 @@ public class MM_Drivetrain {
                 }
             }
             if (runtime.seconds() > 3) {
-                currentDistance = 0;
-                //set an abort variable
+                stop();
+                return false;
             }
         }
         stop();
+        return true;
     }
 
     public void strafe(int direction) {
