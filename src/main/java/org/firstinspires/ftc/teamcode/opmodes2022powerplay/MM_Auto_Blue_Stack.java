@@ -57,9 +57,10 @@ public class MM_Auto_Blue_Stack extends MM_OpMode {
             detector.setConeColor(1); //BLUE
             score = robot.drivetrain.correctForJunction(detector.getHigherMean());
         }
+        detector.changeMode(2);
         if (score) {
             robot.autoScore(false);
-            detector.changeMode(2);
+
             if (detector.goodToCollect()) {
                 robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 6, 5);
                 robot.autoStackCollect(5);

@@ -19,6 +19,8 @@ public class MM_EOCVDetection extends OpenCvPipeline {
     private int higherMean = 0;
 
     private Mat max = new Mat();
+    private Mat right = new Mat();
+    private Mat left = new Mat();
     private Mat cropped =  new Mat();
     public Mat processFrame(Mat frame) {
 
@@ -31,6 +33,7 @@ public class MM_EOCVDetection extends OpenCvPipeline {
             maxColor = -1; //no max
             return frame;
         }
+
 
         if (mode == 1) {
             int loopCount = 0;
@@ -61,13 +64,8 @@ public class MM_EOCVDetection extends OpenCvPipeline {
         } else {
             Mat thresh = new Mat();
             Core.inRange(mat, lowerBoundColorCone(coneColor), upperBoundColorCone(coneColor), thresh);
-            Mat left = new Mat(thresh, new Range(65, 165), new Range(150, 190));
-            Mat right = new Mat(thresh, new Range(65, 165), new Range(190, 230));
-            if (Core.mean(left).val[0] > Core.mean(right).val[0]) {
-                higherMean = -1; //val for left;
-            } else {
-                higherMean = 1;
-            }
+            left = new Mat(thresh, new Range(65, 165), new Range(150, 190));
+            right = new Mat(thresh, new Range(65, 165), new Range(190, 230));
         }
         return max;
     }
@@ -87,11 +85,19 @@ public class MM_EOCVDetection extends OpenCvPipeline {
     }
 
     public boolean goodToCollect() {
-        return Core.mean(max).val[0] > 120;
+        if (coneColor == BLUE) {
+            return Core.mean(max).val[0] > 100;
+        } else {
+            return Core.mean(max).val[0] > 80;
+        }
     }
 
     public int getHigherMean() {
-        return higherMean;
+        if (Core.mean(left).val[0] > Core.mean(right).val[0]) {
+            return -1; //val for left;
+        } else {
+            return 1;
+        }
     }
 
     private Scalar upperBoundColorSleeve(int color) {
@@ -127,6 +133,7 @@ public class MM_EOCVDetection extends OpenCvPipeline {
             return new Scalar(120, 80, 85);
         } else {
             return new Scalar(60, 190, 90);
+
         }
     }
 

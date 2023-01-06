@@ -453,3 +453,25 @@ public class MM_Drivetrain {
         }
     }
 }
+/*    public void correctForJunction() {
+        double startingDistance = distance.getDistance(DistanceUnit.INCH);
+        if (startingDistance > 4) {
+            strafe(RIGHT);
+            runtime.reset();
+            double currentDistance = distance.getDistance(DistanceUnit.INCH);
+            while (currentDistance > 4) {
+                currentDistance = distance.getDistance(DistanceUnit.INCH);
+                if (runtime.seconds() > 1) {
+                    if (currentDistance > startingDistance) {
+                        strafe(LEFT);
+                    }
+                }
+                if (runtime.seconds() > 3) {
+                    currentDistance = 0;
+                    //set an abort variable
+                }
+            }
+            stop();
+        }
+    }*/
+

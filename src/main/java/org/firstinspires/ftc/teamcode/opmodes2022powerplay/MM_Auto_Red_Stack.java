@@ -60,7 +60,7 @@ public class MM_Auto_Red_Stack extends MM_OpMode {
         if (score) {
             robot.autoScore(false);
             detector.changeMode(2);
-            if (detector.goodToCollect()) {
+            if (detector.goodToCollect() || score) {
                 robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 6, 5);
                 robot.autoStackCollect(5);
                 robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -6, 5);
