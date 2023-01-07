@@ -59,7 +59,7 @@ public class MM_EOCVDetection extends OpenCvPipeline {
         } else if (mode == 2) {
             Mat thresh = new Mat();
             Core.inRange(mat, lowerBoundColorCone(coneColor), upperBoundColorCone(coneColor), thresh);
-            cropped = new Mat(thresh, new Range(65, 165), new Range(150, 230));
+            cropped = new Mat(thresh, new Range(65, 165), new Range(135, 215));
             max = cropped;
         } else {
             Mat thresh = new Mat();
@@ -86,9 +86,9 @@ public class MM_EOCVDetection extends OpenCvPipeline {
 
     public boolean goodToCollect() {
         if (coneColor == BLUE) {
-            return Core.mean(max).val[0] > 100;
+            return Core.mean(max).val[0] > 70;
         } else {
-            return Core.mean(max).val[0] > 80;
+            return Core.mean(max).val[0] > 70;
         }
     }
 
@@ -130,7 +130,7 @@ public class MM_EOCVDetection extends OpenCvPipeline {
 
     private Scalar lowerBoundColorCone(int color) {
         if (color == RED) {
-            return new Scalar(120, 80, 85);
+            return new Scalar(140, 100, 110);
         } else {
             return new Scalar(60, 190, 90);
 

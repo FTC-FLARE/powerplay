@@ -38,7 +38,7 @@ public class MM_Auto_Blue_Stack extends MM_OpMode {
 
         robot.collector.changePosition(MM_Collector.CLOSED);
         sleep(500);
-        robot.slide.waitToReachPosition(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT);
+        robot.slide.waitToReachPosition(MM_Slide.SlidePosition.DETECT);
         robot.collector.flipConeSaver();
         int maxColor = detector.getMaxColor();
         telemetry.addData("Max Color", detector.getMaxColorString());
@@ -46,7 +46,7 @@ public class MM_Auto_Blue_Stack extends MM_OpMode {
         robot.drivetrain.microscopicDriveInches(3);
         robot.drivetrain.strafeInches(23);
         robot.slide.turner.changeTurnerPosition(0);
-        robot.runSlideandDrive(MM_Slide.SlidePosition.LOW , 41.3, 20);
+        robot.runSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH , 41.3, 20);
         robot.drivetrain.microscopicDriveInches(0);
         robot.drivetrain.rotateToAngle(60);
         robot.drivetrain.microscopicDriveInches(-2.5);
@@ -58,20 +58,27 @@ public class MM_Auto_Blue_Stack extends MM_OpMode {
             score = robot.drivetrain.correctForJunction(detector.getHigherMean());
         }
         detector.changeMode(2);
+
         if (score) {
             robot.autoScore(false);
 
             if (detector.goodToCollect()) {
                 robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 6, 5);
+                robot.drivetrain.flipDistanceServo();
                 robot.autoStackCollect(5);
-                robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -6, 5);
+                robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -4.5, 5);
                 robot.autoScore(true);
-                robot.drivetrain.microscopicDriveInches(3);
-                robot.sleevePark(maxColor, true);
-            } else {
-                robot.drivetrain.microscopicDriveInches(3);
-                robot.sleevePark(maxColor, true);
+/*                if (maxColor == 0) {
+                    robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 5, 5);
+                    robot.autoStackCollect(5);
+                    robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -4.5, 5);
+                    robot.autoScore(true);
+                }*/
+
             }
+            robot.drivetrain.microscopicDriveInches(3);
+            robot.sleevePark(maxColor, true);
+
         } else {
             robot.collector.flipConeSaver();
             robot.slide.turner.changeTurnerPosition(0.885);

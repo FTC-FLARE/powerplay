@@ -47,7 +47,7 @@ public class cameraOpMode extends LinearOpMode {
         telemetry.addLine("Waiting for start");
         telemetry.update();
         detector.changeMode(2);
-        detector.setConeColor(1);
+        detector.setConeColor(0);
         waitForStart();
 
         while (opModeIsActive()) {

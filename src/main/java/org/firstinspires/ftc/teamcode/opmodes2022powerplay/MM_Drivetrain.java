@@ -400,10 +400,10 @@ public class MM_Drivetrain {
         //left is negative
         double power = 0.26 * direction;
         flPower = power;
-        frPower = -power;
-        blPower = -power;
+        frPower = -power + (0.045 * -direction);
+        blPower = -power + (0.045 * -direction);
         brPower = power;
-        angleStraighten(STRAIGHTEN_P, power, power);
+        //angleStraighten(STRAIGHTEN_P, power, power);
         setMotorPower(flPower, frPower, blPower, brPower);
     }
 
@@ -452,6 +452,10 @@ public class MM_Drivetrain {
         } else {
             distanceServo.setPosition(0);
         }
+    }
+
+    public void flipDistanceServo() {
+        distanceServo.setPosition(1);
     }
 }
 /*    public void correctForJunction() {

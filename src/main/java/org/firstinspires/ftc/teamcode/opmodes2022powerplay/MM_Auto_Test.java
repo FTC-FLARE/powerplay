@@ -43,7 +43,7 @@ public class MM_Auto_Test extends MM_OpMode {
         robot.drivetrain.microscopicDriveInches(3);
         robot.drivetrain.strafeInches(23);
         robot.slide.turner.changeTurnerPosition(0);
-        robot.runSlideandDrive(MM_Slide.SlidePosition.LOW , 41.3, 20);
+        robot.runSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH , 41.3, 20);
         robot.drivetrain.microscopicDriveInches(0);
         robot.drivetrain.rotateToAngle(60);
         robot.drivetrain.microscopicDriveInches(-2.5);
@@ -53,10 +53,10 @@ public class MM_Auto_Test extends MM_OpMode {
             detector.changeMode(3);
             detector.setConeColor(1); //BLUE
             score = robot.drivetrain.correctForJunction(detector.getHigherMean());
+            detector.changeMode(2);
         }
         if (score) {
             robot.autoScore(false);
-            detector.changeMode(2);
             if (detector.goodToCollect()) {
                 robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 6, 5);
                 robot.autoStackCollect(5);

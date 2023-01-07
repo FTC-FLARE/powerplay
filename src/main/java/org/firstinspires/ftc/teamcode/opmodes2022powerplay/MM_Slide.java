@@ -26,6 +26,7 @@ public class MM_Slide {
         COLLECT(0),
         STACK(145),
         GROUND(400),
+        DETECT(750),
         CONESAVE_POSITION_FRONT(1100),
         CONESAVE_POSITION_BACK(1350),
         LOW_RELEASE(1550),
