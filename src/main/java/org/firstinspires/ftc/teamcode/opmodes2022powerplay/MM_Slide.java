@@ -24,9 +24,9 @@ public class MM_Slide {
     public enum SlidePosition {
         UNUSED(0),
         COLLECT(0),
-        STACK(145),
+        STACK(133),
         GROUND(400),
-        DETECT(750),
+        DETECT(850),
         CONESAVE_POSITION_FRONT(1100),
         CONESAVE_POSITION_BACK(1350),
         LOW_RELEASE(1550),
@@ -141,6 +141,13 @@ public class MM_Slide {
     }
 
     public boolean reachedPosition() {
+        return !slide.isBusy() || inDangerZone();
+    }
+
+    public boolean reachedPositionTurner() {
+        if (slide.getCurrentPosition() > 1100) {
+            turner.changeTurnerPosition(0);
+        }
         return !slide.isBusy() || inDangerZone();
     }
 

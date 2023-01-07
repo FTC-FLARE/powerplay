@@ -181,6 +181,7 @@ public class MM_Drivetrain {
             blPower = 0.16;
             brPower = 0.16;
         }
+        opMode.telemetry.addData("leftPriorEncoder", leftPriorEncoderTarget);
         angleStraighten(STRAIGHTEN_P, flPower, frPower);
         normalize();
         setMotorPower(flPower, frPower, blPower, brPower);
@@ -371,7 +372,7 @@ public class MM_Drivetrain {
     }
 
     public boolean withinJunctionRange() {
-        return distance.getDistance(DistanceUnit.INCH) < 4;
+        return distance.getDistance(DistanceUnit.INCH) < 3.25;
     }
 
     public boolean correctForJunction(int direction) {
@@ -380,7 +381,7 @@ public class MM_Drivetrain {
         double startingDistance = distance.getDistance(DistanceUnit.INCH);
         double currentDistance = startingDistance;
         while (opMode.opModeIsActive() && runtime.seconds() < 3) {
-            if(currentDistance > 4){
+            if(currentDistance > 3.25){
                 if (runtime.seconds() > 1.5 ) {
                     strafe(-direction);
                 }

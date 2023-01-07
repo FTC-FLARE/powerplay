@@ -21,8 +21,10 @@ public class MM_Robot {
         this.opMode = opMode;
     }
 
-    public void sleevePark(int sleeveColor, boolean secondCone) {
-        if(secondCone){
+    public void sleevePark(int sleeveColor, boolean secondCone, boolean thirdCone) {
+        if (thirdCone) {
+            slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
+        } else if(secondCone){
             drivetrain.rotateToAngle(0);
             microscopicRunSlideandDrive(MM_Slide.SlidePosition.COLLECT,5, 5);
 
@@ -63,23 +65,17 @@ public class MM_Robot {
 
     public void runSlideandDrive(MM_Slide.SlidePosition slidePosition, double inches, double timeoutTime, boolean flipTurner) {
         drivetrain.prepareToDrive(inches);
-        if (flipTurner) {
-            slide.moveTowardTarget(slidePosition, true);
-        } else {
-            slide.moveTowardTarget(slidePosition);
-        }
+        slide.moveTowardTarget(slidePosition);
 
         boolean driveDone = false;
         boolean slideDone = false;
         runtime.reset();
 
         if (flipTurner) {
-            boolean turnerDone = false;
-            while (opMode.opModeIsActive() && (!driveDone || !slideDone || !turnerDone) && runtime.seconds() < timeoutTime) {
+            while (opMode.opModeIsActive() && (!driveDone || !slideDone) && runtime.seconds() < timeoutTime) {
                 driveDone = drivetrain.reachedPositionDrive();
-                slideDone = slide.reachedPosition();
-                if (!turnerDone) {
-                    turnerDone = slide.turner.reachedPosition(slide.tooLowToPivot());
+                if (!slideDone) {
+                    slideDone = slide.reachedPositionTurner();
                 }
                 opMode.telemetry.addData("inches target", inches);
                 opMode.telemetry.addData("slide target", slidePosition);
@@ -145,23 +141,26 @@ public class MM_Robot {
 
     }
 
-    public void autoScore(boolean flipfirst){
+    public void autoScore(boolean flipfirst, boolean lastMove){
         if (flipfirst){
             slide.turner.changeTurnerPosition(slide.turner.BACK);
             runtime.reset();
-            while (opMode.opModeIsActive() && runtime.seconds() < 1.5) {
+            while (opMode.opModeIsActive() && runtime.seconds() < 1.25) {
             }
         }
         slide.waitToReachPosition(MM_Slide.SlidePosition.LOW_RELEASE);
         collector.autoRunCollector();
         runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 1){
-        }
         slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
+
+        if (lastMove) {
+            drivetrain.microscopicDriveInches(1.5);
+            drivetrain.rotateToAngle(0);
+        }
 
         slide.turner.changeTurnerPosition(slide.turner.FRONT);
         runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 1.5){
+        while (opMode.opModeIsActive() && runtime.seconds() < 1.25){
         }
     }
 
