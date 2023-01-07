@@ -60,24 +60,27 @@ public class MM_Auto_Blue_Stack extends MM_OpMode {
 
         boolean thirdCone = false;
         if (score) {
-            robot.autoScore(false, false);
+            robot.autoScore(false, false, maxColor);
 
             if (detector.goodToCollect()) {
-                robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 6, 5);
+                robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 6.03, 5);
                 robot.drivetrain.flipDistanceServo();
                 robot.autoStackCollect(5);
-                robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -4.5, 5);
-                robot.autoScore(true, false);
-                if (maxColor == 0) {
-                    robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 5, 5);
+                robot.slide.waitToReachPosition(MM_Slide.SlidePosition.LIFT);
+                robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -4.61
+                        , 5);
+                robot.autoScore(true, false, maxColor);
+                if (maxColor == MM_EOCVDetection.RED || maxColor == MM_EOCVDetection.BLUE || maxColor == MM_EOCVDetection.YELLOW) {
+                    robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 4.81, 5);
                     robot.autoStackCollect(4);
-                    robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -4.5, 5);
-                    robot.autoScore(true, true);
+                    robot.slide.waitToReachPosition(MM_Slide.SlidePosition.LIFT);
+                    robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -4.78, 5);
+                    robot.autoScore(true, true, maxColor);
                     thirdCone = true;
                 }
 
             }
-            if (!thirdCone) {
+            if (!thirdCone && maxColor == 0) {
                 robot.drivetrain.microscopicDriveInches(3);
             }
             robot.sleevePark(maxColor, true, thirdCone);

@@ -41,6 +41,7 @@ public class MM_Auto_Right extends MM_OpMode {
         robot.collector.changePosition(MM_Collector.CLOSED);
         sleep(1000);
         robot.slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
+        robot.collector.flipConeSaver();
         int maxColor = detector.getMaxColor();
         telemetry.addData("Max Color", detector.getMaxColorString());
         telemetry.update();
@@ -61,9 +62,9 @@ public class MM_Auto_Right extends MM_OpMode {
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
-            robot.collector.changePosition(MM_Collector.OPEN);
+            robot.collector.autoRunCollector();
             runtime.reset();
-            while (opModeIsActive() && runtime.seconds() < 1) {
+            while (runtime.seconds() < 1) {
             }
             robot.drivetrain.driveInches(-1.5);
         } else if (maxColor == MM_EOCVDetection.RED) {
@@ -81,9 +82,9 @@ public class MM_Auto_Right extends MM_OpMode {
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
-            robot.collector.changePosition(MM_Collector.OPEN);
+            robot.collector.autoRunCollector();
             runtime.reset();
-            while (opModeIsActive() && runtime.seconds() < 1) {
+            while (runtime.seconds() < 1) {
             }
             robot.drivetrain.driveInches(-1.7);
         } else {
@@ -97,9 +98,9 @@ public class MM_Auto_Right extends MM_OpMode {
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
-            robot.collector.changePosition(MM_Collector.OPEN);
+            robot.collector.autoRunCollector();
             runtime.reset();
-            while (opModeIsActive() && runtime.seconds() < 1) {
+            while (runtime.seconds() < 1) {
             }
             robot.drivetrain.driveInches(-2.5);
         }

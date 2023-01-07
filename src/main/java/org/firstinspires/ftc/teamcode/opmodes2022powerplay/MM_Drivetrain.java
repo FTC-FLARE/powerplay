@@ -60,6 +60,9 @@ public class MM_Drivetrain {
     private double brPower = 0;
     private double leftDrivePower = 0;
     private double rightDrivePower = 0;
+    private boolean negative = false;
+    private boolean positive = false;
+    private boolean bothPosandNeg = false;
 
     private int leftCurrentTicks = 0;
     private int rightCurrentTicks = 0;
@@ -112,6 +115,10 @@ public class MM_Drivetrain {
         opMode.pRightDriveController.setSetpoint(rightTargetTicks);
         leftPriorEncoderTarget = leftTargetTicks;
         rightPriorEncoderTarget = rightTargetTicks;
+
+        negative = false;
+        positive = false;
+        bothPosandNeg = false;
     }
 
     public void prepareToStrafe(double inches) {
@@ -133,7 +140,7 @@ public class MM_Drivetrain {
 
     public boolean reachedPositionMicroscopicDrive() {
         setMicroscopicStraightPower();
-        if (Math.abs(leftEncoder.getCurrentPosition() - leftPriorEncoderTarget) < 175 || Math.abs(rightEncoder.getCurrentPosition() - rightPriorEncoderTarget) < 175) {
+        if (Math.abs(leftEncoder.getCurrentPosition() - leftPriorEncoderTarget) < 210 || Math.abs(rightEncoder.getCurrentPosition() - rightPriorEncoderTarget) < 210) {
             stop();
             return true;
         }
@@ -175,12 +182,19 @@ public class MM_Drivetrain {
             frPower = -0.16;
             blPower = -0.16;
             brPower = -0.16;
+            positive = true;
         } else {
             flPower = 0.16;
             frPower = 0.16;
             blPower = 0.16;
             brPower = 0.16;
+            negative = true;
+        } if (!bothPosandNeg && positive && negative) {
+            leftPriorEncoderTarget += 250;
+            rightPriorEncoderTarget += 250;
+            bothPosandNeg = true;
         }
+
         opMode.telemetry.addData("leftPriorEncoder", leftPriorEncoderTarget);
         angleStraighten(STRAIGHTEN_P, flPower, frPower);
         normalize();

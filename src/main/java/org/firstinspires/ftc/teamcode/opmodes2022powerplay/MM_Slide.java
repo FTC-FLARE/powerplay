@@ -24,9 +24,10 @@ public class MM_Slide {
     public enum SlidePosition {
         UNUSED(0),
         COLLECT(0),
-        STACK(133),
+        STACK(125),
         GROUND(400),
-        DETECT(850),
+        DETECT(700),
+        LIFT(900),
         CONESAVE_POSITION_FRONT(1100),
         CONESAVE_POSITION_BACK(1350),
         LOW_RELEASE(1550),

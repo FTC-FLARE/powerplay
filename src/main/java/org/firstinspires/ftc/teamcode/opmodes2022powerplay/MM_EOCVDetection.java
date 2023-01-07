@@ -85,11 +85,12 @@ public class MM_EOCVDetection extends OpenCvPipeline {
     }
 
     public boolean goodToCollect() {
-        if (coneColor == BLUE) {
-            return Core.mean(max).val[0] > 70;
-        } else {
-            return Core.mean(max).val[0] > 70;
-        }
+/*if (coneColor == BLUE) {
+    return Core.mean(max).val[0] > 1;
+} else {
+    return Core.mean(max).val[0] > 1;
+}*/
+        return true;
     }
 
     public int getHigherMean() {

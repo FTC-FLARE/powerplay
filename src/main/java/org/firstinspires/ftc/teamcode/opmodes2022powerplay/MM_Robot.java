@@ -22,16 +22,23 @@ public class MM_Robot {
     }
 
     public void sleevePark(int sleeveColor, boolean secondCone, boolean thirdCone) {
-        if (thirdCone) {
+        if (thirdCone && sleeveColor == 0) {
             slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
         } else if(secondCone){
             drivetrain.rotateToAngle(0);
-            microscopicRunSlideandDrive(MM_Slide.SlidePosition.COLLECT,5, 5);
+            if (!thirdCone) {
+                microscopicRunSlideandDrive(MM_Slide.SlidePosition.COLLECT,3.5, 5);
+            } else {
+                drivetrain.microscopicDriveInches(3.5);
+            }
 
             if (sleeveColor == MM_EOCVDetection.BLUE){
                 drivetrain.strafeInches(-22);
             }else if (sleeveColor == MM_EOCVDetection.YELLOW){
                 drivetrain.strafeInches(-46);
+            }
+            if (thirdCone) {
+                slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
             }
 
         }else{
@@ -129,6 +136,9 @@ public class MM_Robot {
     //    feel free to refactor any names
     public void autoStackCollect(int stackLevel){
         slide.setSlideTarget(MM_Slide.SlidePosition.STACK.ticks * (stackLevel - 1));
+        if (stackLevel == 4) {
+            slide.setSlideTarget((MM_Slide.SlidePosition.STACK.ticks * (stackLevel - 1) - 8));
+        }
         slide.runCollector();
         while (opMode.opModeIsActive() && !slide.reachedPosition()) {
             opMode.telemetry.update();
@@ -141,8 +151,12 @@ public class MM_Robot {
 
     }
 
-    public void autoScore(boolean flipfirst, boolean lastMove){
+    public void autoScore(boolean flipfirst, boolean lastMove, int sleeveColor){
         if (flipfirst){
+            collector.flipConeSaver();
+            runtime.reset();
+            while (runtime.seconds() < 0.4) {
+            }
             slide.turner.changeTurnerPosition(slide.turner.BACK);
             runtime.reset();
             while (opMode.opModeIsActive() && runtime.seconds() < 1.25) {
@@ -152,15 +166,15 @@ public class MM_Robot {
         collector.autoRunCollector();
         runtime.reset();
         slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
-
-        if (lastMove) {
+        slide.turner.changeTurnerPosition(0.885);
+        if (lastMove && sleeveColor == 0) {
             drivetrain.microscopicDriveInches(1.5);
             drivetrain.rotateToAngle(0);
         }
-
-        slide.turner.changeTurnerPosition(slide.turner.FRONT);
-        runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 1.25){
+        if (!lastMove) {
+            runtime.reset();
+            while (opMode.opModeIsActive() && runtime.seconds() < 1.25){
+            }
         }
     }
 

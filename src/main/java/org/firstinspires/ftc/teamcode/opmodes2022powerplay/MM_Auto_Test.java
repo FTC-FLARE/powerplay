@@ -56,12 +56,12 @@ public class MM_Auto_Test extends MM_OpMode {
             detector.changeMode(2);
         }
         if (score) {
-            robot.autoScore(false, false);
+            robot.autoScore(false, false, 0);
             if (detector.goodToCollect()) {
                 robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 6, 5);
                 robot.autoStackCollect(5);
                 robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -6, 5);
-                robot.autoScore(true, false);
+                robot.autoScore(true, false, 0);
                 robot.drivetrain.microscopicDriveInches(3);
                 robot.sleevePark(2, true, false);
             } else {
