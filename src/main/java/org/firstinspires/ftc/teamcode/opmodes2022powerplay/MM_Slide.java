@@ -62,9 +62,10 @@ public class MM_Slide {
             checkSelectHeight();
         }
 
-        if (inDangerZone() || getSlideTarget() < 0) {
-            setSlideTarget(0);
+        if (inDangerZone()) {
+            opMode.telemetry.addLine("Danger Zone - Resetting Encoder");
         }
+
         if (turner.isMoving() && tooLowToPivot() && getSlideTarget() < SlidePosition.PIVOT_POSITION.ticks) {
             setSlideTarget(SlidePosition.PIVOT_POSITION.ticks);
         }
@@ -193,6 +194,7 @@ public class MM_Slide {
     }
 
     private void reset() {
+        setSlideTarget(0);
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slide.setTargetPosition(0);
