@@ -155,7 +155,7 @@ public class MM_Robot {
         slide.waitToReachPosition(MM_Slide.SlidePosition.LOW_RELEASE);
         collector.autoRunCollector();
         runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 1.5){
+        while (opMode.opModeIsActive() && runtime.seconds() < 1){
         }
         slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
 

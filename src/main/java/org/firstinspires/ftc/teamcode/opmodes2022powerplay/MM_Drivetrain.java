@@ -378,21 +378,22 @@ public class MM_Drivetrain {
         strafe(direction);
         runtime.reset();
         double startingDistance = distance.getDistance(DistanceUnit.INCH);
-        double currentDistance = distance.getDistance(DistanceUnit.INCH);
-        while (currentDistance > 4) {
-            currentDistance = distance.getDistance(DistanceUnit.INCH);
-            if (runtime.seconds() > 1.5) {
-                if (currentDistance > startingDistance) {
+        double currentDistance = startingDistance;
+        while (opMode.opModeIsActive() && runtime.seconds() < 3) {
+            if(currentDistance > 4){
+                if (runtime.seconds() > 1.5 ) {
                     strafe(-direction);
                 }
-            }
-            if (runtime.seconds() > 3) {
+            }else{
                 stop();
-                return false;
+                return true;
             }
+            currentDistance = distance.getDistance(DistanceUnit.INCH);
         }
+
         stop();
-        return true;
+        return false;
+
     }
 
     public void strafe(int direction) {

@@ -73,8 +73,12 @@ public class MM_Auto_Blue_Stack extends MM_OpMode {
                 robot.sleevePark(maxColor, true);
             }
         } else {
+            robot.collector.flipConeSaver();
             robot.slide.turner.changeTurnerPosition(0.885);
-            robot.slide.moveTowardTarget(MM_Slide.SlidePosition.COLLECT);
+            runtime.reset();
+            while (opModeIsActive() && runtime.seconds() < 2){
+            }
+            robot.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
         }
 
     }
