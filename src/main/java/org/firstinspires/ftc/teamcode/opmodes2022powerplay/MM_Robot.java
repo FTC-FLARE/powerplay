@@ -135,10 +135,7 @@ public class MM_Robot {
 
     //    feel free to refactor any names
     public void autoStackCollect(int stackLevel){
-        slide.setSlideTarget(MM_Slide.SlidePosition.STACK.ticks * (stackLevel - 1));
-        if (stackLevel == 4) {
-            slide.setSlideTarget((MM_Slide.SlidePosition.STACK.ticks * (stackLevel - 1) - 8));
-        }
+        slide.setSlideTarget(MM_Slide.SlidePosition.STACK.ticks * (stackLevel - 1) - 8);
         slide.runCollector();
         while (opMode.opModeIsActive() && !slide.reachedPosition()) {
             opMode.telemetry.update();

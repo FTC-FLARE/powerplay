@@ -63,18 +63,16 @@ public class MM_Auto_Blue_Stack extends MM_OpMode {
             robot.autoScore(false, false, maxColor);
 
             if (detector.goodToCollect()) {
-                robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 6.03, 5);
+                robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 5.85, 5);
                 robot.drivetrain.flipDistanceServo();
                 robot.autoStackCollect(5);
-                robot.slide.waitToReachPosition(MM_Slide.SlidePosition.LIFT);
-                robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -4.61
+                robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -4.46
                         , 5);
                 robot.autoScore(true, false, maxColor);
                 if (maxColor == MM_EOCVDetection.RED || maxColor == MM_EOCVDetection.BLUE || maxColor == MM_EOCVDetection.YELLOW) {
-                    robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 4.81, 5);
+                    robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 4.66, 5);
                     robot.autoStackCollect(4);
-                    robot.slide.waitToReachPosition(MM_Slide.SlidePosition.LIFT);
-                    robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -4.78, 5);
+                    robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -4.63, 5);
                     robot.autoScore(true, true, maxColor);
                     thirdCone = true;
                 }
