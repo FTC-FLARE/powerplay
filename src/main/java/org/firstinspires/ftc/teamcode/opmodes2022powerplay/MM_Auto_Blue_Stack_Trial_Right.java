@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -11,8 +12,9 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
+@Disabled
 @Config
-@Autonomous(name="MM_Auto_Blue_Stack", group="MM")
+@Autonomous(name="MM_Auto_Blue_Stack_Trial", group="MM")
 public class MM_Auto_Blue_Stack_Trial_Right extends MM_OpMode {
     private final MM_Robot robot = new MM_Robot(this);
 
@@ -20,6 +22,7 @@ public class MM_Auto_Blue_Stack_Trial_Right extends MM_OpMode {
     OpenCvCamera camera;
 
     private ElapsedTime runtime = new ElapsedTime();
+
 
     @Override
     public void runOpMode() {
@@ -44,10 +47,10 @@ public class MM_Auto_Blue_Stack_Trial_Right extends MM_OpMode {
         telemetry.addData("Max Color", detector.getMaxColorString());
         telemetry.update();
         robot.drivetrain.microscopicDriveInches(3);
-        robot.drivetrain.strafeInches(23);
+        robot.drivetrain.strafeInches(-23);
         robot.runSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH , 41.3, 20, true);
         robot.drivetrain.microscopicDriveInches(0);
-        robot.drivetrain.rotateToAngle(60);
+        robot.drivetrain.rotateToAngle(-60);
         robot.drivetrain.microscopicDriveInches(-2.5);
 
         boolean score = true;
