@@ -152,7 +152,7 @@ public class MM_Robot {
         if (flipfirst){
             collector.flipConeSaver();
             runtime.reset();
-            while (runtime.seconds() < 0.4) {
+            while (opMode.opModeIsActive() && runtime.seconds() < 0.4) {
             }
             slide.turner.changeTurnerPosition(slide.turner.BACK);
             runtime.reset();

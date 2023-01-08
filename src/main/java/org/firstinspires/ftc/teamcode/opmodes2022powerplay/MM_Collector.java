@@ -70,7 +70,7 @@ public class MM_Collector {
             if (coneSaverPosition == FRONT) {
                 coneSaver.setPosition(BACK);
                 timer.reset();
-                while (timer.seconds() < 0.2) {
+                while (opMode.opModeIsActive() && timer.seconds() < 0.2) {
                 }
             }
             changePosition(OPEN);

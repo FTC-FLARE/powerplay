@@ -90,7 +90,7 @@ public class MM_Drivetrain {
     public void microscopicDriveInches(double inches) {
         prepareToDrive(inches);
         runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 2 && !reachedPositionMicroscopicDrive()) {
+        while (opMode.opModeIsActive() && runtime.seconds() < 1.5 && !reachedPositionMicroscopicDrive()) {
             opMode.telemetry.addData("inches target", inches);
             opMode.telemetry.update();
         }
@@ -386,7 +386,7 @@ public class MM_Drivetrain {
     }
 
     public boolean withinJunctionRange() {
-        return distance.getDistance(DistanceUnit.INCH) < 3.25;
+        return distance.getDistance(DistanceUnit.INCH) < 5;
     }
 
     public boolean correctForJunction(int direction) {
@@ -395,7 +395,7 @@ public class MM_Drivetrain {
         double startingDistance = distance.getDistance(DistanceUnit.INCH);
         double currentDistance = startingDistance;
         while (opMode.opModeIsActive() && runtime.seconds() < 3) {
-            if(currentDistance > 3.25){
+            if(currentDistance > 5){
                 if (runtime.seconds() > 1.5 ) {
                     strafe(-direction);
                 }

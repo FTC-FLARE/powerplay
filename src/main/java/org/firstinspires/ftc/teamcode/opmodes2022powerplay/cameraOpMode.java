@@ -46,15 +46,14 @@ public class cameraOpMode extends LinearOpMode {
         FtcDashboard.getInstance().startCameraStream(camera, 0);
         telemetry.addLine("Waiting for start");
         telemetry.update();
-        detector.changeMode(2);
-        detector.setConeColor(0);
+        detector.changeMode(1);
         waitForStart();
 
         while (opModeIsActive()) {
             //telemetry.addData("columns", detector.columns());
             telemetry.addData("mean", detector.getMean());
             telemetry.addData("Frame Count", camera.getFrameCount());
-            //telemetry.addData("Max Color", getMax());
+            telemetry.addData("Max Color", getMax());
             telemetry.update();
         }
     }

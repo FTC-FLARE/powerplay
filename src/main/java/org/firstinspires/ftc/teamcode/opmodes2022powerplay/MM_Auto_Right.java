@@ -64,7 +64,7 @@ public class MM_Auto_Right extends MM_OpMode {
             }
             robot.collector.autoRunCollector();
             runtime.reset();
-            while (runtime.seconds() < 1) {
+            while (opModeIsActive() && runtime.seconds() < 1) {
             }
             robot.drivetrain.driveInches(-1.5);
         } else if (maxColor == MM_EOCVDetection.RED) {
@@ -84,7 +84,7 @@ public class MM_Auto_Right extends MM_OpMode {
             }
             robot.collector.autoRunCollector();
             runtime.reset();
-            while (runtime.seconds() < 1) {
+            while (opModeIsActive() && runtime.seconds() < 1) {
             }
             robot.drivetrain.driveInches(-1.7);
         } else {
@@ -100,7 +100,7 @@ public class MM_Auto_Right extends MM_OpMode {
             }
             robot.collector.autoRunCollector();
             runtime.reset();
-            while (runtime.seconds() < 1) {
+            while (opModeIsActive() && runtime.seconds() < 1) {
             }
             robot.drivetrain.driveInches(-2.5);
         }

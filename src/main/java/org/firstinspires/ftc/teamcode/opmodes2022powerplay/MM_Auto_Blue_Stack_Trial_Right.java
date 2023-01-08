@@ -13,7 +13,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Config
 @Autonomous(name="MM_Auto_Blue_Stack", group="MM")
-public class MM_Auto_Blue_Stack extends MM_OpMode {
+public class MM_Auto_Blue_Stack_Trial_Right extends MM_OpMode {
     private final MM_Robot robot = new MM_Robot(this);
 
     MM_EOCVDetection detector = new MM_EOCVDetection();
