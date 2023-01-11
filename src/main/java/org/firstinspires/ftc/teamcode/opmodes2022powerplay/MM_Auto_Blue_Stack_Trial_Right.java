@@ -12,9 +12,8 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-@Disabled
 @Config
-@Autonomous(name="MM_Auto_Blue_Stack_Trial", group="MM")
+@Autonomous(name="MM_Auto_Blue_Stack_Right", group="MM")
 public class MM_Auto_Blue_Stack_Trial_Right extends MM_OpMode {
     private final MM_Robot robot = new MM_Robot(this);
 
@@ -69,12 +68,12 @@ public class MM_Auto_Blue_Stack_Trial_Right extends MM_OpMode {
                 robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 5.85, 2.5);
                 robot.drivetrain.flipDistanceServo();
                 robot.autoStackCollect(5);
-                robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -4.46, 2.5);
+                robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -6.46, 2.5);
                 robot.autoScore(true, false, maxColor);
                 if (maxColor == MM_EOCVDetection.RED || maxColor == MM_EOCVDetection.BLUE || maxColor == MM_EOCVDetection.YELLOW) {
-                    robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 4.66, 2.5);
+                    robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 5.96, 2.5);
                     robot.autoStackCollect(4);
-                    robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -4.63, 2.5);
+                    robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -5.93, 2.5);
                     robot.autoScore(true, true, maxColor);
                     thirdCone = true;
                 }
@@ -83,7 +82,7 @@ public class MM_Auto_Blue_Stack_Trial_Right extends MM_OpMode {
             if (!thirdCone && maxColor == 0) {
                 robot.drivetrain.microscopicDriveInches(3);
             }
-            robot.sleevePark(maxColor, true, thirdCone);
+            robot.sleevePark(maxColor, true, thirdCone, true);
 
         } else {
             robot.collector.autoRunCollector();

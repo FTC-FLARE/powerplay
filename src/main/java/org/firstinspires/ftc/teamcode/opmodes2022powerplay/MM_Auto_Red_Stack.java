@@ -81,7 +81,7 @@ public class MM_Auto_Red_Stack extends MM_OpMode {
             if (!thirdCone && maxColor == 0) {
                 robot.drivetrain.microscopicDriveInches(3);
             }
-            robot.sleevePark(maxColor, true, thirdCone);
+            robot.sleevePark(maxColor, true, thirdCone, false);
 
         } else {
             robot.collector.autoRunCollector();

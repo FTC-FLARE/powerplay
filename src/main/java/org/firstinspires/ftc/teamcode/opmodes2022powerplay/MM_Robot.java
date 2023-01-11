@@ -21,7 +21,7 @@ public class MM_Robot {
         this.opMode = opMode;
     }
 
-    public void sleevePark(int sleeveColor, boolean secondCone, boolean thirdCone) {
+    public void sleevePark(int sleeveColor, boolean secondCone, boolean thirdCone, boolean right) {
         if (thirdCone && sleeveColor == 0) {
             slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
         } else if(secondCone){
@@ -33,10 +33,23 @@ public class MM_Robot {
             }
 
             if (sleeveColor == MM_EOCVDetection.BLUE){
-                drivetrain.strafeInches(-22);
+                if (right) {
+                    drivetrain.strafeInches(22);
+                } else {
+                    drivetrain.strafeInches(-22);
+                }
             }else if (sleeveColor == MM_EOCVDetection.YELLOW){
-                drivetrain.strafeInches(-46);
+                if (right) {
+
+                } else {
+                    drivetrain.strafeInches(-46);
+                }
+            } else {
+                if (right) {
+                    drivetrain.strafeInches(46);
+                }
             }
+
             if (thirdCone) {
                 slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
             }

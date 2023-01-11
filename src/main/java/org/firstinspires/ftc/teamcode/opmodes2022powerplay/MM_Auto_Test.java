@@ -63,10 +63,10 @@ public class MM_Auto_Test extends MM_OpMode {
                 robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -6, 5);
                 robot.autoScore(true, false, 0);
                 robot.drivetrain.microscopicDriveInches(3);
-                robot.sleevePark(2, true, false);
+                robot.sleevePark(2, true, false, false);
             } else {
                 robot.drivetrain.microscopicDriveInches(3);
-                robot.sleevePark(2, true, false);
+                robot.sleevePark(2, true, false, false);
             }
         } else {
             robot.slide.turner.changeTurnerPosition(0.885);
