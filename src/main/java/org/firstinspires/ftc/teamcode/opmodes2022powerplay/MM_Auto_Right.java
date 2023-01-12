@@ -38,10 +38,10 @@ public class MM_Auto_Right extends MM_OpMode {
 
         waitForStart();
 
-        robot.collector.changePosition(MM_Collector.CLOSED);
+        robot.lift.collector.chomp();
         sleep(1000);
-        robot.slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
-        robot.collector.flipConeSaver();
+        robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
+        robot.lift.collector.engageConesaver();
         int maxColor = detector.getMaxColor();
         telemetry.addData("Max Color", detector.getMaxColorString());
         telemetry.update();
@@ -58,11 +58,11 @@ public class MM_Auto_Right extends MM_OpMode {
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 3) {
             }
-            robot.slide.waitToReachPosition(MM_Slide.SlidePosition.LOW_RELEASE);
+            robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.LOW_RELEASE);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
-            robot.collector.autoRunCollector();
+            robot.lift.collector.autoRunCollector();
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
@@ -78,11 +78,11 @@ public class MM_Auto_Right extends MM_OpMode {
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 3) {
             }
-            robot.slide.waitToReachPosition(MM_Slide.SlidePosition.MEDIUM_RELEASE);
+            robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.MEDIUM_RELEASE);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
-            robot.collector.autoRunCollector();
+            robot.lift.collector.autoRunCollector();
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
@@ -94,18 +94,18 @@ public class MM_Auto_Right extends MM_OpMode {
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 3) {
             }
-            robot.slide.waitToReachPosition(MM_Slide.SlidePosition.MEDIUM_RELEASE);
+            robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.MEDIUM_RELEASE);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
-            robot.collector.autoRunCollector();
+            robot.lift.collector.autoRunCollector();
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 1) {
             }
             robot.drivetrain.driveInches(-2.5);
         }
         robot.drivetrain.rotateToAngle(0);
-        robot.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
+        robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
 
 
 /*      red left 1

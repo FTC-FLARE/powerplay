@@ -20,7 +20,7 @@ public class MM_Turner{
     private double targetPosition = FRONT;
     private double turnIncrement = BACK_TURN_INCREMENT;
 
-    public MM_Turner(MM_OpMode opMode, MM_Slide slide) {
+    public MM_Turner(MM_OpMode opMode) {
         this.opMode = opMode;
         turner = opMode.hardwareMap.get(Servo.class, "Turner");
         turner.setPosition(FRONT);

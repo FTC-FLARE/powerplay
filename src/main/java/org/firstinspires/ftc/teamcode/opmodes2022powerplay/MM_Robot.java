@@ -5,8 +5,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class MM_Robot {
     private final MM_OpMode opMode;
     public MM_Drivetrain drivetrain;
-    public MM_Slide slide;
-    public MM_Collector collector;
+    public MM_Lift lift;
 
     static final double MIN_DRIVE_SPEED = 0.24;
     static final double MAX_DRIVE_SPEED = 0.6;
@@ -23,7 +22,7 @@ public class MM_Robot {
 
     public void sleevePark(int sleeveColor, boolean secondCone, boolean thirdCone, boolean right) {
         if (thirdCone && sleeveColor == 0) {
-            slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
+            lift.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
         } else if(secondCone){
             drivetrain.rotateToAngle(0);
             if (!thirdCone) {
@@ -51,7 +50,7 @@ public class MM_Robot {
             }
 
             if (thirdCone) {
-                slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
+                lift.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
             }
 
         }else{
@@ -73,7 +72,7 @@ public class MM_Robot {
                 drivetrain.driveInches(42);
                 drivetrain.driveInches(-8);
             }
-            slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
+            lift.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
             opMode.telemetry.update();
 
         }
@@ -85,7 +84,7 @@ public class MM_Robot {
 
     public void runSlideandDrive(MM_Slide.SlidePosition slidePosition, double inches, double timeoutTime, boolean flipTurner) {
         drivetrain.prepareToDrive(inches);
-        slide.moveTowardTarget(slidePosition);
+        lift.slide.moveTowardTarget(slidePosition);
 
         boolean driveDone = false;
         boolean slideDone = false;
@@ -95,7 +94,7 @@ public class MM_Robot {
             while (opMode.opModeIsActive() && (!driveDone || !slideDone) && runtime.seconds() < timeoutTime) {
                 driveDone = drivetrain.reachedPositionDrive();
                 if (!slideDone) {
-                    slideDone = slide.reachedPositionTurner();
+                    slideDone = lift.slide.reachedPositionTurner();
                 }
                 opMode.telemetry.addData("inches target", inches);
                 opMode.telemetry.addData("slide target", slidePosition);
@@ -104,7 +103,7 @@ public class MM_Robot {
         } else {
             while (opMode.opModeIsActive() && (!driveDone || !slideDone) && runtime.seconds() < timeoutTime) {
                 driveDone = drivetrain.reachedPositionDrive();
-                slideDone = slide.reachedPosition();
+                slideDone = lift.slide.reachedPosition();
                 opMode.telemetry.addData("inches target", inches);
                 opMode.telemetry.addData("slide target", slidePosition);
                 opMode.telemetry.update();
@@ -118,7 +117,7 @@ public class MM_Robot {
 
     public void microscopicRunSlideandDrive(MM_Slide.SlidePosition slidePosition, double inches, double timeoutTime, boolean flipTurner) {
         drivetrain.prepareToDrive(inches);
-        slide.moveTowardTarget(slidePosition);
+        lift.slide.moveTowardTarget(slidePosition);
         boolean driveDone = false;
         boolean slideDone = false;
         runtime.reset();
@@ -127,9 +126,9 @@ public class MM_Robot {
             boolean turnerDone = false;
             while (opMode.opModeIsActive() && (!driveDone || !slideDone || !turnerDone) && runtime.seconds() < timeoutTime) {
                 driveDone = drivetrain.reachedPositionMicroscopicDrive();
-                slideDone = slide.reachedPosition();
+                slideDone = lift.slide.reachedPosition();
                 if (!turnerDone) {
-                    turnerDone = slide.turner.reachedPosition(slide.tooLowToPivot());
+                    turnerDone = lift.slide.turner.reachedPosition(lift.slide.tooLowToPivot());
                 }
                 opMode.telemetry.addData("inches target", inches);
                 opMode.telemetry.addData("slide target", slidePosition);
@@ -138,7 +137,7 @@ public class MM_Robot {
         } else {
             while (opMode.opModeIsActive() && (!driveDone || !slideDone) && runtime.seconds() < timeoutTime) {
                 driveDone = drivetrain.reachedPositionMicroscopicDrive();
-                slideDone = slide.reachedPosition();
+                slideDone = lift.slide.reachedPosition();
                 opMode.telemetry.addData("inches target", inches);
                 opMode.telemetry.addData("slide target", slidePosition);
                 opMode.telemetry.update();
@@ -146,52 +145,8 @@ public class MM_Robot {
         }
     }
 
-    //    feel free to refactor any names
-    public void autoStackCollect(int stackLevel){
-        slide.setSlideTarget(MM_Slide.SlidePosition.STACK.ticks * (stackLevel - 1) - 8);
-        slide.runCollector();
-        while (opMode.opModeIsActive() && !slide.reachedPosition()) {
-            opMode.telemetry.update();
-        }
-        collector.autoRunCollector();
-        runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 0.8) {
-            opMode.telemetry.update();
-        }
-
-    }
-
-    public void autoScore(boolean flipfirst, boolean lastMove, int sleeveColor){
-        if (flipfirst){
-            collector.flipConeSaver();
-            runtime.reset();
-            while (opMode.opModeIsActive() && runtime.seconds() < 0.4) {
-            }
-            slide.turner.changeTurnerPosition(slide.turner.BACK);
-            runtime.reset();
-            while (opMode.opModeIsActive() && runtime.seconds() < 1.25) {
-            }
-        }
-        slide.waitToReachPosition(MM_Slide.SlidePosition.LOW_RELEASE);
-        collector.autoRunCollector();
-        runtime.reset();
-        slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
-        slide.turner.changeTurnerPosition(0.885);
-        if (lastMove && sleeveColor == 0) {
-            drivetrain.microscopicDriveInches(1.5);
-            drivetrain.rotateToAngle(0);
-        }
-        if (!lastMove) {
-            runtime.reset();
-            while (opMode.opModeIsActive() && runtime.seconds() < 1.25){
-            }
-        }
-    }
-
     public void init(){
         drivetrain = new MM_Drivetrain(opMode);
-        slide = new MM_Slide(opMode);
-        collector = new MM_Collector(opMode);
 
         opMode.pTurnController.setOutputRange(MIN_ROTATE_POWER, MAX_ROTATE_POWER);
         opMode.pLeftDriveController.setOutputRange(MIN_DRIVE_SPEED, MAX_DRIVE_SPEED);

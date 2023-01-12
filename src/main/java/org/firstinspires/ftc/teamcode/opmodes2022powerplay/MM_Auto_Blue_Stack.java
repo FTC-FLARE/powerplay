@@ -36,10 +36,10 @@ public class MM_Auto_Blue_Stack extends MM_OpMode {
         telemetry.update();
         waitForStart();
 
-        robot.collector.changePosition(MM_Collector.CLOSED);
+        robot.lift.collector.chomp();
         sleep(400);
-        robot.slide.waitToReachPosition(MM_Slide.SlidePosition.DETECT);
-        robot.collector.flipConeSaver();
+        robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.DETECT);
+        robot.lift.collector.engageConesaver();
         int maxColor = detector.getMaxColor();
         telemetry.addData("Max Color", detector.getMaxColorString());
         telemetry.update();
@@ -60,19 +60,19 @@ public class MM_Auto_Blue_Stack extends MM_OpMode {
 
         boolean thirdCone = false;
         if (score) {
-            robot.autoScore(false, false, maxColor);
+            robot.lift.autoScore(false, false, maxColor);
 
             if (detector.goodToCollect()) {
                 robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 5.85, 2.5);
                 robot.drivetrain.flipDistanceServo();
-                robot.autoStackCollect(5);
+                robot.lift.autoStackCollect(5);
                 robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -4.46, 2.5);
-                robot.autoScore(true, false, maxColor);
+                robot.lift.autoScore(true, false, maxColor);
                 if (maxColor == MM_EOCVDetection.RED || maxColor == MM_EOCVDetection.BLUE || maxColor == MM_EOCVDetection.YELLOW) {
                     robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.CONESAVE_POSITION_FRONT, 4.66, 2.5);
-                    robot.autoStackCollect(4);
+                    robot.lift.autoStackCollect(4);
                     robot.microscopicRunSlideandDrive(MM_Slide.SlidePosition.LOW_HIGH, -4.63, 2.5);
-                    robot.autoScore(true, true, maxColor);
+                    robot.lift.autoScore(true, true, maxColor);
                     thirdCone = true;
                 }
 
@@ -83,12 +83,12 @@ public class MM_Auto_Blue_Stack extends MM_OpMode {
             robot.sleevePark(maxColor, true, thirdCone, false);
 
         } else {
-            robot.collector.autoRunCollector();
-            robot.slide.turner.changeTurnerPosition(0.885);
+            robot.lift.collector.autoRunCollector();
+            robot.lift.slide.turner.changeTurnerPosition(0.885);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 2){
             }
-            robot.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
+            robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
         }
 
     }

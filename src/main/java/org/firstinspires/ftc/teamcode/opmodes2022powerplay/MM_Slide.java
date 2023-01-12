@@ -188,7 +188,6 @@ public class MM_Slide {
     }
 
     private void init() {
-        turner = new MM_Turner(opMode, this);
 
         slide = opMode.hardwareMap.get(DcMotor.class, "Slide");
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

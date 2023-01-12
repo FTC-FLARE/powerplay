@@ -1,93 +1,43 @@
 package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class MM_Collector {
     private final MM_OpMode opMode;
-    private Servo grabber = null;
-    private Servo coneSaver = null;
-
-//    collector positions
-    public static final double CLOSED = 0.07; //0.185 - 0.09
-    public static final double OPEN = 1.0;
-//    cone saver positions
-    private static final int BACK = 1;
-    private static final int FRONT = 0;
+    private final MM_Slide slide;
+    private MM_Chomper chomper;
+    private MM_Conesaver conesaver;
 
     private ElapsedTime timer = new ElapsedTime();
-    private double position = OPEN;
-    private boolean scored = false;
 
-    private double coneSaverPosition = 1;
-
-    public MM_Collector(MM_OpMode opMode) {
+    public MM_Collector(MM_OpMode opMode, MM_Slide slide) {
         this.opMode = opMode;
-        grabber = opMode.hardwareMap.get(Servo.class, "Grabber");
-        coneSaver = opMode.hardwareMap.get(Servo.class,"Conesaver");
-        changePosition(OPEN);
-        coneSaver.setPosition(BACK);
+        this.slide = slide;
+
+        chomper = new MM_Chomper(opMode, slide);
+        conesaver = new MM_Conesaver(opMode, slide);
     }
 
     public void runCollector() {
         if (opMode.rightBumperPressed(opMode.GAMEPAD2)) {
-            if (getPosition() == OPEN) {
-                changePosition(CLOSED);
-                scored = false;
-            } else {
-                if (coneSaverPosition == FRONT) {
-                    coneSaver.setPosition(BACK);
-                    timer.reset();
-                    while (timer.seconds() < 0.2) {
-                    }
-                }
-                changePosition(OPEN);
-                scored = true;
-            }
+            autoRunCollector();
         }
-        opMode.telemetry.addData("Collector Position", grabber.getPosition());
-        runConeSaver();
+        conesaver.runConeSaver(chomper.getPosition());
     }
 
-    public void runConeSaver() {
-        if (opMode.robot.slide.tooLowtoConesave()) {
-            coneSaver.setPosition(BACK);
-            coneSaverPosition = BACK;
-        } else if (!scored) {
-           coneSaver.setPosition(FRONT);
-           coneSaverPosition = FRONT;
-        }
-    }
-
-    public void changePosition(double position){
-        grabber.setPosition(position);
-        this.position = position;
-    }
     public void autoRunCollector(){
-        if (grabber.getPosition() == OPEN){
-            changePosition(CLOSED);
+        if (chomper.getPosition() == MM_Chomper.OPEN) {
+            chomper.changePosition(MM_Chomper.CLOSED);
         } else {
-            if (coneSaverPosition == FRONT) {
-                coneSaver.setPosition(BACK);
-                timer.reset();
-                while (opMode.opModeIsActive() && timer.seconds() < 0.2) {
-                }
-            }
-            changePosition(OPEN);
+            conesaver.disengage();
+            chomper.changePosition(MM_Chomper.OPEN);
         }
     }
 
-    public void flipConeSaver() {
-        if (coneSaver.getPosition() == FRONT) {
-            coneSaver.setPosition(BACK);
-            coneSaverPosition = BACK;
-        } else {
-            coneSaver.setPosition(FRONT);
-            coneSaverPosition = FRONT;
-        }
+    public void engageConesaver(){
+        conesaver.engage();
     }
-
-    public double getPosition() {
-        return position;
+    public void chomp(){
+        chomper.changePosition(MM_Chomper.CLOSED);
     }
 }
