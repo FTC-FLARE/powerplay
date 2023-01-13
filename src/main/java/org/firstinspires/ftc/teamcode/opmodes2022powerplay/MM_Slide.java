@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.util.Range;
 
 public class MM_Slide {
     private final MM_OpMode opMode;
-    public MM_Turner turner;
     private DcMotor slide = null;
     private DigitalChannel topStop;
     private DigitalChannel bottomStop;
@@ -68,7 +67,7 @@ public class MM_Slide {
             opMode.telemetry.addLine("Danger Zone - Resetting Encoder");
         }
 
-        if (turner.isMoving() && tooLowToPivot() && getSlideTarget() < SlidePosition.PIVOT_POSITION.ticks) {
+        if (opMode.robot.lift.turner.isMoving() && tooLowToPivot() && getSlideTarget() < SlidePosition.PIVOT_POSITION.ticks) {
             setSlideTarget(SlidePosition.PIVOT_POSITION.ticks);
         }
         slide.setTargetPosition(getSlideTarget());
@@ -77,7 +76,7 @@ public class MM_Slide {
         opMode.telemetry.addData("Top Stop", isTriggered(topStop));
         opMode.telemetry.addData("Bottom Stop", isTriggered(bottomStop));
         opMode.telemetry.addData("Stack Level", stackLevel);
-        turner.runTurner(tooLowToPivot());
+        opMode.robot.lift.turner.runTurner(tooLowToPivot());
     }
 
     public void waitToReachPosition(SlidePosition slidePosition) {
@@ -128,7 +127,7 @@ public class MM_Slide {
         setSlideTarget(slidePosition.ticks);
         slide.setTargetPosition(getSlideTarget());
         if (flipTurner) {
-            turner.setTarget();
+            opMode.robot.lift.turner.setTarget();
         }
     }
 
@@ -147,7 +146,7 @@ public class MM_Slide {
 
     public boolean reachedPositionTurner() {
         if (slide.getCurrentPosition() > 1100) {
-            turner.changeTurnerPosition(0);
+            opMode.robot.lift.turner.changeTurnerPosition(0);
         }
         return !slide.isBusy() || inDangerZone();
     }
@@ -162,7 +161,7 @@ public class MM_Slide {
     }
 
     public boolean tooLowtoConesave() {
-        if (turner.getPosition() > 0.4) {
+        if (opMode.robot.lift.turner.getPosition() > 0.4) {
             return slide.getCurrentPosition() < SlidePosition.CONESAVE_POSITION_FRONT.ticks;
         }
         return slide.getCurrentPosition() < SlidePosition.CONESAVE_POSITION_BACK.ticks;
@@ -180,11 +179,11 @@ public class MM_Slide {
     }
     public void autoScore(){
         waitToReachPosition(SlidePosition.LOW);
-        turner.startMoving(turner.BACK);
+        opMode.robot.lift.turner.startMoving(opMode.robot.lift.turner.BACK);
         waitToReachPosition(SlidePosition.LOW_RELEASE);
 //        collector release
         waitToReachPosition(SlidePosition.LOW);
-        turner.startMoving(turner.FRONT);
+        opMode.robot.lift.turner.startMoving(opMode.robot.lift.turner.FRONT);
     }
 
     private void init() {

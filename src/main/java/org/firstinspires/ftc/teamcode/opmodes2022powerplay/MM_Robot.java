@@ -128,7 +128,7 @@ public class MM_Robot {
                 driveDone = drivetrain.reachedPositionMicroscopicDrive();
                 slideDone = lift.slide.reachedPosition();
                 if (!turnerDone) {
-                    turnerDone = lift.slide.turner.reachedPosition(lift.slide.tooLowToPivot());
+                    turnerDone = opMode.robot.lift.turner.reachedPosition(lift.slide.tooLowToPivot());
                 }
                 opMode.telemetry.addData("inches target", inches);
                 opMode.telemetry.addData("slide target", slidePosition);
@@ -147,6 +147,7 @@ public class MM_Robot {
 
     public void init(){
         drivetrain = new MM_Drivetrain(opMode);
+        lift = new MM_Lift(opMode);
 
         opMode.pTurnController.setOutputRange(MIN_ROTATE_POWER, MAX_ROTATE_POWER);
         opMode.pLeftDriveController.setOutputRange(MIN_DRIVE_SPEED, MAX_DRIVE_SPEED);

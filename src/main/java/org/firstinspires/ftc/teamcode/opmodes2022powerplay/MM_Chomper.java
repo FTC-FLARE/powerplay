@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class MM_Chomper {
     private final MM_OpMode opMode;
-    private final MM_Slide slide;
     private Servo grabber = null;
 
 //    collector positions
@@ -16,9 +15,8 @@ public class MM_Chomper {
     private double position = OPEN;
 
 
-    public MM_Chomper(MM_OpMode opMode, MM_Slide slide) {
+    public MM_Chomper(MM_OpMode opMode) {
         this.opMode = opMode;
-        this.slide = slide;
         grabber = opMode.hardwareMap.get(Servo.class, "Grabber");
     }
 

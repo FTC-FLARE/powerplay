@@ -12,6 +12,10 @@ public class MM_Lift {
 
     public MM_Lift(MM_OpMode opMode){
         this.opMode = opMode;
+        slide = new MM_Slide(opMode);
+        collector = new MM_Collector(opMode, slide);
+        turner = new MM_Turner(opMode);
+
     }
 
     public void autoStackCollect(int stackLevel){
@@ -33,7 +37,7 @@ public class MM_Lift {
             runtime.reset();
             while (opMode.opModeIsActive() && runtime.seconds() < 0.4) {
             }
-            slide.turner.changeTurnerPosition(slide.turner.BACK);
+            turner.changeTurnerPosition(turner.BACK);
             runtime.reset();
             while (opMode.opModeIsActive() && runtime.seconds() < 1.25) {
             }
@@ -42,7 +46,7 @@ public class MM_Lift {
         collector.autoRunCollector();
         runtime.reset();
         slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
-        slide.turner.changeTurnerPosition(0.885);
+        turner.changeTurnerPosition(0.885);
         runtime.reset();
         while (opMode.opModeIsActive() && runtime.seconds() < 1.25){
         }
@@ -58,11 +62,4 @@ public class MM_Lift {
 //        }
     }
 
-    public void init(){
-        slide = new MM_Slide(opMode);
-        collector = new MM_Collector(opMode, slide);
-        turner = new MM_Turner(opMode);
-
-
-    }
 }

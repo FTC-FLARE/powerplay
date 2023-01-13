@@ -14,7 +14,7 @@ public class MM_Collector {
         this.opMode = opMode;
         this.slide = slide;
 
-        chomper = new MM_Chomper(opMode, slide);
+        chomper = new MM_Chomper(opMode);
         conesaver = new MM_Conesaver(opMode, slide);
     }
 
