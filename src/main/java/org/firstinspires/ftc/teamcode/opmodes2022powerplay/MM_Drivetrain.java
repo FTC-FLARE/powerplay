@@ -320,7 +320,12 @@ public class MM_Drivetrain {
 
         normalize();
         handleSlowMode();
-        setMotorPower(flPower, frPower, blPower, brPower);
+        if (opMode.gamepad1.right_trigger > 0.1){
+            setMotorPower(flPower * .35, frPower * .35, blPower * .35, brPower * .35);
+
+        }else {
+            setMotorPower(flPower, frPower, blPower, brPower);
+        }
 
         opMode.telemetry.addData("first heading", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
     }
