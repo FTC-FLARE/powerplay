@@ -9,7 +9,7 @@ public class MM_Robot {
 
     static final double MIN_DRIVE_SPEED = 0.24;
     static final double MAX_DRIVE_SPEED = 0.6;
-    static final double MIN_STRAFE_POWER = 0.263;
+    static final double MIN_STRAFE_POWER = 0.283;
     static final double MAX_STRAFE_POWER = 0.6;
     static final double MIN_ROTATE_POWER = 0.24;
     static final double MAX_ROTATE_POWER = 0.6;
@@ -153,5 +153,7 @@ public class MM_Robot {
         opMode.pLeftDriveController.setOutputRange(MIN_DRIVE_SPEED, MAX_DRIVE_SPEED);
         opMode.pRightDriveController.setOutputRange(MIN_DRIVE_SPEED, MAX_DRIVE_SPEED);
         opMode.pBackDriveController.setOutputRange(MIN_STRAFE_POWER, MAX_STRAFE_POWER);
+        opMode.pLeftDiagDriveController.setOutputRange(0.15, MAX_DRIVE_SPEED);
+        opMode.pRightDiagDriveController.setOutputRange(0.15, MAX_DRIVE_SPEED);
     }
 }
