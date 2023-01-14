@@ -18,6 +18,8 @@ public class MM_Chomper {
     public MM_Chomper(MM_OpMode opMode) {
         this.opMode = opMode;
         grabber = opMode.hardwareMap.get(Servo.class, "Grabber");
+
+        changePosition(OPEN);
     }
 
 

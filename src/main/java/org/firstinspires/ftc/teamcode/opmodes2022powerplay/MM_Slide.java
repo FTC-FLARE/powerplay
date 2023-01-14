@@ -144,9 +144,9 @@ public class MM_Slide {
         return !slide.isBusy() || inDangerZone();
     }
 
-    public boolean reachedPositionTurner() {
+    public boolean reachedPositionTurner(MM_Turner turner) {
         if (slide.getCurrentPosition() > 1100) {
-            opMode.robot.lift.turner.changeTurnerPosition(0);
+            turner.changeTurnerPosition(0);
         }
         return !slide.isBusy() || inDangerZone();
     }
