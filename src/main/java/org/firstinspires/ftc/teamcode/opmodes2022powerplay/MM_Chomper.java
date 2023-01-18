@@ -1,35 +1,42 @@
 package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class MM_Chomper {
-    private final MM_OpMode opMode;
-    private Servo grabber = null;
+    private Servo chomper = null;
 
-//    collector positions
-    public static final double CLOSED = 0.07;
-    public static final double OPEN = 1.0;
+    private static final double CHOKE = 0.39;  // tighten belt to collect
+    public static final double RELEASE = 1.0;
 
-    private ElapsedTime timer = new ElapsedTime();
-    private double position = OPEN;
+    private double position = RELEASE;
 
-
-    public MM_Chomper(MM_OpMode opMode) {
-        this.opMode = opMode;
-        grabber = opMode.hardwareMap.get(Servo.class, "Grabber");
-
-        changePosition(OPEN);
+    public MM_Chomper(HardwareMap hardwareMap) {
+        chomper = hardwareMap.get(Servo.class, "Grabber");
+        changePosition(RELEASE);
     }
-
 
     public double getPosition() {
         return position;
     }
 
-    public void changePosition(double position){
-        grabber.setPosition(position);
-        this.position = position;
+    public void toggle() {
+        if (getPosition() == RELEASE) {
+            choke();
+        } else {
+            release();
+        }
+    }
 
+    public void choke(){
+        changePosition(CHOKE);
+    }
+    public void release(){
+        changePosition(RELEASE);
+    }
+
+    private void changePosition(double position) {
+        chomper.setPosition(position);
+        this.position = position;
     }
 }

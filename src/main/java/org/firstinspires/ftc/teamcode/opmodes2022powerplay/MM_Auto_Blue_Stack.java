@@ -36,10 +36,9 @@ public class MM_Auto_Blue_Stack extends MM_OpMode {
         telemetry.update();
         waitForStart();
 
-        robot.lift.collector.chomp();
+        robot.lift.chomper.choke();
         sleep(400);
         robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.DETECT);
-        robot.lift.collector.engageConesaver();
         int maxColor = detector.getMaxColor();
         telemetry.addData("Max Color", detector.getMaxColorString());
         telemetry.update();
@@ -83,7 +82,7 @@ public class MM_Auto_Blue_Stack extends MM_OpMode {
             robot.sleevePark(maxColor, true, thirdCone, false);
 
         } else {
-            robot.lift.collector.autoRunCollector();
+            robot.lift.chomper.toggle();
             robot.lift.turner.changeTurnerPosition(0.885);
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 2){
