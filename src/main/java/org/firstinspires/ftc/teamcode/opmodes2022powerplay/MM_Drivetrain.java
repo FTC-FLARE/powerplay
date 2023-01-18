@@ -63,6 +63,7 @@ public class MM_Drivetrain {
     private boolean negative = false;
     private boolean positive = false;
     private boolean bothPosandNeg = false;
+    private boolean backwardsMode = false;
 
     private int leftCurrentTicks = 0;
     private int rightCurrentTicks = 0;
@@ -313,6 +314,16 @@ public class MM_Drivetrain {
         double turn = opMode.gamepad1.right_stick_x;
         double strafe = opMode.gamepad1.left_stick_x;
 
+
+        if(opMode.leftBumperPressed(opMode.GAMEPAD1)){
+            backwardsMode = !backwardsMode;
+        }
+        if (backwardsMode){
+            drive = -drive;
+            strafe = -strafe;
+        }
+
+
         flPower = (drive + turn + strafe);
         frPower = (drive - turn - strafe);
         blPower = (drive + turn - strafe);
@@ -321,7 +332,12 @@ public class MM_Drivetrain {
         normalize();
         handleSlowMode();
         if (opMode.gamepad1.right_trigger > 0.1){
-            setMotorPower(flPower * .35, frPower * .35, blPower * .35, brPower * .35);
+            if (slowMode == 1){
+                setMotorPower(flPower * .5, frPower * .5, blPower * .5, brPower * .5);
+
+            }else {
+                setMotorPower(flPower * .35, frPower * .35, blPower * .35, brPower * .35);
+            }
 
         }else {
             setMotorPower(flPower, frPower, blPower, brPower);
