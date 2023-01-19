@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 public abstract class MM_OpMode extends LinearOpMode {
     public MM_Robot robot = new MM_Robot(this);
@@ -23,6 +24,8 @@ public abstract class MM_OpMode extends LinearOpMode {
 
     final int GAMEPAD1 = 0;
     final int GAMEPAD2 = 1;
+
+    private final ElapsedTime runtime = new ElapsedTime();
 
     public boolean aPressed(int gamepad) {
         if (gamepad == GAMEPAD1) {
@@ -109,6 +112,11 @@ public abstract class MM_OpMode extends LinearOpMode {
             return gamepad1Current.right_bumper && !gamepad1Prior.right_bumper;
         } else {
             return gamepad2Current.right_bumper && !gamepad2Prior.right_bumper;
+        }
+    }
+
+    public void waitSeconds(double seconds) {
+        while (opModeIsActive() && runtime.seconds() < seconds){
         }
     }
 }

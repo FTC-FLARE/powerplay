@@ -8,13 +8,12 @@ public class MM_Turner{
     private final MM_OpMode opMode;
     private Servo turner = null;
 
-    final double FRONT = 0.885;
-    final double BACK = 0;
-    static final double BACK_TURN_INCREMENT = -0.020;
+    static final double FRONT = 0.885;
+    static final double BACK = 0;
     static final double FRONT_TURN_INCREMENT = 0.025;
+    static final double BACK_TURN_INCREMENT = -0.020;
 
-    private ElapsedTime timer = new ElapsedTime();
-    private boolean turnerDone = false;
+    private final ElapsedTime timer = new ElapsedTime();
     private boolean isMoving = false;
     private double currentPosition = FRONT;
     private double targetPosition = FRONT;
@@ -26,58 +25,34 @@ public class MM_Turner{
         turner.setPosition(FRONT);
     }
 
-    public void runTurner(boolean tooLowToPivot) {
-        if (!tooLowToPivot) {
-            if (opMode.dpadLeftPressed(opMode.GAMEPAD2)) {
-                startMoving(BACK);
-            } else if (opMode.dpadRightPressed(opMode.GAMEPAD2)) {
-                startMoving(FRONT);
-            }
-        }
-
-        if (isMoving) {
-            currentPosition = Range.clip(currentPosition + turnIncrement, BACK, FRONT);
-            turner.setPosition(currentPosition);
-            if (currentPosition == BACK || currentPosition == FRONT) {
-                isMoving = false;
-            }
-        }
-
-        opMode.telemetry.addData("Turner Position", currentPosition);
-    }
-
-    public void startMoving(double position) {
-        if (position == BACK) {
-            turnIncrement = BACK_TURN_INCREMENT;
-        } else {
-            turnIncrement = FRONT_TURN_INCREMENT;
-        }
+    public void startMoving(double increment) {
+        turnIncrement = increment;
         isMoving = true;
     }
 
-    public void changeTurnerPosition(double position){
-        turner.setPosition(position);
+    public void checkIfDoneMoving() {
+        currentPosition = Range.clip(currentPosition + turnIncrement, BACK, FRONT);
+        changePosition(currentPosition);
+        if (currentPosition == BACK || currentPosition == FRONT) {
+            isMoving = false;
+        }
+        opMode.telemetry.addData("Turner Position", currentPosition);
     }
 
     public boolean reachedPosition(boolean tooLowToPivot) {
         if (currentPosition != targetPosition && !tooLowToPivot) {
-            turner.setPosition(targetPosition);
+            changePosition(targetPosition);
             currentPosition = targetPosition;
             timer.reset();
-        } else if (targetPosition == currentPosition) {
-            if (timer.seconds() > 0.6) {
-                return true;
-            }
+        } else {
+            return targetPosition == currentPosition && timer.seconds() > 0.6;
         }
+
         return false;
     }
 
-    public void setTarget() {
-        if (currentPosition == FRONT) {
-            targetPosition = BACK;
-        } else {
-            targetPosition = FRONT;
-        }
+    public void changePosition(double position){
+        turner.setPosition(position);
     }
 
     public double getPosition() {

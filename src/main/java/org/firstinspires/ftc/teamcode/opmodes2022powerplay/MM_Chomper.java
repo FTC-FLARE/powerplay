@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class MM_Chomper {
     private Servo chomper = null;
 
-    private static final double CHOKE = 0.39;  // tighten belt to collect
-    public static final double RELEASE = 1.0;
+    private static final double CHOKE = 0.36;  // tighten belt to collect
+    public static final double RELEASE = 0.0;
 
     private double position = RELEASE;
 

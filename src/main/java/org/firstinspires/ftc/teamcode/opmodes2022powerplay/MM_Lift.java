@@ -18,42 +18,59 @@ public class MM_Lift {
     }
 
     public void autoStackCollect(int stackLevel){
-        slide.setSlideTarget(MM_Slide.SlidePosition.STACK.ticks * (stackLevel - 1) - 8);
-        slide.runCollector();
+        slide.moveTowardTarget(MM_Slide.SlidePosition.STACK.ticks * (stackLevel - 1) - 8);
         while (opMode.opModeIsActive() && !slide.reachedPosition()) {
             opMode.telemetry.update();
         }
         chomper.toggle();
         runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 0.8) {
-            opMode.telemetry.update();
-        }
+        opMode.waitSeconds(.8);
     }
 
     public void autoScore(boolean flipfirst, boolean lastMove, int sleeveColor){
         if (flipfirst){
             runtime.reset();
-            while (opMode.opModeIsActive() && runtime.seconds() < 0.4) {
-            }
-            turner.changeTurnerPosition(turner.BACK);
+            opMode.waitSeconds(4);
+            turner.changePosition(MM_Turner.BACK);
             runtime.reset();
-            while (opMode.opModeIsActive() && runtime.seconds() < 1.25) {
-            }
+            opMode.waitSeconds(1.25);
         }
         slide.waitToReachPosition(MM_Slide.SlidePosition.LOW_RELEASE);
         chomper.toggle();
         runtime.reset();
         slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
-        turner.changeTurnerPosition(0.885);
+        turner.changePosition(0.885);
         runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 1.25){
+        opMode.waitSeconds(1.25);
+    }
+
+    public boolean reachedPositionTurner() {
+        if (slide.getCurrentTicks() > 1100) {
+            turner.changePosition(MM_Turner.BACK);
         }
+        return slide.reachedPosition();
     }
 
     public void driverControl(){
         slide.driverControl();
+        runTurner(slide.tooLowToPivot());
+
         if (opMode.rightBumperPressed(opMode.GAMEPAD2)) {
             chomper.toggle();
+        }
+    }
+
+    public void runTurner(boolean tooLowToPivot) {   // used in teleOp
+        if (!tooLowToPivot) {
+            if (opMode.dpadLeftPressed(opMode.GAMEPAD2)) {
+                turner.startMoving(MM_Turner.BACK_TURN_INCREMENT);
+            } else if (opMode.dpadRightPressed(opMode.GAMEPAD2)) {
+                turner.startMoving(MM_Turner.FRONT_TURN_INCREMENT);
+            }
+        }
+
+        if (turner.isMoving()) {
+            turner.checkIfDoneMoving();
         }
     }
 }

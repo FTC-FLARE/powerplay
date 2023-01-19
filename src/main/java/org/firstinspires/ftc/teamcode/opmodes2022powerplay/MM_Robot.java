@@ -78,10 +78,6 @@ public class MM_Robot {
         }
     }
 
-    public void runSlideandDrive(MM_Slide.SlidePosition slidePosition, double inches, double timeoutTime) {
-        runSlideandDrive(slidePosition, inches, timeoutTime, false);
-    }
-
     public void runSlideandDrive(MM_Slide.SlidePosition slidePosition, double inches, double timeoutTime, boolean flipTurner) {
         drivetrain.prepareToDrive(inches);
         lift.slide.moveTowardTarget(slidePosition);
@@ -90,24 +86,20 @@ public class MM_Robot {
         boolean slideDone = false;
         runtime.reset();
 
-        if (flipTurner) {
-            while (opMode.opModeIsActive() && (!driveDone || !slideDone) && runtime.seconds() < timeoutTime) {
-                driveDone = drivetrain.reachedPositionDrive();
+        while (opMode.opModeIsActive() && (!driveDone || !slideDone) && runtime.seconds() < timeoutTime) {
+            driveDone = drivetrain.reachedPositionDrive();
+
+            if (flipTurner) {
                 if (!slideDone) {
-                    slideDone = lift.slide.reachedPositionTurner(lift.turner);
+                    slideDone = lift.reachedPositionTurner();
                 }
-                opMode.telemetry.addData("inches target", inches);
-                opMode.telemetry.addData("slide target", slidePosition);
-                opMode.telemetry.update();
-            }
-        } else {
-            while (opMode.opModeIsActive() && (!driveDone || !slideDone) && runtime.seconds() < timeoutTime) {
-                driveDone = drivetrain.reachedPositionDrive();
+            } else {
                 slideDone = lift.slide.reachedPosition();
-                opMode.telemetry.addData("inches target", inches);
-                opMode.telemetry.addData("slide target", slidePosition);
-                opMode.telemetry.update();
             }
+
+            opMode.telemetry.addData("inches target", inches);
+            opMode.telemetry.addData("slide target", slidePosition);
+            opMode.telemetry.update();
         }
     }
 

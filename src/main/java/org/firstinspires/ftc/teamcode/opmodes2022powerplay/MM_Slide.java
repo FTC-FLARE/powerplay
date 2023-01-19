@@ -27,8 +27,6 @@ public class MM_Slide {
         GROUND(400),
         DETECT(700),
         LIFT(900),
-        CONESAVE_POSITION_FRONT(1100),
-        CONESAVE_POSITION_BACK(1350),
         LOW_RELEASE(1550),
         PIVOT_POSITION(1600),
         LOW(1750),
@@ -39,8 +37,6 @@ public class MM_Slide {
         HIGH(4000);
 
         public final int ticks;
-
-
 
         SlidePosition(int ticks) {
             this.ticks = ticks;
@@ -53,10 +49,10 @@ public class MM_Slide {
     }
 
     public void driverControl() {
-        if (opMode.gamepad2.right_trigger > 0.1 && !isTriggered(topStop)) {
+        if (opMode.gamepad2.right_trigger > 0.1 && !atTop()) {
             setSlideTarget(slide.getCurrentPosition() + MANUAL_INCREMENT);
             stackLevel = 1;
-        } else if (opMode.gamepad2.left_trigger > 0.1 && !isTriggered(bottomStop)) {
+        } else if (opMode.gamepad2.left_trigger > 0.1 && !atBottom()) {
             setSlideTarget(slide.getCurrentPosition() - MANUAL_INCREMENT);
             stackLevel = 1;
         } else {
@@ -73,10 +69,9 @@ public class MM_Slide {
         slide.setTargetPosition(getSlideTarget());
 
         opMode.telemetry.addData("Slide", "Current: %d  Target: %d", slide.getCurrentPosition(), getSlideTarget());
-        opMode.telemetry.addData("Top Stop", isTriggered(topStop));
-        opMode.telemetry.addData("Bottom Stop", isTriggered(bottomStop));
+        opMode.telemetry.addData("Top Stop", atTop());
+        opMode.telemetry.addData("Bottom Stop", atBottom());
         opMode.telemetry.addData("Stack Level", stackLevel);
-        opMode.robot.lift.turner.runTurner(tooLowToPivot());
     }
 
     public void waitToReachPosition(SlidePosition slidePosition) {
@@ -120,19 +115,16 @@ public class MM_Slide {
     }
 
     public void moveTowardTarget(SlidePosition slidePosition) {
-        moveTowardTarget(slidePosition, false);
+        moveTowardTarget(slidePosition.ticks);
     }
 
-    public void moveTowardTarget(SlidePosition slidePosition, boolean flipTurner) {
-        setSlideTarget(slidePosition.ticks);
+    public void moveTowardTarget(int ticks) {
+        setSlideTarget(ticks);
         slide.setTargetPosition(getSlideTarget());
-        if (flipTurner) {
-            opMode.robot.lift.turner.setTarget();
-        }
     }
 
     private boolean inDangerZone() {
-        if (isTriggered(bottomStop) && getSlideTarget() < slide.getCurrentPosition()) {
+        if (atBottom() && getSlideTarget() < slide.getCurrentPosition()) {
             reset();
             return true;
         }
@@ -144,27 +136,17 @@ public class MM_Slide {
         return !slide.isBusy() || inDangerZone();
     }
 
-    public boolean reachedPositionTurner(MM_Turner turner) {
-        if (slide.getCurrentPosition() > 1100) {
-            turner.changeTurnerPosition(0);
-        }
-        return !slide.isBusy() || inDangerZone();
+    private boolean atTop() {
+        return !topStop. getState();
     }
 
-    private boolean isTriggered(DigitalChannel limitSwitch) {
-        return !limitSwitch.getState();
+    private boolean atBottom() {
+        return !bottomStop.getState();
     }
 
     //the slide is too far down to flip the pivot/turner
     public boolean tooLowToPivot() {
         return slide.getCurrentPosition() < SlidePosition.PIVOT_POSITION.ticks;
-    }
-
-    public boolean tooLowtoConesave() {
-        if (opMode.robot.lift.turner.getPosition() > 0.4) {
-            return slide.getCurrentPosition() < SlidePosition.CONESAVE_POSITION_FRONT.ticks;
-        }
-        return slide.getCurrentPosition() < SlidePosition.CONESAVE_POSITION_BACK.ticks;
     }
 
     public int getSlideTarget() {
@@ -174,20 +156,12 @@ public class MM_Slide {
     public void setSlideTarget(int slideTarget) {
         this.slideTarget = slideTarget;
     }
-    public void runCollector(){
-        slide.setTargetPosition(getSlideTarget());
-    }
-    public void autoScore(){
-        waitToReachPosition(SlidePosition.LOW);
-        opMode.robot.lift.turner.startMoving(opMode.robot.lift.turner.BACK);
-        waitToReachPosition(SlidePosition.LOW_RELEASE);
-//        collector release
-        waitToReachPosition(SlidePosition.LOW);
-        opMode.robot.lift.turner.startMoving(opMode.robot.lift.turner.FRONT);
+
+    public int getCurrentTicks() {
+        return slide.getCurrentPosition();
     }
 
     private void init() {
-
         slide = opMode.hardwareMap.get(DcMotor.class, "Slide");
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide.setDirection(DcMotorSimple.Direction.REVERSE);
