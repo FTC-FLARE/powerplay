@@ -91,13 +91,38 @@ public class MM_Robot {
 
             if (flipTurner) {
                 if (!slideDone) {
-                    slideDone = lift.reachedPositionTurner();
-                }
+                    slideDone = lift.reachedPositionTurner(); //watch out
+                   }
             } else {
                 slideDone = lift.slide.reachedPosition();
             }
 
             opMode.telemetry.addData("inches target", inches);
+            opMode.telemetry.addData("slide target", slidePosition);
+            opMode.telemetry.update();
+        }
+    }
+
+    public void runSlideandDiagonalDrive(MM_Slide.SlidePosition slidePosition, double forwardInches, double strafeInches, int kickInPercent, int move, double timeoutTime, boolean flipTurner) {
+        drivetrain.prepareToDiagonalDrive(forwardInches, strafeInches, kickInPercent, move);
+        lift.slide.moveTowardTarget(slidePosition);
+
+        boolean driveDone = false;
+        boolean slideDone = false;
+        runtime.reset();
+
+        while (opMode.opModeIsActive() && (!driveDone || !slideDone) && runtime.seconds() < timeoutTime) {
+            driveDone = drivetrain.reachedPositionDiagonalDrive();
+
+            if (flipTurner) {
+                if (!slideDone) {
+                    slideDone = lift.reachedPositionTurner();//watch out for this
+                }
+            } else {
+                slideDone = lift.slide.reachedPosition();
+            }
+            opMode.telemetry.addData("forward inches target", forwardInches);
+            opMode.telemetry.addData("strafe inches target", strafeInches);
             opMode.telemetry.addData("slide target", slidePosition);
             opMode.telemetry.update();
         }

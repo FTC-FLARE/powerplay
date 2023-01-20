@@ -103,8 +103,7 @@ public class MM_Drivetrain {
     }
 
     public void diagonalDriveInches(double forwardInches, double strafeInches, int percentKickIn, int move) {
-        this.move = move;
-        prepareToDiagonalDrive(forwardInches, strafeInches, percentKickIn);
+        prepareToDiagonalDrive(forwardInches, strafeInches, percentKickIn, move);
         runtime.reset();
         while (opMode.opModeIsActive() && runtime.seconds() < 5 && !reachedPositionDiagonalDrive()) {
             opMode.telemetry.addData("forward inches target", forwardInches);
@@ -147,28 +146,29 @@ public class MM_Drivetrain {
         bothPosandNeg = false;
     }
 
-    public void prepareToDiagonalDrive(double forwardInches, double strafeInches, int kickInPercent) {
+    public void prepareToDiagonalDrive(double forwardInches, double strafeInches, int kickInPercent, int move) {
         int backTargetTicks = backPriorEncoderTarget + MM_Util.inchesToTicks(strafeInches);
         int leftTargetTicks = leftPriorEncoderTarget + MM_Util.inchesToTicks(forwardInches);
         int rightTargetTicks = rightPriorEncoderTarget + MM_Util.inchesToTicks(forwardInches);
 
+        this.move = move;
         if (move == DRIVE) {
             if (forwardInches < 0) {
-                direction =  BACKWARD;
+                direction = BACKWARD;
             } else {
                 direction = FORWARD;
             }
-            kickInTicks = kickInPercent * (leftTargetTicks - leftPriorEncoderTarget) + leftPriorEncoderTarget;
+            kickInTicks = kickInPercent * (backTargetTicks - backPriorEncoderTarget) + backPriorEncoderTarget;
             kickInTicks /= 100;
             strafeIn = true;
             straightIn = false;
         } else if (move == STRAFE) {
             if (strafeInches < 0) {
-                direction = RIGHT;
+                direction = -RIGHT;
             } else {
-                direction = LEFT;
+                direction = -LEFT;
             }
-            kickInTicks = kickInPercent * (backTargetTicks - backPriorEncoderTarget) + backPriorEncoderTarget;
+            kickInTicks = kickInPercent * (leftTargetTicks - leftPriorEncoderTarget) + leftPriorEncoderTarget;
             kickInTicks /= 100;
             strafeIn = false;
             straightIn = true;
@@ -262,7 +262,7 @@ public class MM_Drivetrain {
         rightCurrentTicks = rightEncoder.getCurrentPosition();
         backCurrentTicks = -backEncoder.getCurrentPosition();
 
-
+        checkKickIn();
 
         if (straightIn && (!leftReachedTarget || !rightReachedTarget)) {
             leftDrivePower = opMode.pLeftDiagDriveController.calculatePower(leftCurrentTicks);
@@ -273,6 +273,9 @@ public class MM_Drivetrain {
             calculatedPower = opMode.pBackDriveController.calculatePower(backCurrentTicks);
         }
         opMode.telemetry.addData("calc power", calculatedPower);
+        opMode.telemetry.addData("strafein", strafeIn);
+        opMode.telemetry.addData("straightin", straightIn);
+        opMode.telemetry.addData("kickinticks", kickInTicks);
 
         flPower = -calculatedPower + leftDrivePower;
         frPower = calculatedPower + rightDrivePower;
@@ -485,24 +488,24 @@ public class MM_Drivetrain {
 
     private void checkKickIn() {
         if (!strafeIn || !straightIn) {
-            if (move == DRIVE) {
+            if (move == STRAFE) {
                 if (direction == BACKWARD) {
                     if (leftCurrentTicks < kickInTicks) {
-                        straightIn = true;
+                        strafeIn = true;
                     }
                 } else {
                     if (leftCurrentTicks > kickInTicks) {
-                        straightIn = true;
+                        strafeIn = true;
                     }
                 }
             } else {
                 if (direction == RIGHT) {
                     if (backCurrentTicks < kickInTicks) {
-                        strafeIn = true;
+                        straightIn = true;
                     }
                 } else {
                     if (backCurrentTicks > kickInTicks) {
-                        strafeIn = true;
+                        straightIn = true;
                     }
                 }
             }
