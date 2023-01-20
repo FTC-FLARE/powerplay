@@ -39,6 +39,8 @@ public class MM_Drivetrain {
 
     private static final int RIGHT = 1;
     private static final int LEFT = -1;
+    private static final int FORWARD = 1;
+    private static final int BACKWARD = -1;
     private static final double SECONDS_PER_DEGREE = 0.025;//??
     private static final double STRAIGHTEN_P = .0780;
     private static final double STRAFE_P = .089;
@@ -74,8 +76,9 @@ public class MM_Drivetrain {
     private boolean backReachedTarget = false;
     private boolean leftReachedTarget = false;
     private boolean rightReachedTarget = false;
-    private double straightKickInTimer = 0;
-    private double strafeKickInTimer = 0;
+    private int move = DRIVE;
+    private int direction = 0;
+    private int kickInTicks = 0;
     private boolean strafeIn = false;
     private boolean straightIn = false;
 
@@ -96,13 +99,12 @@ public class MM_Drivetrain {
     }
 
     public void diagonalDriveInches(double forwardInches, double strafeInches) {
-        diagonalDriveInches(forwardInches, strafeInches, 0,0);
+        diagonalDriveInches(forwardInches, strafeInches, 100,0);
     }
 
-    public void diagonalDriveInches(double forwardInches, double strafeInches, double forwardTimer, double strafeTimer) {
-        strafeKickInTimer = strafeTimer;
-        straightKickInTimer = forwardTimer;
-        prepareToDiagonalDrive(forwardInches, strafeInches);
+    public void diagonalDriveInches(double forwardInches, double strafeInches, int percentKickIn, int move) {
+        this.move = move;
+        prepareToDiagonalDrive(forwardInches, strafeInches, percentKickIn);
         runtime.reset();
         while (opMode.opModeIsActive() && runtime.seconds() < 5 && !reachedPositionDiagonalDrive()) {
             opMode.telemetry.addData("forward inches target", forwardInches);
@@ -145,10 +147,35 @@ public class MM_Drivetrain {
         bothPosandNeg = false;
     }
 
-    public void prepareToDiagonalDrive(double forwardInches, double strafeInches) {
+    public void prepareToDiagonalDrive(double forwardInches, double strafeInches, int kickInPercent) {
         int backTargetTicks = backPriorEncoderTarget + MM_Util.inchesToTicks(strafeInches);
         int leftTargetTicks = leftPriorEncoderTarget + MM_Util.inchesToTicks(forwardInches);
         int rightTargetTicks = rightPriorEncoderTarget + MM_Util.inchesToTicks(forwardInches);
+
+        if (move == DRIVE) {
+            if (forwardInches < 0) {
+                direction =  BACKWARD;
+            } else {
+                direction = FORWARD;
+            }
+            kickInTicks = kickInPercent * (leftTargetTicks - leftPriorEncoderTarget) + leftPriorEncoderTarget;
+            kickInTicks /= 100;
+            strafeIn = true;
+            straightIn = false;
+        } else if (move == STRAFE) {
+            if (strafeInches < 0) {
+                direction = RIGHT;
+            } else {
+                direction = LEFT;
+            }
+            kickInTicks = kickInPercent * (backTargetTicks - backPriorEncoderTarget) + backPriorEncoderTarget;
+            kickInTicks /= 100;
+            strafeIn = false;
+            straightIn = true;
+        } else {
+            strafeIn = true;
+            straightIn = true;
+        }
 
         opMode.pLeftDiagDriveController.setInputRange(leftPriorEncoderTarget, leftTargetTicks);
         opMode.pRightDiagDriveController.setInputRange(rightPriorEncoderTarget, rightTargetTicks);
@@ -163,8 +190,7 @@ public class MM_Drivetrain {
         backReachedTarget = false;
         leftReachedTarget = false;
         rightReachedTarget = false;
-        strafeIn = false;
-        straightIn = false;
+
     }
 
     public void prepareToStrafe(double inches) {
@@ -232,15 +258,11 @@ public class MM_Drivetrain {
     }
 
     private void setDiagonalPower() {
-        if (runtime.seconds() > strafeKickInTimer) {
-            strafeIn = true;
-        }
-        if (runtime.seconds() > straightKickInTimer) {
-            straightIn = true;
-        }
         leftCurrentTicks = leftEncoder.getCurrentPosition();
         rightCurrentTicks = rightEncoder.getCurrentPosition();
         backCurrentTicks = -backEncoder.getCurrentPosition();
+
+
 
         if (straightIn && (!leftReachedTarget || !rightReachedTarget)) {
             leftDrivePower = opMode.pLeftDiagDriveController.calculatePower(leftCurrentTicks);
@@ -459,6 +481,32 @@ public class MM_Drivetrain {
         rightPriorEncoderTarget = rightPriorEncoderTarget - rightStartingTicks + rightEncoder.getCurrentPosition();
         leftPriorEncoderTarget = leftPriorEncoderTarget - leftStartingTicks + leftEncoder.getCurrentPosition();
         backPriorEncoderTarget = backPriorEncoderTarget - backStartingTicks + backEncoder.getCurrentPosition();
+    }
+
+    private void checkKickIn() {
+        if (!strafeIn || !straightIn) {
+            if (move == DRIVE) {
+                if (direction == BACKWARD) {
+                    if (leftCurrentTicks < kickInTicks) {
+                        straightIn = true;
+                    }
+                } else {
+                    if (leftCurrentTicks > kickInTicks) {
+                        straightIn = true;
+                    }
+                }
+            } else {
+                if (direction == RIGHT) {
+                    if (backCurrentTicks < kickInTicks) {
+                        strafeIn = true;
+                    }
+                } else {
+                    if (backCurrentTicks > kickInTicks) {
+                        strafeIn = true;
+                    }
+                }
+            }
+        }
     }
 
     private void encoderCorrect(double calculatedPower, int movement) { //TODO RENAME

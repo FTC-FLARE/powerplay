@@ -38,5 +38,6 @@ public class MM_Chomper {
     private void changePosition(double position) {
         chomper.setPosition(position);
         this.position = position;
+
     }
 }

@@ -34,7 +34,8 @@ public class MM_Auto_Test extends MM_OpMode {
         telemetry.update();
         waitForStart();
 
-        robot.drivetrain.diagonalDriveInches(24, 12, 0, 0.25);
+        robot.drivetrain.diagonalDriveInches(24, 24, 1
+                , MM_Drivetrain.STRAFE);
 
     }
 }
