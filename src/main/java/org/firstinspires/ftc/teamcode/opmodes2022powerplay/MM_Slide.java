@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -10,12 +11,17 @@ public class MM_Slide {
     private DcMotor slide = null;
     private DigitalChannel topStop;
     private DigitalChannel bottomStop;
+    private ColorSensor colorSensor;
+
 
     private final static double SLIDE_POWER = 0.6;
     private final static int MANUAL_INCREMENT = 150;
+    private final static int SLOW_INCREMENT = 50;
+    private final static double SLIDE_SLOW_SPEED = 0.3;
 
     private int slideTarget = 0;
     private int stackLevel = 1;
+    private boolean slowZone = true;
 
     private int autoStacklevel = 5;
 
@@ -50,11 +56,16 @@ public class MM_Slide {
 
     public void driverControl() {
         if (opMode.gamepad2.right_trigger > 0.1 && !atTop()) {
+
             setSlideTarget(slide.getCurrentPosition() + MANUAL_INCREMENT);
             stackLevel = 1;
         } else if (opMode.gamepad2.left_trigger > 0.1 && !atBottom()) {
-            setSlideTarget(slide.getCurrentPosition() - MANUAL_INCREMENT);
-            stackLevel = 1;
+//            if (slowZone()){
+//                setSlideTarget(slide.getCurrentPosition() - MANUAL_INCREMENT);
+//            }else {
+                setSlideTarget(slide.getCurrentPosition() - MANUAL_INCREMENT);
+                stackLevel = 1;
+//            }
         } else {
             checkSelectHeight();
         }
@@ -72,6 +83,9 @@ public class MM_Slide {
         opMode.telemetry.addData("Top Stop", atTop());
         opMode.telemetry.addData("Bottom Stop", atBottom());
         opMode.telemetry.addData("Stack Level", stackLevel);
+        opMode.telemetry.addData("red", colorSensor.red());
+        opMode.telemetry.addData("blue",colorSensor.blue());
+        opMode.telemetry.addData("green",colorSensor.green());
     }
 
     public void waitToReachPosition(SlidePosition slidePosition) {
@@ -128,7 +142,6 @@ public class MM_Slide {
             reset();
             return true;
         }
-
         return false;
     }
 
@@ -144,6 +157,9 @@ public class MM_Slide {
         return !bottomStop.getState();
     }
 
+//    private boolean slowZone(){
+//        return !slowerizer.getState();
+//    }
     //the slide is too far down to flip the pivot/turner
     public boolean tooLowToPivot() {
         return slide.getCurrentPosition() < SlidePosition.PIVOT_POSITION.ticks;
@@ -169,9 +185,11 @@ public class MM_Slide {
 
         topStop = opMode.hardwareMap.get(DigitalChannel.class, "topStop");
         bottomStop = opMode.hardwareMap.get(DigitalChannel.class, "bottomStop");
+        colorSensor = opMode.hardwareMap.get(ColorSensor.class, "colorSensor");
 
-        topStop.setMode(DigitalChannel.Mode.INPUT);  // are these 2 lines needed?
+        topStop.setMode(DigitalChannel.Mode.INPUT);  // are these 2 lines needed? //3 lines
         bottomStop.setMode(DigitalChannel.Mode.INPUT);
+
     }
 
     private void reset() {
