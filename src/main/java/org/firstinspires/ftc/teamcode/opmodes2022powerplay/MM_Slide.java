@@ -21,6 +21,7 @@ public class MM_Slide {
 
     private int slideTarget = 0;
     private int stackLevel = 1;
+    private double currentSlidePower = SLIDE_POWER;
     private boolean slowZone = true;
 
     private int autoStacklevel = 5;
@@ -55,21 +56,19 @@ public class MM_Slide {
     }
 
     public void driverControl() {
-        if (opMode.gamepad2.right_trigger > 0.1 && !atTop()) {
-
+        boolean rightTriggerPressed = (opMode.gamepad2.right_trigger > 0.1);
+        boolean leftTriggerPressed = (opMode.gamepad2.left_trigger > 0.1);
+        if (rightTriggerPressed && !atTop()) {
             setSlideTarget(slide.getCurrentPosition() + MANUAL_INCREMENT);
             stackLevel = 1;
-        } else if (opMode.gamepad2.left_trigger > 0.1 && !atBottom()) {
-//            if (slowZone()){
-//                setSlideTarget(slide.getCurrentPosition() - MANUAL_INCREMENT);
-//            }else {
-                setSlideTarget(slide.getCurrentPosition() - MANUAL_INCREMENT);
-                stackLevel = 1;
-//            }
+        } else if (leftTriggerPressed && !atBottom()) {
+            setSlideTarget(slide.getCurrentPosition() - MANUAL_INCREMENT);
+            stackLevel = 1;
         } else {
             checkSelectHeight();
         }
 
+        handleSlowZone(rightTriggerPressed, leftTriggerPressed);
         if (inDangerZone()) {
             opMode.telemetry.addLine("Danger Zone - Resetting Encoder");
         }
@@ -157,9 +156,15 @@ public class MM_Slide {
         return !bottomStop.getState();
     }
 
-//    private boolean slowZone(){
-//        return !slowerizer.getState();
-//    }
+    private void handleSlowZone(boolean rightTriggerPressed, boolean leftTriggerPressed){
+        if (!rightTriggerPressed && leftTriggerPressed && colorSensor.red() > 1000) {
+            slide.setPower(0.3);
+            currentSlidePower = 0.3;
+        } else if (currentSlidePower == 0.3) {
+            slide.setPower(0.6);
+            currentSlidePower = 0.6;
+        }
+    }
     //the slide is too far down to flip the pivot/turner
     public boolean tooLowToPivot() {
         return slide.getCurrentPosition() < SlidePosition.PIVOT_POSITION.ticks;

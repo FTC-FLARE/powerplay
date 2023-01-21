@@ -105,7 +105,7 @@ public class MM_Drivetrain {
     public void diagonalDriveInches(double forwardInches, double strafeInches, int percentKickIn, int move) {
         prepareToDiagonalDrive(forwardInches, strafeInches, percentKickIn, move);
         runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 5 && !reachedPositionDiagonalDrive()) {
+        while (opMode.opModeIsActive() && runtime.seconds() < 10 && !reachedPositionDiagonalDrive()) {
             opMode.telemetry.addData("forward inches target", forwardInches);
             opMode.telemetry.addData("strafe inches target", strafeInches);
             opMode.telemetry.update();
@@ -215,6 +215,7 @@ public class MM_Drivetrain {
         backReachedTarget = opMode.pBackDriveController.reachedTarget();
         leftReachedTarget = opMode.pLeftDiagDriveController.reachedTarget();
         rightReachedTarget = opMode.pRightDiagDriveController.reachedTarget();
+        opMode.telemetry.addData("Back reached target", backReachedTarget);
         if (backReachedTarget && (rightReachedTarget || leftReachedTarget)) {
             stop();
             return true;
