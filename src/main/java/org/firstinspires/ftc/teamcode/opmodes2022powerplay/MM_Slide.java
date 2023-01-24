@@ -11,7 +11,7 @@ public class MM_Slide {
     private DcMotor slide = null;
     private DigitalChannel topStop;
     private DigitalChannel bottomStop;
-    private ColorSensor colorSensor;
+    private ColorSensor slowerizationModule;
 
 
     private final static double SLIDE_NORMAL_SPEED = 0.6;
@@ -23,7 +23,6 @@ public class MM_Slide {
     private int slideTarget = 0;
     private int stackLevel = 1;
     private double currentSlidePower = SLIDE_NORMAL_SPEED;
-    private boolean slowZone = true;
 
     private int autoStacklevel = 5;
 
@@ -64,8 +63,7 @@ public class MM_Slide {
             setSlideTarget(slide.getCurrentPosition() -400);
             stackLevel = 1;
         }else {
-            checkSelectHeight();
-
+            checkForSelectedHeight();
         }
 
         if (opMode.robot.lift.turner.isMoving() && tooLowToPivot() && getSlideTarget() < SlidePosition.PIVOT_POSITION.ticks) {
@@ -88,7 +86,6 @@ public class MM_Slide {
         opMode.telemetry.addData("Top Stop", atTop());
         opMode.telemetry.addData("Bottom Stop", atBottom());
         opMode.telemetry.addData("Stack Level", stackLevel);
-        opMode.telemetry.addData("red", colorSensor.red());
     }
 
     public void waitToReachPosition(SlidePosition slidePosition) {
@@ -100,7 +97,7 @@ public class MM_Slide {
         }
     }
 
-    private void checkSelectHeight() {
+    private void checkForSelectedHeight() {
         if (opMode.leftStickYDownPressed(opMode.GAMEPAD2)) {
             changeStack(1);
         } else if (opMode.leftStickYUpPressed(opMode.GAMEPAD2)) {
@@ -153,7 +150,7 @@ public class MM_Slide {
     }
 
     private boolean inSlowZone() {
-        return colorSensor.red() > 1000;
+        return slowerizationModule.red() > 1000;
     }
 
     public boolean reachedPosition() {
@@ -193,7 +190,7 @@ public class MM_Slide {
 
         topStop = opMode.hardwareMap.get(DigitalChannel.class, "topStop");
         bottomStop = opMode.hardwareMap.get(DigitalChannel.class, "bottomStop");
-        colorSensor = opMode.hardwareMap.get(ColorSensor.class, "colorSensor");
+        slowerizationModule = opMode.hardwareMap.get(ColorSensor.class, "slowerizer");
 
         topStop.setMode(DigitalChannel.Mode.INPUT);  // are these 2 lines needed?
         bottomStop.setMode(DigitalChannel.Mode.INPUT);
