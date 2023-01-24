@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -31,14 +30,16 @@ public class MM_Drivetrain {
     private Servo leftOdomLift = null;
     private Servo rightOdomLift = null;
     private Servo backOdomLift = null;
+    private Servo indicator = null;
+    private Servo scorer = null;
     private Servo distanceServo = null;
 
     private DistanceSensor distance = null;
 
     private final ElapsedTime runtime = new ElapsedTime();
 
-    private static final int RIGHT = 1;
-    private static final int LEFT = -1;
+    private static final int RIGHT = -1;
+    private static final int LEFT = 1;
     private static final int FORWARD = 1;
     private static final int BACKWARD = -1;
     private static final double SECONDS_PER_DEGREE = 0.025;//??
@@ -73,14 +74,17 @@ public class MM_Drivetrain {
     private int leftPriorEncoderTarget = 0;
     private int rightPriorEncoderTarget = 0;
     private int backPriorEncoderTarget = 0;
+    private int leftCorrectionEncoderTarget = 0;
+    private int rightCorrectionEncoderTarget = 0;
     private boolean backReachedTarget = false;
     private boolean leftReachedTarget = false;
     private boolean rightReachedTarget = false;
-    private int move = DRIVE;
+    private int kickInMove = DRIVE;
     private int direction = 0;
     private int kickInTicks = 0;
+    private double strafePower = 0;
     private boolean strafeIn = false;
-    private boolean straightIn = false;
+    private boolean driveIn = false;
 
     private double priorAngle = 0;
 
@@ -102,7 +106,7 @@ public class MM_Drivetrain {
         diagonalDriveInches(forwardInches, strafeInches, 100,0);
     }
 
-    public void diagonalDriveInches(double forwardInches, double strafeInches, int percentKickIn, int move) {
+    public void diagonalDriveInches(double forwardInches, double strafeInches, int move, int percentKickIn) {
         prepareToDiagonalDrive(forwardInches, strafeInches, percentKickIn, move);
         runtime.reset();
         while (opMode.opModeIsActive() && runtime.seconds() < 10 && !reachedPositionDiagonalDrive()) {
@@ -146,35 +150,35 @@ public class MM_Drivetrain {
         bothPosandNeg = false;
     }
 
-    public void prepareToDiagonalDrive(double forwardInches, double strafeInches, int kickInPercent, int move) {
+    public void prepareToDiagonalDrive(double forwardInches, double strafeInches, int kickInPercent, int kickInMove) {
         int backTargetTicks = backPriorEncoderTarget + MM_Util.inchesToTicks(strafeInches);
         int leftTargetTicks = leftPriorEncoderTarget + MM_Util.inchesToTicks(forwardInches);
         int rightTargetTicks = rightPriorEncoderTarget + MM_Util.inchesToTicks(forwardInches);
 
-        this.move = move;
-        if (move == DRIVE) {
+        this.kickInMove = kickInMove;
+        if (kickInMove == DRIVE) {
+            if (strafeInches < 0) {
+                direction = RIGHT;
+            } else {
+                direction = LEFT;
+            }
+            kickInTicks = kickInPercent * (backTargetTicks - backPriorEncoderTarget) + backPriorEncoderTarget;
+            kickInTicks /= 100;
+            strafeIn = true;
+            driveIn = false;
+        } else if (kickInMove == STRAFE) {
             if (forwardInches < 0) {
                 direction = BACKWARD;
             } else {
                 direction = FORWARD;
             }
-            kickInTicks = kickInPercent * (backTargetTicks - backPriorEncoderTarget) + backPriorEncoderTarget;
-            kickInTicks /= 100;
-            strafeIn = true;
-            straightIn = false;
-        } else if (move == STRAFE) {
-            if (strafeInches < 0) {
-                direction = -RIGHT;
-            } else {
-                direction = -LEFT;
-            }
             kickInTicks = kickInPercent * (leftTargetTicks - leftPriorEncoderTarget) + leftPriorEncoderTarget;
             kickInTicks /= 100;
             strafeIn = false;
-            straightIn = true;
+            driveIn = true;
         } else {
             strafeIn = true;
-            straightIn = true;
+            driveIn = true;
         }
 
         opMode.pLeftDiagDriveController.setInputRange(leftPriorEncoderTarget, leftTargetTicks);
@@ -183,6 +187,8 @@ public class MM_Drivetrain {
         opMode.pLeftDiagDriveController.setSetpoint(leftTargetTicks);
         opMode.pRightDiagDriveController.setSetpoint(rightTargetTicks);
         opMode.pBackDriveController.setSetpoint(backTargetTicks);
+        leftCorrectionEncoderTarget = leftPriorEncoderTarget;
+        rightCorrectionEncoderTarget = rightPriorEncoderTarget;
         leftPriorEncoderTarget = leftTargetTicks;
         rightPriorEncoderTarget = rightTargetTicks;
         backPriorEncoderTarget = backTargetTicks;
@@ -190,7 +196,6 @@ public class MM_Drivetrain {
         backReachedTarget = false;
         leftReachedTarget = false;
         rightReachedTarget = false;
-
     }
 
     public void prepareToStrafe(double inches) {
@@ -215,8 +220,19 @@ public class MM_Drivetrain {
         backReachedTarget = opMode.pBackDriveController.reachedTarget();
         leftReachedTarget = opMode.pLeftDiagDriveController.reachedTarget();
         rightReachedTarget = opMode.pRightDiagDriveController.reachedTarget();
+
+        if (strafeIn) {
+            strafeIn = !backReachedTarget;
+        }
+        if (driveIn) {
+            if (leftReachedTarget || rightReachedTarget) {
+                driveIn = false;
+                rightCorrectionEncoderTarget = rightPriorEncoderTarget;
+                leftCorrectionEncoderTarget = leftPriorEncoderTarget;
+            }
+        }
         opMode.telemetry.addData("Back reached target", backReachedTarget);
-        if (backReachedTarget && (rightReachedTarget || leftReachedTarget)) {
+        if (!driveIn && !strafeIn) {
             stop();
             return true;
         }
@@ -264,27 +280,33 @@ public class MM_Drivetrain {
         backCurrentTicks = -backEncoder.getCurrentPosition();
 
         checkKickIn();
-
-        if (straightIn && (!leftReachedTarget || !rightReachedTarget)) {
+        if (driveIn) {
             leftDrivePower = opMode.pLeftDiagDriveController.calculatePower(leftCurrentTicks);
             rightDrivePower = opMode.pRightDiagDriveController.calculatePower(rightCurrentTicks);
+        } else {
+            leftDrivePower = 0;
+            rightDrivePower = 0;
         }
-        double calculatedPower = 0;
-        if (strafeIn && !backReachedTarget) {
-            calculatedPower = opMode.pBackDriveController.calculatePower(backCurrentTicks);
+
+        if (strafeIn) {
+            strafePower = opMode.pBackDriveController.calculatePower(backCurrentTicks);
+        } else {
+            strafePower = 0;
         }
-        opMode.telemetry.addData("calc power", calculatedPower);
         opMode.telemetry.addData("strafein", strafeIn);
-        opMode.telemetry.addData("straightin", straightIn);
+        opMode.telemetry.addData("drivein", driveIn);
+        opMode.telemetry.addData("right drive power", rightDrivePower);
+        opMode.telemetry.addData("left drive power", leftDrivePower);
+        opMode.telemetry.addData("calc power", strafePower);
         opMode.telemetry.addData("kickinticks", kickInTicks);
 
-        flPower = -calculatedPower + leftDrivePower;
-        frPower = calculatedPower + rightDrivePower;
-        blPower = calculatedPower + leftDrivePower;
-        brPower = -calculatedPower + rightDrivePower;
+        flPower = -strafePower + leftDrivePower;
+        frPower = strafePower + rightDrivePower;
+        blPower = strafePower + leftDrivePower;
+        brPower = -strafePower + rightDrivePower;
 
-        if (leftReachedTarget || rightReachedTarget) {
-            encoderCorrect(calculatedPower, STRAFE);
+        if (!driveIn) {
+            encoderCorrect(strafePower, STRAFE, leftCorrectionEncoderTarget, rightCorrectionEncoderTarget);
         }
         angleStraighten(STRAIGHTEN_P, flPower, frPower);
         normalizeAutos();
@@ -329,7 +351,7 @@ public class MM_Drivetrain {
         blPower = calculatedPower;
         brPower = -calculatedPower;
 
-        encoderCorrect(calculatedPower, STRAFE);
+        encoderCorrect(calculatedPower, STRAFE, leftPriorEncoderTarget, rightPriorEncoderTarget);
         angleStraighten(STRAFE_P, calculatedPower, calculatedPower);
         normalize();
         setMotorPower(flPower, frPower, blPower, brPower);
@@ -412,7 +434,7 @@ public class MM_Drivetrain {
     }
 
     private void normalizeAutos() {
-        if (strafeIn && straightIn && !backReachedTarget && !leftReachedTarget && !rightReachedTarget) {
+        if (strafeIn && driveIn) {
             flPower /= 1.25;
             frPower /= 1.25;
             blPower /= 1.25;
@@ -488,8 +510,8 @@ public class MM_Drivetrain {
     }
 
     private void checkKickIn() {
-        if (!strafeIn || !straightIn) {
-            if (move == STRAFE) {
+        if (!strafeIn || !driveIn) {
+            if (kickInMove == STRAFE) {
                 if (direction == BACKWARD) {
                     if (leftCurrentTicks < kickInTicks) {
                         strafeIn = true;
@@ -502,24 +524,24 @@ public class MM_Drivetrain {
             } else {
                 if (direction == RIGHT) {
                     if (backCurrentTicks < kickInTicks) {
-                        straightIn = true;
+                        driveIn = true;
                     }
                 } else {
                     if (backCurrentTicks > kickInTicks) {
-                        straightIn = true;
+                        driveIn = true;
                     }
                 }
             }
         }
     }
 
-    private void encoderCorrect(double calculatedPower, int movement) { //TODO RENAME
+    private void encoderCorrect(double calculatedPower, int movement, int leftTarget, int rightTarget) { //TODO RENAME
         if (movement == STRAFE) {
             leftCurrentTicks = leftEncoder.getCurrentPosition();
             rightCurrentTicks = rightEncoder.getCurrentPosition();
 
-            double leftError = leftPriorEncoderTarget - leftCurrentTicks;
-            double rightError =  rightPriorEncoderTarget - rightCurrentTicks;
+            double leftError = leftTarget - leftCurrentTicks;
+            double rightError =  rightTarget - rightCurrentTicks;
             //modeled after straighten
             flPower = flPower + (leftError * CORRECTION_COEFFICIENT * Math.abs(calculatedPower));
             frPower = frPower + (rightError * CORRECTION_COEFFICIENT * Math.abs(calculatedPower));
@@ -629,6 +651,7 @@ public class MM_Drivetrain {
     private void initServos(){
         distanceServo = opMode.hardwareMap.get(Servo.class, "distanceServo");
         if(opMode.getClass() == MM_TeleOp.class){
+            indicator = opMode.hardwareMap.get(Servo.class, "autoScore");
             leftOdomLift = opMode.hardwareMap.get(Servo.class,"leftOdometryLift");
             rightOdomLift = opMode.hardwareMap.get(Servo.class,"rightOdometryLift");
             backOdomLift = opMode.hardwareMap.get(Servo.class,"backOdometryLift");
@@ -637,13 +660,28 @@ public class MM_Drivetrain {
             rightOdomLift.setPosition(0);
             backOdomLift.setPosition(1);
             distanceServo.setPosition(1);
+            indicator.setPosition(1);
         } else {
+            scorer = opMode.hardwareMap.get(Servo.class, "autoScore");
             distanceServo.setPosition(0);
+            scorer.setPosition(1);
         }
     }
 
     public void flipDistanceServo() {
         distanceServo.setPosition(1);
+    }
+
+    public void scoreAndUnscore() {
+        scorer.setPosition(0);
+        runtime.reset();
+        while (opMode.opModeIsActive() && runtime.seconds() < 1.4) {
+        }
+        scorer.setPosition(0.15);
+        runtime.reset();
+        while (opMode.opModeIsActive() && runtime.seconds() < 0.4) {
+        }
+        scorer.setPosition(1);
     }
 }
 /*    public void correctForJunction() {

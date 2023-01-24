@@ -14,7 +14,7 @@ public class MM_Slide {
     private ColorSensor colorSensor;
 
 
-    private final static double SLIDE_NORMAL_SPEED = 0.6;
+    private final static double SLIDE_NORMAL_SPEED = 0.75;
     private final static int MANUAL_INCREMENT = 150;
     private final static int SLOW_INCREMENT = 50;
     private final static double SLIDE_SLOW_SPEED = 0.3;

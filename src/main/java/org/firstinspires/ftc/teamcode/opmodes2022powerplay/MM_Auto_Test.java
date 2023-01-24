@@ -33,9 +33,13 @@ public class MM_Auto_Test extends MM_OpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-
-        robot.drivetrain.diagonalDriveInches(24, 24, 50, MM_Drivetrain.STRAFE);
-
+        robot.drivetrain.microscopicDriveInches(1.40);
+        robot.drivetrain.strafeInches(-8);
+        robot.drivetrain.scoreAndUnscore();
+        sleep(1000);
+        robot.drivetrain.diagonalDriveInches(2, 8);
+        robot.drivetrain.rotateToAngle(90);
+        robot.drivetrain.diagonalDriveInches(22, -57, MM_Drivetrain.DRIVE, 80);
     }
 }
 //*/
