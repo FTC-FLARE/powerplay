@@ -39,7 +39,30 @@ public class MM_Auto_Test extends MM_OpMode {
         sleep(1000);
         robot.drivetrain.diagonalDriveInches(2, 8);
         robot.drivetrain.rotateToAngle(90);
-        robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.PIVOT_POSITION, 29, -57, MM_Drivetrain.DRIVE, 80, 8, false);
+        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 26, -57, MM_Drivetrain.DRIVE, 70, 8, false);
+        robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(5));
+        robot.lift.chomper.choke();
+        runtime.reset();
+        while (opModeIsActive() && runtime.seconds() < 0.3) {
+        }
+        robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
+        robot.lift.turner.changePosition(MM_Turner.SIDE);
+        robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.LOW.ticks, -11.5, 2, 2, 0, 5,false);
+        robot.lift.chomper.release();
+        runtime.reset();
+        while (opModeIsActive() && runtime.seconds() < 0.6) {
+        }
+        robot.lift.turner.changePosition(MM_Turner.FRONT);
+        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(4), 11.5, -2, 2, 0, 5,false);
+        robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(4));
+        robot.lift.chomper.choke();
+        runtime.reset();
+        while (opModeIsActive() && runtime.seconds() < 0.3) {
+        }
+        robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
+        robot.lift.turner.changePosition(MM_Turner.SIDE);
+        robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.LOW.ticks, -11.5, 2, 2, 0, 5,false);
+
         //start collection code
     }
 }

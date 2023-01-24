@@ -103,9 +103,9 @@ public class MM_Robot {
         }
     }
 
-    public void runSlideandDiagonalDrive(MM_Slide.SlidePosition slidePosition, double forwardInches, double strafeInches, int move, int kickInPercent, double timeoutTime, boolean flipTurner) {
+    public void runSlideandDiagonalDrive(int ticks, double forwardInches, double strafeInches, int move, int kickInPercent, double timeoutTime, boolean flipTurner) {
         drivetrain.prepareToDiagonalDrive(forwardInches, strafeInches, kickInPercent, move);
-        lift.slide.moveTowardTarget(slidePosition);
+        lift.slide.moveTowardTarget(ticks);
 
         boolean driveDone = false;
         boolean slideDone = false;
@@ -123,7 +123,7 @@ public class MM_Robot {
             }
             opMode.telemetry.addData("forward inches target", forwardInches);
             opMode.telemetry.addData("strafe inches target", strafeInches);
-            opMode.telemetry.addData("slide target", slidePosition);
+            opMode.telemetry.addData("slide target", ticks);
             opMode.telemetry.update();
         }
     }

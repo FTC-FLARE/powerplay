@@ -76,9 +76,6 @@ public class MM_Drivetrain {
     private int backPriorEncoderTarget = 0;
     private int leftCorrectionEncoderTarget = 0;
     private int rightCorrectionEncoderTarget = 0;
-    private boolean backReachedTarget = false;
-    private boolean leftReachedTarget = false;
-    private boolean rightReachedTarget = false;
     private int kickInMove = DRIVE;
     private int direction = 0;
     private int kickInTicks = 0;
@@ -187,15 +184,18 @@ public class MM_Drivetrain {
         opMode.pLeftDiagDriveController.setSetpoint(leftTargetTicks);
         opMode.pRightDiagDriveController.setSetpoint(rightTargetTicks);
         opMode.pBackDriveController.setSetpoint(backTargetTicks);
+        opMode.pLeftDriveController.setInputRange(leftPriorEncoderTarget, leftTargetTicks);
+        opMode.pRightDriveController.setInputRange(rightPriorEncoderTarget, rightTargetTicks);
+        opMode.pLeftDriveController.setSetpoint(leftTargetTicks);
+        opMode.pRightDriveController.setSetpoint(rightTargetTicks);
         leftCorrectionEncoderTarget = leftPriorEncoderTarget;
         rightCorrectionEncoderTarget = rightPriorEncoderTarget;
         leftPriorEncoderTarget = leftTargetTicks;
         rightPriorEncoderTarget = rightTargetTicks;
         backPriorEncoderTarget = backTargetTicks;
 
-        backReachedTarget = false;
-        leftReachedTarget = false;
-        rightReachedTarget = false;
+        double number = opMode.pRightDriveController.calculatePower(10000);
+        double number2 = opMode.pLeftDriveController.calculatePower(10000);
     }
 
     public void prepareToStrafe(double inches) {
@@ -217,21 +217,25 @@ public class MM_Drivetrain {
 
     public boolean reachedPositionDiagonalDrive() {
         setDiagonalPower();
-        backReachedTarget = opMode.pBackDriveController.reachedTarget();
-        leftReachedTarget = opMode.pLeftDiagDriveController.reachedTarget();
-        rightReachedTarget = opMode.pRightDiagDriveController.reachedTarget();
 
         if (strafeIn) {
-            strafeIn = !backReachedTarget;
+            strafeIn = !opMode.pBackDriveController.reachedTarget();
         }
         if (driveIn) {
-            if (leftReachedTarget || rightReachedTarget) {
-                driveIn = false;
-                rightCorrectionEncoderTarget = rightPriorEncoderTarget;
-                leftCorrectionEncoderTarget = leftPriorEncoderTarget;
+            if (strafeIn) {
+                if (opMode.pLeftDiagDriveController.reachedTarget() || opMode.pRightDiagDriveController.reachedTarget()) {
+                    driveIn = false;
+                    rightCorrectionEncoderTarget = rightPriorEncoderTarget;
+                    leftCorrectionEncoderTarget = leftPriorEncoderTarget;
+                }
+            } else {
+                if (opMode.pLeftDriveController.reachedTarget() || opMode.pRightDriveController.reachedTarget()) {
+                    driveIn = false;
+                    rightCorrectionEncoderTarget = rightPriorEncoderTarget;
+                    leftCorrectionEncoderTarget = leftPriorEncoderTarget;
+                }
             }
         }
-        opMode.telemetry.addData("Back reached target", backReachedTarget);
         if (!driveIn && !strafeIn) {
             stop();
             return true;
@@ -281,8 +285,13 @@ public class MM_Drivetrain {
 
         checkKickIn();
         if (driveIn) {
-            leftDrivePower = opMode.pLeftDiagDriveController.calculatePower(leftCurrentTicks);
-            rightDrivePower = opMode.pRightDiagDriveController.calculatePower(rightCurrentTicks);
+            if (strafeIn) {
+                leftDrivePower = opMode.pLeftDiagDriveController.calculatePower(leftCurrentTicks);
+                rightDrivePower = opMode.pRightDiagDriveController.calculatePower(rightCurrentTicks);
+            } else {
+                leftDrivePower = opMode.pLeftDriveController.calculatePower(leftCurrentTicks);
+                rightDrivePower = opMode.pRightDriveController.calculatePower(rightCurrentTicks);
+            }
         } else {
             leftDrivePower = 0;
             rightDrivePower = 0;
@@ -675,11 +684,11 @@ public class MM_Drivetrain {
     public void scoreAndUnscore() {
         scorer.setPosition(0);
         runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 1.4) {
+        while (opMode.opModeIsActive() && runtime.seconds() < 0.65) {
         }
         scorer.setPosition(0.15);
         runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 0.4) {
+        while (opMode.opModeIsActive() && runtime.seconds() < 0.1) {
         }
         scorer.setPosition(1);
     }

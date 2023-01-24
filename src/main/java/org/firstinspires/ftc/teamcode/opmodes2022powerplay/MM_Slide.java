@@ -17,7 +17,7 @@ public class MM_Slide {
     private final static double SLIDE_NORMAL_SPEED = 0.75;
     private final static int MANUAL_INCREMENT = 150;
     private final static double SLIDE_SLOW_SPEED = 0.3;
-    public final static int STACK_LEVEL_INCREMENT = 125;
+    public final static int STACK_LEVEL_INCREMENT = 150;
 
 
     private int slideTarget = 0;
@@ -30,8 +30,9 @@ public class MM_Slide {
     public enum SlidePosition {
         UNUSED(0),
         COLLECT(0),
-        HOVER_FLOOR(400),
+        HOVER_FLOOR(435),
         DETECT(700),
+        PIVOT_AUTO(1235),
         PIVOT_POSITION(1600),
         LOW(1750),
         MEDIUM(2850),
@@ -97,6 +98,16 @@ public class MM_Slide {
         }
     }
 
+    public void waitToReachPosition(int ticks) {
+        moveTowardTarget(ticks);
+
+        while (opMode.opModeIsActive() && !reachedPosition()) {
+            opMode.telemetry.addData("Waiting for Slide", "Current: %d  Target: %d", slide.getCurrentPosition(), getSlideTarget());
+            opMode.telemetry.update();
+        }
+    }
+
+
     private void checkForSelectedHeight() {
         if (opMode.leftStickYDownPressed(opMode.GAMEPAD2)) {
             changeStack(1);
@@ -126,6 +137,14 @@ public class MM_Slide {
     public void changeStack(int change){
         stackLevel = Range.clip(stackLevel + change, 1, 5);
         setSlideTarget(STACK_LEVEL_INCREMENT * (stackLevel - 1) + 400);
+    }
+
+    public int stackTicks(int stackLevel) {
+        return STACK_LEVEL_INCREMENT * (stackLevel - 1) + 400;
+    }
+
+    public int lowerStackTicks(int stackLevel) {
+        return STACK_LEVEL_INCREMENT * (stackLevel - 1);
     }
 
     public void moveTowardTarget(SlidePosition slidePosition) {

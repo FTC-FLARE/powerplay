@@ -9,7 +9,7 @@ public class MM_Turner{
     private Servo turner = null;
 
     static final double FRONT = 0.885;
-    static final double SIDE = 0.4425;
+    static final double SIDE = 0.5325;
     static final double BACK = 0;
     static final double FRONT_TURN_INCREMENT = 0.025;
     static final double BACK_TURN_INCREMENT = -0.020;
