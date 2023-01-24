@@ -18,7 +18,7 @@ public class MM_Lift {
     }
 
     public void autoStackCollect(int stackLevel){
-        slide.moveTowardTarget(MM_Slide.SlidePosition.STACK.ticks * (stackLevel - 1) - 8);
+        slide.moveTowardTarget(MM_Slide.STACK_LEVEL_INCREMENT * (stackLevel - 1) - 8);
         while (opMode.opModeIsActive() && !slide.reachedPosition()) {
             opMode.telemetry.update();
         }
@@ -35,7 +35,7 @@ public class MM_Lift {
             runtime.reset();
             opMode.waitSeconds(1.25);
         }
-        slide.waitToReachPosition(MM_Slide.SlidePosition.LOW_RELEASE);
+        slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_POSITION);
         chomper.toggle();
         runtime.reset();
         slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);

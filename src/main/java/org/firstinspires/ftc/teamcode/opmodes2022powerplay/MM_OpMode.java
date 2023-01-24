@@ -115,6 +115,22 @@ public abstract class MM_OpMode extends LinearOpMode {
         }
     }
 
+    public boolean leftStickYDownPressed(int gamepad) {
+        if (gamepad == GAMEPAD1) {
+            return -gamepad1Current.right_stick_y > 0.1 && !(-gamepad1Prior.right_stick_y > 0.1);
+        } else {
+            return -gamepad2Current.right_stick_y > 0.1 && !(-gamepad2Prior.right_stick_y > 0.1);
+        }
+    }
+
+    public boolean leftStickYUpPressed(int gamepad) {
+        if (gamepad == GAMEPAD1) {
+            return -gamepad1Current.right_stick_y < 0.1 && !(-gamepad1Prior.right_stick_y < 0.1);
+        } else {
+            return -gamepad2Current.right_stick_y < -0.1 && !(-gamepad2Prior.right_stick_y < -0.1);
+        }
+    }
+
     public void waitSeconds(double seconds) {
         while (opModeIsActive() && runtime.seconds() < seconds){
         }
