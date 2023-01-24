@@ -21,8 +21,9 @@
             <REV_VL53L0X_RANGE_SENSOR name="distance" port="0" bus="0" />
             <DigitalDevice name="topStop" port="0"/>
             <DigitalDevice name="bottomStop" port="2"/>
-            <RevColorSensorV3 name="colorSensor" port="0" bus="2" />
             <RevColorSensorV3 name="tapeSensor" port="0" bus="3"/>
+            <DigitalDevice name="bottomStop" port="3"/>
+            <RevColorSensorV3 name="slowerizer" port="0" bus="2" />
         </LynxModule>
     </LynxUsbDevice>
     <Webcam serialNumber="87BE527F" name="Webcam"/>
