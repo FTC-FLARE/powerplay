@@ -46,7 +46,7 @@ public class MM_Lift {
 
     public boolean reachedPositionTurner() {
         if (slide.getCurrentTicks() > 1100) {
-            turner.changePosition(MM_Turner.BACK);
+            turner.changePosition(MM_Turner.SIDE);
         }
         return slide.reachedPosition();
     }

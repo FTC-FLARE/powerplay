@@ -103,7 +103,7 @@ public class MM_Robot {
         }
     }
 
-    public void runSlideandDiagonalDrive(MM_Slide.SlidePosition slidePosition, double forwardInches, double strafeInches, int kickInPercent, int move, double timeoutTime, boolean flipTurner) {
+    public void runSlideandDiagonalDrive(MM_Slide.SlidePosition slidePosition, double forwardInches, double strafeInches, int move, int kickInPercent, double timeoutTime, boolean flipTurner) {
         drivetrain.prepareToDiagonalDrive(forwardInches, strafeInches, kickInPercent, move);
         lift.slide.moveTowardTarget(slidePosition);
 

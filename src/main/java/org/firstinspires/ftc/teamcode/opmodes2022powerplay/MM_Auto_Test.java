@@ -39,7 +39,8 @@ public class MM_Auto_Test extends MM_OpMode {
         sleep(1000);
         robot.drivetrain.diagonalDriveInches(2, 8);
         robot.drivetrain.rotateToAngle(90);
-        robot.drivetrain.diagonalDriveInches(22, -57, MM_Drivetrain.DRIVE, 80);
+        robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.PIVOT_POSITION, 29, -57, MM_Drivetrain.DRIVE, 80, 8, false);
+        //start collection code
     }
 }
 //*/
