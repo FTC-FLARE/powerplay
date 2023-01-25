@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -33,6 +34,7 @@ public class MM_Drivetrain {
     private Servo indicator = null;
     private Servo scorer = null;
     private Servo distanceServo = null;
+    private ColorSensor tapeSensor = null;
 
     private DistanceSensor distance = null;
 
@@ -681,14 +683,30 @@ public class MM_Drivetrain {
             }
             currentDistance = distance.getDistance(DistanceUnit.INCH);
         }
-
         stop();
         return false;
     }
 
+    public void correctForTape() {
+        //if during the drive, strafe with a P coefficent maybe or just add powers somehow, you will have to change the prior encoders tho
+        boolean corrected = true;
+        if (tapeSensor.red() > 1000) {
+            strafe(LEFT);
+            corrected = false;
+        } else if (tapeSensor.red() < 200) {
+            strafe(RIGHT);
+            corrected = false;
+        }
+
+        while (opMode.opModeIsActive() && !corrected) {
+            corrected = (tapeSensor.red() > 200 && tapeSensor.red() < 1000);
+        }
+        stop();
+    }
+
     public void strafe(int direction) {
-        //left is negative
-        double power = 0.26 * direction;
+        //right is negative
+        double power = -0.26 * direction;
         flPower = power;
         frPower = -power + (0.045 * -direction);
         blPower = -power + (0.045 * -direction);
@@ -726,6 +744,7 @@ public class MM_Drivetrain {
         imu.initialize(parameters);
 
         distance = opMode.hardwareMap.get(DistanceSensor.class, "distance");
+        tapeSensor = opMode.hardwareMap.get(ColorSensor.class, "tapeSensor");
     }
 
     private void initServos(){
