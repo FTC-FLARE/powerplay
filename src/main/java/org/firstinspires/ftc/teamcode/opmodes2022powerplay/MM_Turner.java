@@ -9,6 +9,8 @@ public class MM_Turner{
     private Servo turner = null;
 
     static final double FRONT = 0.885;
+    static final double JIGGLE_RIGHT = 0.915;
+    static final double JIGGLE_LEFT = 0.855;
     static final double SIDE = 0.5325;
     static final double BACK = 0;
     static final double FRONT_TURN_INCREMENT = 0.025;
@@ -18,6 +20,7 @@ public class MM_Turner{
 
     private final ElapsedTime timer = new ElapsedTime();
     private boolean isMoving = false;
+    private double timerGoal = 0;
     private double currentPosition = FRONT;
     private double targetPosition = FRONT;
     private double turnIncrement = BACK_TURN_INCREMENT;

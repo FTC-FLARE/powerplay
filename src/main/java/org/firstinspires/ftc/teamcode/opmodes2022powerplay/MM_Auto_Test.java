@@ -39,10 +39,11 @@ public class MM_Auto_Test extends MM_OpMode {
         robot.drivetrain.microscopicDriveInches(1.40);
         robot.drivetrain.strafeInches(-8);
         robot.drivetrain.scoreAndUnscore();
-        sleep(1000);
+        while (opModeIsActive() && runtime.seconds() < 0.3) {
+        }
         robot.drivetrain.diagonalDriveInches(2, 8);
         robot.drivetrain.rotateToAngle(90); //1/25 - -56.75 under this
-        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 24.5, -57.9, MM_Drivetrain.DRIVE, 70, 8, false);
+        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 24.5, -57.5, MM_Drivetrain.DRIVE, 70, 8, false);
         robot.drivetrain.rotateToMicroscopicAngle(90);
         robot.drivetrain.correctForTape();
         robot.drivetrain.correctForCone();
@@ -50,7 +51,7 @@ public class MM_Auto_Test extends MM_OpMode {
         robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(5));
         robot.lift.chomper.choke();
         runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.3) {
+        while (opModeIsActive() && runtime.seconds() < 0.25) {
         }
         robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
         robot.lift.turner.changePosition(MM_Turner.SIDE);
@@ -59,42 +60,42 @@ public class MM_Auto_Test extends MM_OpMode {
         robot.drivetrain.microscopicStrafeInches(2.5);
         robot.lift.chomper.release();
         runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.5) {
+        while (opModeIsActive() && runtime.seconds() < 0.25) {
         }
         robot.lift.turner.changePosition(MM_Turner.FRONT);
         runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.2) {
+        while (opModeIsActive() && runtime.seconds() < 0.1) {
         }
-        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(4), 10.2, -1, 2, 0,5,false);
+        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 10.2, -1, 2, 0,5,false);
         robot.drivetrain.rotateToMicroscopicAngle(90);
         robot.drivetrain.correctForTape();
         robot.drivetrain.correctForCone();
         robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(4));
         robot.lift.chomper.choke();
         runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.3) {
+        while (opModeIsActive() && runtime.seconds() < 0.25) {
         }
         robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
         robot.lift.turner.changePosition(MM_Turner.SIDE);
         robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -10.2,4, false);
         robot.drivetrain.rotateToMicroscopicAngle(90);
-        robot.drivetrain.microscopicStrafeInches(1.9);
+        robot.drivetrain.microscopicStrafeInches(2.5);
         robot.lift.chomper.release();
         runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.5) {
+        while (opModeIsActive() && runtime.seconds() < 0.25) {
         }
         robot.lift.turner.changePosition(MM_Turner.FRONT);
         runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.2) {
+        while (opModeIsActive() && runtime.seconds() < 0.1) {
         }
-        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(3), 9.2, -2.1, 2, 0,5,false);
+        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 9.2, -2, 2, 0,5,false);
         robot.drivetrain.rotateToMicroscopicAngle(90);
         robot.drivetrain.correctForTape();
         robot.drivetrain.correctForCone();
         robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(3));
         robot.lift.chomper.choke();
         runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.3) {
+        while (opModeIsActive() && runtime.seconds() < 0.25) {
         }
         robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
         robot.drivetrain.resetEncoders();
@@ -105,7 +106,7 @@ public class MM_Auto_Test extends MM_OpMode {
         robot.drivetrain.microscopicStrafeInches(1.3);
         robot.lift.chomper.release();
         runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.6) {
+        while (opModeIsActive() && runtime.seconds() < 0.25) {
         }
         robot.lift.turner.changePosition(MM_Turner.FRONT);
         runtime.reset();
