@@ -429,10 +429,6 @@ public class MM_Drivetrain {
         blPower = (drive + turn - strafe);
         brPower = (drive - turn + strafe);
 
-        opMode.telemetry.addData("tape Sensor", tapeSensor.red());
-        opMode.telemetry.addData("distance", distance.getDistance(DistanceUnit.INCH));
-        opMode.telemetry.addData("tape sensor 2", tapeSensor2.red());
-
         normalize();
         handleSlowMode();
         if (opMode.gamepad1.right_trigger > 0.1){
