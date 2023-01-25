@@ -7,8 +7,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public abstract class MM_OpMode extends LinearOpMode {
     public MM_Robot robot = new MM_Robot(this);
     public MM_P_Controller pTurnController = new MM_P_Controller(this, 1, TURN_P_COEFFICIENT);
-    public MM_P_Controller pLeftDriveController = new MM_P_Controller(this,1.6, DRIVE_P_COEFFICIENT);
-    public MM_P_Controller pRightDriveController = new MM_P_Controller(this,1.6, DRIVE_P_COEFFICIENT);
+    public MM_P_Controller pMicroscopicTurnController = new MM_P_Controller(this, 35, TURN_P_COEFFICIENT);
+    public MM_P_Controller pLeftDriveController = new MM_P_Controller(this,2.2, DRIVE_P_COEFFICIENT);
+    public MM_P_Controller pRightDriveController = new MM_P_Controller(this,2.2, DRIVE_P_COEFFICIENT);
     public MM_P_Controller pLeftDiagDriveController = new MM_P_Controller(this,1.6, DRIVE_P_COEFFICIENT);
     public MM_P_Controller pRightDiagDriveController = new MM_P_Controller(this,1.6, DRIVE_P_COEFFICIENT);
     public MM_P_Controller pBackDriveController = new MM_P_Controller(this,2.6, STRAFE_P_COEFFICIENT);
@@ -91,11 +92,11 @@ public abstract class MM_OpMode extends LinearOpMode {
         }
     }
 
-    public boolean rightJoystickPressed(int gamepad) {
+    public boolean leftJoystickPressed(int gamepad) {
         if (gamepad == GAMEPAD1) {
-            return gamepad1Current.right_stick_button && !gamepad1Prior.right_stick_button;
+            return gamepad1Current.left_stick_button && !gamepad1Prior.left_stick_button;
         } else {
-            return gamepad2Current.right_stick_button && !gamepad2Prior.right_stick_button;
+            return gamepad2Current.left_stick_button && !gamepad2Prior.left_stick_button;
         }
     }
 

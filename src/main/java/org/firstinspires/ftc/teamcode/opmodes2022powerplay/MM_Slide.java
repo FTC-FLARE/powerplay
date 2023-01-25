@@ -14,7 +14,7 @@ public class MM_Slide {
     private ColorSensor slowerizationModule;
 
 
-    private final static double SLIDE_NORMAL_SPEED = 0.75;
+    private final static double SLIDE_NORMAL_SPEED = 0.85;
     private final static int MANUAL_INCREMENT = 150;
     private final static double SLIDE_SLOW_SPEED = 0.3;
     public final static int STACK_LEVEL_INCREMENT = 150;
@@ -28,12 +28,13 @@ public class MM_Slide {
 
 
     public enum SlidePosition {
+        RESET(-4436),
         UNUSED(0),
         COLLECT(0),
         HOVER_FLOOR(435),
         DETECT(700),
         PIVOT_AUTO(1235),
-        PIVOT_POSITION(1600),
+        PIVOT_POSITION(1333),
         LOW(1750),
         MEDIUM(2850),
         HIGH(4000);
@@ -73,6 +74,7 @@ public class MM_Slide {
 
         if (bottomLimit()) {
             opMode.telemetry.addLine("Danger Zone - Resetting Encoder");
+            slide.setPower(0);
         }else {
             if (inSlowZone() && headedDown()) {
                 currentSlidePower = SLIDE_SLOW_SPEED;
@@ -115,9 +117,9 @@ public class MM_Slide {
             changeStack(-1);
         } else {
             SlidePosition selectedPosition = SlidePosition.UNUSED;
-            if (opMode.xPressed(opMode.GAMEPAD2)) {
-                selectedPosition = SlidePosition.COLLECT;
-            } else if (opMode.leftBumperPressed(opMode.GAMEPAD2)) {
+            if (opMode.leftBumperPressed(opMode.GAMEPAD2)) {
+                selectedPosition = SlidePosition.RESET;
+            } else if (opMode.xPressed(opMode.GAMEPAD2)) {
                 selectedPosition = SlidePosition.HOVER_FLOOR;
             } else if (opMode.aPressed(opMode.GAMEPAD2)) {
                 selectedPosition = SlidePosition.LOW;
@@ -126,7 +128,6 @@ public class MM_Slide {
             } else if (opMode.yPressed(opMode.GAMEPAD2)) {
                 selectedPosition = SlidePosition.HIGH;
             }
-
             if (selectedPosition != SlidePosition.UNUSED) {
                 stackLevel = 1;
                 setSlideTarget(selectedPosition.ticks);
@@ -152,6 +153,7 @@ public class MM_Slide {
     }
 
     public void moveTowardTarget(int ticks) {
+        slide.setPower(SLIDE_NORMAL_SPEED);
         setSlideTarget(ticks);
         slide.setTargetPosition(getSlideTarget());
     }
@@ -173,7 +175,7 @@ public class MM_Slide {
     }
 
     public boolean reachedPosition() {
-        return !slide.isBusy() || bottomLimit();
+        return !slide.isBusy() || (headedDown() && atBottom());
     }
 
     private boolean atTop() {
@@ -222,7 +224,7 @@ public class MM_Slide {
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slide.setTargetPosition(0);
         slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        slide.setPower(SLIDE_NORMAL_SPEED);
+        slide.setPower(0);
     }
 }
 

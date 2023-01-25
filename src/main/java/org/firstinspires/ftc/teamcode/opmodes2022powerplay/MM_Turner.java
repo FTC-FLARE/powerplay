@@ -12,7 +12,9 @@ public class MM_Turner{
     static final double SIDE = 0.5325;
     static final double BACK = 0;
     static final double FRONT_TURN_INCREMENT = 0.025;
-    static final double BACK_TURN_INCREMENT = -0.020;
+    static final double SIDE_TURN_INCREMENT_BACK = 0.026;
+    static final double SIDE_TURN_INCREMENT_FRONT = -0.026;
+    static final double BACK_TURN_INCREMENT = -0.025;
 
     private final ElapsedTime timer = new ElapsedTime();
     private boolean isMoving = false;
@@ -32,7 +34,13 @@ public class MM_Turner{
     }
 
     public void checkIfDoneMoving() {
-        currentPosition = Range.clip(currentPosition + turnIncrement, BACK, FRONT);
+        if (turnIncrement == SIDE_TURN_INCREMENT_FRONT) {
+            currentPosition = Range.clip(currentPosition + turnIncrement, SIDE, FRONT);
+        } else if (turnIncrement == SIDE_TURN_INCREMENT_BACK) {
+            currentPosition = Range.clip(currentPosition + turnIncrement, BACK, SIDE);
+        } else {
+            currentPosition = Range.clip(currentPosition + turnIncrement, BACK, FRONT);
+        }
         changePosition(currentPosition);
         if (currentPosition == BACK || currentPosition == FRONT) {
             isMoving = false;

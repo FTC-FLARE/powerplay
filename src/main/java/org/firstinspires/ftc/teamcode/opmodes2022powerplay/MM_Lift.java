@@ -66,6 +66,12 @@ public class MM_Lift {
                 turner.startMoving(MM_Turner.BACK_TURN_INCREMENT);
             } else if (opMode.dpadRightPressed(opMode.GAMEPAD2)) {
                 turner.startMoving(MM_Turner.FRONT_TURN_INCREMENT);
+            } else if (opMode.leftJoystickPressed(opMode.GAMEPAD2)) {
+                if (turner.getPosition() == MM_Turner.FRONT) {
+                    turner.startMoving(MM_Turner.SIDE_TURN_INCREMENT_FRONT);
+                } else {
+                    turner.startMoving(MM_Turner.SIDE_TURN_INCREMENT_BACK);
+                }
             }
         }
 

@@ -122,6 +122,15 @@ public class MM_Drivetrain {
         }
     }
 
+    public void microscopicStrafeInches(double inches) {
+        prepareToStrafe(inches);
+        runtime.reset();
+        while (opMode.opModeIsActive() && runtime.seconds() < 0.7 && !reachedPositionMicroscopicStrafe()) {
+            opMode.telemetry.addData("inches target", inches);
+            opMode.telemetry.update();
+        }
+    }
+
     public void strafeInches(double inches) {
         prepareToStrafe(inches);
         runtime.reset();
@@ -252,6 +261,16 @@ public class MM_Drivetrain {
         return false;
     }
 
+    public boolean reachedPositionMicroscopicStrafe() {
+        setMicroscopicStrafePower();
+        opMode.pBackDriveController.calculatePower(backCurrentTicks);
+        if (opMode.pBackDriveController.reachedTarget()) {
+            stop();
+            return true;
+        }
+        return false;
+    }
+
     public boolean reachedPositionStrafe() {
         setStrafePower();
         if (opMode.pBackDriveController.reachedTarget()) {
@@ -350,6 +369,23 @@ public class MM_Drivetrain {
         setMotorPower(flPower, frPower, blPower, brPower);
     }
 
+    private void setMicroscopicStrafePower() {
+        backCurrentTicks = -backEncoder.getCurrentPosition();
+        if (backCurrentTicks > backPriorEncoderTarget) {
+            strafePower = 0.235;
+        } else {
+            strafePower = -0.235;
+        }
+        flPower = strafePower;
+        frPower = -strafePower; //+ (0.045 * -direction);
+        blPower = -strafePower; //+ (0.045 * -direction);
+        brPower = strafePower;
+        opMode.telemetry.addData("leftPriorEncoder", leftPriorEncoderTarget);
+        angleStraighten(STRAIGHTEN_P, flPower, frPower);
+        normalize();
+        setMotorPower(flPower, frPower, blPower, brPower);
+    }
+
     private void setStrafePower() {
         backCurrentTicks = -backEncoder.getCurrentPosition();
 
@@ -375,9 +411,13 @@ public class MM_Drivetrain {
         if(opMode.leftBumperPressed(opMode.GAMEPAD1)){
             backwardsMode = !backwardsMode;
         }
+
         if (backwardsMode){
             drive = -drive;
             strafe = -strafe;
+            indicator.setPosition(0.52);
+        } else {
+            indicator.setPosition(0.62);
         }
 
 
@@ -510,6 +550,37 @@ public class MM_Drivetrain {
             opMode.telemetry.update();
 
         } while (opMode.opModeIsActive() && !opMode.pTurnController.reachedTarget() && runtime.seconds() < timeOut);
+
+        stop();
+        priorAngle = targetAngle;
+        rightPriorEncoderTarget = rightPriorEncoderTarget - rightStartingTicks + rightEncoder.getCurrentPosition();
+        leftPriorEncoderTarget = leftPriorEncoderTarget - leftStartingTicks + leftEncoder.getCurrentPosition();
+        backPriorEncoderTarget = backPriorEncoderTarget - backStartingTicks + backEncoder.getCurrentPosition();
+    }
+
+    public void rotateToMicroscopicAngle(double targetAngle){
+        double timeOut = 1.2;
+
+        int rightStartingTicks = rightEncoder.getCurrentPosition();
+        int leftStartingTicks = leftEncoder.getCurrentPosition();
+        int backStartingTicks = backEncoder.getCurrentPosition();
+
+        opMode.pMicroscopicTurnController.setInputRange(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle, targetAngle);
+        opMode.pMicroscopicTurnController.setSetpoint(targetAngle);
+        runtime.reset();
+
+        do {
+            double turnPower = Math.abs(opMode.pMicroscopicTurnController.calculatePower(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle));
+
+            if(correctedAngle(opMode.pMicroscopicTurnController.getCurrentError()) > 0){
+                setMotorPower(-turnPower, turnPower, -turnPower, turnPower);
+            }else {
+                setMotorPower(turnPower, -turnPower, turnPower, -turnPower);
+            }
+            opMode.telemetry.addData("target reached", opMode.pMicroscopicTurnController.reachedTarget());
+            opMode.telemetry.update();
+
+        } while (opMode.opModeIsActive() && !opMode.pMicroscopicTurnController.reachedTarget() && runtime.seconds() < timeOut);
 
         stop();
         priorAngle = targetAngle;
@@ -688,7 +759,7 @@ public class MM_Drivetrain {
         }
         scorer.setPosition(0.15);
         runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 0.1) {
+        while (opMode.opModeIsActive() && runtime.seconds() < 0.2) {
         }
         scorer.setPosition(1);
     }

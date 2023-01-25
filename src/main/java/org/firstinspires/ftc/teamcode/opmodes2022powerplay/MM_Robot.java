@@ -7,7 +7,7 @@ public class MM_Robot {
     public MM_Drivetrain drivetrain;
     public MM_Lift lift;
 
-    static final double MIN_DRIVE_SPEED = 0.24;
+    static final double MIN_DRIVE_SPEED = 0.23;
     static final double MAX_DRIVE_SPEED = 0.6;
     static final double MIN_STRAFE_POWER = 0.283;
     static final double MAX_STRAFE_POWER = 0.6;
@@ -167,6 +167,7 @@ public class MM_Robot {
         lift = new MM_Lift(opMode);
 
         opMode.pTurnController.setOutputRange(MIN_ROTATE_POWER, MAX_ROTATE_POWER);
+        opMode.pMicroscopicTurnController.setOutputRange(0.11, MAX_ROTATE_POWER);
         opMode.pLeftDriveController.setOutputRange(MIN_DRIVE_SPEED, MAX_DRIVE_SPEED);
         opMode.pRightDriveController.setOutputRange(MIN_DRIVE_SPEED, MAX_DRIVE_SPEED);
         opMode.pBackDriveController.setOutputRange(MIN_STRAFE_POWER, MAX_STRAFE_POWER);
