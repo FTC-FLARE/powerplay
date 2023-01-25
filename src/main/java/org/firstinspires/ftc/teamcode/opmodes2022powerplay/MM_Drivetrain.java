@@ -19,10 +19,10 @@ public class MM_Drivetrain {
 
     BNO055IMU imu;
 
-    private DcMotor backLeftDrive = null;
-    private DcMotor backRightDrive = null;
-    private DcMotor frontLeftDrive = null;
-    private DcMotor frontRightDrive = null;
+    private DcMotorEx backLeftDrive = null;
+    private DcMotorEx backRightDrive = null;
+    private DcMotorEx frontLeftDrive = null;
+    private DcMotorEx frontRightDrive = null;
 
     private DcMotorEx leftEncoder = null;
     private DcMotorEx rightEncoder = null;
@@ -35,6 +35,7 @@ public class MM_Drivetrain {
     private Servo scorer = null;
     private Servo distanceServo = null;
     private ColorSensor tapeSensor = null;
+    private ColorSensor tapeSensor2 = null;
 
     private DistanceSensor distance = null;
 
@@ -45,7 +46,7 @@ public class MM_Drivetrain {
     private static final int FORWARD = 1;
     private static final int BACKWARD = -1;
     private static final double SECONDS_PER_DEGREE = 0.025;//??
-    private static final double STRAIGHTEN_P = .0780;
+    private static final double STRAIGHTEN_P = .0840; //.0780
     private static final double STRAFE_P = .089;
     private static final double CORRECTION_COEFFICIENT = 0.000055; //Gain per tick
     public static final double SLOW_MULTIPLIER = 0.65;
@@ -428,6 +429,10 @@ public class MM_Drivetrain {
         blPower = (drive + turn - strafe);
         brPower = (drive - turn + strafe);
 
+        opMode.telemetry.addData("tape Sensor", tapeSensor.red());
+        opMode.telemetry.addData("distance", distance.getDistance(DistanceUnit.INCH));
+        opMode.telemetry.addData("tape sensor 2", tapeSensor2.red());
+
         normalize();
         handleSlowMode();
         if (opMode.gamepad1.right_trigger > 0.1){
@@ -687,26 +692,49 @@ public class MM_Drivetrain {
         return false;
     }
 
-    public void correctForTape() {
-        //if during the drive, strafe with a P coefficent maybe or just add powers somehow, you will have to change the prior encoders tho
+    public void correctForCone() {
+        leftCurrentTicks = leftEncoder.getCurrentPosition();
+        rightCurrentTicks = rightEncoder.getCurrentPosition();
         boolean corrected = true;
-        if (tapeSensor.red() > 1000) {
-            strafe(LEFT);
+        if (getFrontDistance() > 5.2) {
+            drive(FORWARD);
             corrected = false;
-        } else if (tapeSensor.red() < 200) {
-            strafe(RIGHT);
+        } else if (getFrontDistance() < 2.5) {
+            drive(BACKWARD);
             corrected = false;
         }
 
         while (opMode.opModeIsActive() && !corrected) {
-            corrected = (tapeSensor.red() > 200 && tapeSensor.red() < 1000);
+            double distance = getFrontDistance();
+            corrected = (distance < 5.2 && distance > 2.5);
         }
+        leftPriorEncoderTarget = leftPriorEncoderTarget + (leftEncoder.getCurrentPosition() - leftCurrentTicks);
+        rightPriorEncoderTarget = rightPriorEncoderTarget + (rightEncoder.getCurrentPosition() - rightCurrentTicks);
+        stop();
+    }
+
+    public void correctForTape() {
+        //if during the drive, strafe with a P coefficent maybe or just add powers somehow, you will have to change the prior encoders tho
+        backCurrentTicks = backEncoder.getCurrentPosition();
+        boolean corrected = true;
+        if (tapeSensor2.red() < 250) {
+            strafe(RIGHT);
+            corrected = false;
+        } else if (tapeSensor.red() < 250) {
+            strafe(LEFT);
+            corrected = false;
+        }
+
+        while (opMode.opModeIsActive() && !corrected) {
+            corrected = (tapeSensor.red() > 250 && tapeSensor2.red() > 250);
+        }
+        backPriorEncoderTarget = backPriorEncoderTarget + (backEncoder.getCurrentPosition() - backCurrentTicks);
         stop();
     }
 
     public void strafe(int direction) {
         //right is negative
-        double power = -0.26 * direction;
+        double power = -0.25 * direction;
         flPower = power;
         frPower = -power + (0.045 * -direction);
         blPower = -power + (0.045 * -direction);
@@ -715,11 +743,20 @@ public class MM_Drivetrain {
         setMotorPower(flPower, frPower, blPower, brPower);
     }
 
+    public void drive(int direction) {
+        double power = 0.20 * direction;
+        flPower = power;
+        frPower = power;
+        blPower = power;
+        brPower = power;
+        setMotorPower(flPower, frPower, blPower, brPower);
+    }
+
     private void init() {
-        frontLeftDrive = opMode.hardwareMap.get(DcMotor.class, "FLMotor");
-        frontRightDrive = opMode.hardwareMap.get(DcMotor.class, "FRMotor");
-        backLeftDrive = opMode.hardwareMap.get(DcMotor.class, "BLMotor");
-        backRightDrive = opMode.hardwareMap.get(DcMotor.class, "BRMotor");
+        frontLeftDrive = opMode.hardwareMap.get(DcMotorEx.class, "FLMotor");
+        frontRightDrive = opMode.hardwareMap.get(DcMotorEx.class, "FRMotor");
+        backLeftDrive = opMode.hardwareMap.get(DcMotorEx.class, "BLMotor");
+        backRightDrive = opMode.hardwareMap.get(DcMotorEx.class, "BRMotor");
 
         frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -745,6 +782,7 @@ public class MM_Drivetrain {
 
         distance = opMode.hardwareMap.get(DistanceSensor.class, "distance");
         tapeSensor = opMode.hardwareMap.get(ColorSensor.class, "tapeSensor");
+        tapeSensor2 = opMode.hardwareMap.get(ColorSensor.class, "tapeSensor2");
     }
 
     private void initServos(){
@@ -781,6 +819,10 @@ public class MM_Drivetrain {
         while (opMode.opModeIsActive() && runtime.seconds() < 0.2) {
         }
         scorer.setPosition(1);
+    }
+
+    public double getFrontDistance() {
+        return distance.getDistance(DistanceUnit.INCH);
     }
 }
 /*    public void correctForJunction() {
