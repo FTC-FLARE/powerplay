@@ -566,7 +566,7 @@ public class MM_Drivetrain {
     }
 
     public void rotateToMicroscopicAngle(double targetAngle){
-        double timeOut = 1.2;
+        double timeOut = 0.7;
 
         int rightStartingTicks = rightEncoder.getCurrentPosition();
         int leftStartingTicks = leftEncoder.getCurrentPosition();
@@ -696,17 +696,17 @@ public class MM_Drivetrain {
         leftCurrentTicks = leftEncoder.getCurrentPosition();
         rightCurrentTicks = rightEncoder.getCurrentPosition();
         boolean corrected = true;
-        if (getFrontDistance() > 5.2) {
+        if (getFrontDistance() > 4.2) {
             drive(FORWARD);
             corrected = false;
-        } else if (getFrontDistance() < 2.5) {
+        } else if (getFrontDistance() < 3.2) {
             drive(BACKWARD);
             corrected = false;
         }
 
         while (opMode.opModeIsActive() && !corrected) {
             double distance = getFrontDistance();
-            corrected = (distance < 5.2 && distance > 2.5);
+            corrected = (distance < 4.2 && distance > 2.8);
         }
         leftPriorEncoderTarget = leftPriorEncoderTarget + (leftEncoder.getCurrentPosition() - leftCurrentTicks);
         rightPriorEncoderTarget = rightPriorEncoderTarget + (rightEncoder.getCurrentPosition() - rightCurrentTicks);
@@ -716,25 +716,31 @@ public class MM_Drivetrain {
     public void correctForTape() {
         //if during the drive, strafe with a P coefficent maybe or just add powers somehow, you will have to change the prior encoders tho
         backCurrentTicks = backEncoder.getCurrentPosition();
+        leftCurrentTicks = leftEncoder.getCurrentPosition();
+        rightCurrentTicks = rightEncoder.getCurrentPosition();
+
         boolean corrected = true;
-        if (tapeSensor2.red() < 250) {
+        if (tapeSensor2.red() < 280) {
             strafe(RIGHT);
             corrected = false;
-        } else if (tapeSensor.red() < 250) {
+        } else if (tapeSensor.red() < 300) {
             strafe(LEFT);
             corrected = false;
         }
 
-        while (opMode.opModeIsActive() && !corrected) {
-            corrected = (tapeSensor.red() > 250 && tapeSensor2.red() > 250);
+        runtime.reset();
+        while (opMode.opModeIsActive() && !corrected && runtime.seconds() < 1) {
+            corrected = (tapeSensor.red() > 270 && tapeSensor2.red() > 290);
         }
         backPriorEncoderTarget = backPriorEncoderTarget + (backEncoder.getCurrentPosition() - backCurrentTicks);
+        leftPriorEncoderTarget = leftPriorEncoderTarget + (leftEncoder.getCurrentPosition() - leftCurrentTicks);
+        rightPriorEncoderTarget = rightPriorEncoderTarget + (rightEncoder.getCurrentPosition() - rightCurrentTicks);
         stop();
     }
 
     public void strafe(int direction) {
         //right is negative
-        double power = -0.25 * direction;
+        double power = -0.292 * direction;
         flPower = power;
         frPower = -power + (0.045 * -direction);
         blPower = -power + (0.045 * -direction);
@@ -752,6 +758,14 @@ public class MM_Drivetrain {
         setMotorPower(flPower, frPower, blPower, brPower);
     }
 
+    public void resetEncoders() {
+        switchEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        switchEncoderMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        backPriorEncoderTarget = 0;
+        leftPriorEncoderTarget = 0;
+        rightPriorEncoderTarget = 0;
+    }
     private void init() {
         frontLeftDrive = opMode.hardwareMap.get(DcMotorEx.class, "FLMotor");
         frontRightDrive = opMode.hardwareMap.get(DcMotorEx.class, "FRMotor");

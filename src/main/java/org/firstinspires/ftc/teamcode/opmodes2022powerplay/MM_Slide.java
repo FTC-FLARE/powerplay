@@ -36,7 +36,7 @@ public class MM_Slide {
         PIVOT_AUTO(1235),
         PIVOT_POSITION(1333),
         LOW(1750),
-        MEDIUM(2850),
+        MEDIUM(2900),
         HIGH(4000);
 
         public final int ticks;

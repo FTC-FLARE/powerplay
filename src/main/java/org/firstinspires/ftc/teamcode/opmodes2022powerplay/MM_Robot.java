@@ -167,7 +167,7 @@ public class MM_Robot {
         lift = new MM_Lift(opMode);
 
         opMode.pTurnController.setOutputRange(MIN_ROTATE_POWER, MAX_ROTATE_POWER);
-        opMode.pMicroscopicTurnController.setOutputRange(0.11, MAX_ROTATE_POWER);
+        opMode.pMicroscopicTurnController.setOutputRange(0.1225, MAX_ROTATE_POWER);
         opMode.pLeftDriveController.setOutputRange(MIN_DRIVE_SPEED, MAX_DRIVE_SPEED);
         opMode.pRightDriveController.setOutputRange(MIN_DRIVE_SPEED, MAX_DRIVE_SPEED);
         opMode.pBackDriveController.setOutputRange(MIN_STRAFE_POWER, MAX_STRAFE_POWER);
