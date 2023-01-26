@@ -688,7 +688,7 @@ public class MM_Drivetrain {
         return false;
     }
 
-    public void correctForCone() {
+    public boolean correctForCone() {
         leftCurrentTicks = leftEncoder.getCurrentPosition();
         rightCurrentTicks = rightEncoder.getCurrentPosition();
         boolean corrected = true;
@@ -700,13 +700,16 @@ public class MM_Drivetrain {
             corrected = false;
         }
 
+        runtime.reset();
         while (opMode.opModeIsActive() && !corrected) {
             double distance = getFrontDistance();
             corrected = (distance < 4.2 && distance > 2.8);
         }
+
         leftPriorEncoderTarget = leftPriorEncoderTarget + (leftEncoder.getCurrentPosition() - leftCurrentTicks);
         rightPriorEncoderTarget = rightPriorEncoderTarget + (rightEncoder.getCurrentPosition() - rightCurrentTicks);
         stop();
+        return corrected;
     }
 
     public void correctForTape() {

@@ -46,83 +46,89 @@ public class MM_Auto_Test extends MM_OpMode {
         robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 24.5, -57.5, MM_Drivetrain.DRIVE, 70, 8, false);
         robot.drivetrain.rotateToMicroscopicAngle(90);
         robot.drivetrain.correctForTape();
-        robot.drivetrain.correctForCone();
-        robot.drivetrain.resetEncoders();
-        robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(5));
-        robot.lift.chomper.choke();
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.25) {
-        }
-        robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
-        robot.lift.turner.changePosition(MM_Turner.SIDE);
-        robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -10.5,4, false);
-        robot.drivetrain.rotateToMicroscopicAngle(90);
-        robot.drivetrain.microscopicStrafeInches(2.5);
-        robot.lift.chomper.release();
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.25) {
-        }
-        robot.lift.turner.changePosition(MM_Turner.FRONT);
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.1) {
-        }
-        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 10.2, -1, 2, 0,5,false);
-        robot.drivetrain.rotateToMicroscopicAngle(90);
-        robot.drivetrain.correctForTape();
-        robot.drivetrain.correctForCone();
-        robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(4));
-        robot.lift.chomper.choke();
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.25) {
-        }
-        robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
-        robot.lift.turner.changePosition(MM_Turner.SIDE);
-        robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -10.2,4, false);
-        robot.drivetrain.rotateToMicroscopicAngle(90);
-        robot.drivetrain.microscopicStrafeInches(2.5);
-        robot.lift.chomper.release();
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.25) {
-        }
-        robot.lift.turner.changePosition(MM_Turner.FRONT);
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.1) {
-        }
-        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 9.2, -2, 2, 0,5,false);
-        robot.drivetrain.rotateToMicroscopicAngle(90);
-        robot.drivetrain.correctForTape();
-        robot.drivetrain.correctForCone();
-        robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(3));
-        robot.lift.chomper.choke();
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.25) {
-        }
-        robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
-        robot.drivetrain.resetEncoders();
-        robot.drivetrain.microscopicStrafeInches(0.9);
-        robot.lift.turner.changePosition(MM_Turner.SIDE);
-        robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, -34.2, 5, false);
-        robot.drivetrain.rotateToMicroscopicAngle(90);
-        robot.drivetrain.microscopicStrafeInches(1.3);
-        robot.lift.chomper.release();
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.25) {
-        }
-        robot.lift.turner.changePosition(MM_Turner.FRONT);
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.2) {
-        }
-        robot.drivetrain.resetEncoders();
-        if (color == MM_EOCVDetection.RED) {
-            robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, 35, -1, 2, 0,5,false);
-        } else if (color == MM_EOCVDetection.BLUE) {
-            robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, 9, -1, 2, 0,5,false);
+        if (!robot.drivetrain.correctForCone()) {
+            robot.parkFromStack(color);
         } else {
-            robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, -16, -1, 2, 0,5,false);
+            robot.drivetrain.resetEncoders();
+            robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(5));
+            robot.lift.chomper.choke();
+            runtime.reset();
+            while (opModeIsActive() && runtime.seconds() < 0.25) {
+            }
+            robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
+            robot.lift.turner.changePosition(MM_Turner.SIDE);
+            robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -10.5,4, false);
+            robot.drivetrain.rotateToMicroscopicAngle(90);
+            robot.drivetrain.microscopicStrafeInches(2.5);
+            robot.lift.chomper.release();
+            runtime.reset();
+            while (opModeIsActive() && runtime.seconds() < 0.25) {
+            }
+            robot.lift.turner.changePosition(MM_Turner.FRONT);
+            runtime.reset();
+            while (opModeIsActive() && runtime.seconds() < 0.1) {
+            }
+            robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 10.2, -1, 2, 0,5,false);
+            robot.drivetrain.rotateToMicroscopicAngle(90);
+            robot.drivetrain.correctForTape();
+            if (!robot.drivetrain.correctForCone()) {
+                robot.parkFromStack(color);
+            } else {
+                robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(4));
+                robot.lift.chomper.choke();
+                runtime.reset();
+                while (opModeIsActive() && runtime.seconds() < 0.25) {
+                }
+                robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
+                robot.lift.turner.changePosition(MM_Turner.SIDE);
+                robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -10.2,4, false);
+                robot.drivetrain.rotateToMicroscopicAngle(90);
+                robot.drivetrain.microscopicStrafeInches(2.5);
+                robot.lift.chomper.release();
+                runtime.reset();
+                while (opModeIsActive() && runtime.seconds() < 0.25) {
+                }
+                robot.lift.turner.changePosition(MM_Turner.FRONT);
+                runtime.reset();
+                while (opModeIsActive() && runtime.seconds() < 0.1) {
+                }
+                robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 9.2, -2, 2, 0,5,false);
+                robot.drivetrain.rotateToMicroscopicAngle(90);
+                robot.drivetrain.correctForTape();
+                if (!robot.drivetrain.correctForCone()) {
+                    robot.parkFromStack(color);
+                } else {
+                    robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(3));
+                    robot.lift.chomper.choke();
+                    runtime.reset();
+                    while (opModeIsActive() && runtime.seconds() < 0.25) {
+                    }
+                    robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
+                    robot.drivetrain.resetEncoders();
+                    robot.drivetrain.microscopicStrafeInches(0.9);
+                    robot.lift.turner.changePosition(MM_Turner.SIDE);
+                    robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, -34.2, 5, false);
+                    robot.drivetrain.rotateToMicroscopicAngle(90);
+                    robot.drivetrain.microscopicStrafeInches(1.3);
+                    robot.lift.chomper.release();
+                    runtime.reset();
+                    while (opModeIsActive() && runtime.seconds() < 0.25) {
+                    }
+                    robot.lift.turner.changePosition(MM_Turner.FRONT);
+                    runtime.reset();
+                    while (opModeIsActive() && runtime.seconds() < 0.2) {
+                    }
+                    robot.drivetrain.resetEncoders();
+                    if (color == MM_EOCVDetection.RED) {
+                        robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, 35, -1, 2, 0,5,false);
+                    } else if (color == MM_EOCVDetection.BLUE) {
+                        robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, 9, -1, 2, 0,5,false);
+                    } else {
+                        robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, -16, -1, 2, 0,5,false);
+                    }
+                }
+            }
         }
-
-
-
         //start collection code
     }
     private void initCamera() {

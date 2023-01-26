@@ -15,6 +15,7 @@ public class MM_Robot {
     static final double MAX_ROTATE_POWER = 0.6;
 
     ElapsedTime runtime = new ElapsedTime();
+    private boolean timedOut = false;
 
     public MM_Robot(MM_OpMode opMode){
         this.opMode = opMode;
@@ -78,6 +79,19 @@ public class MM_Robot {
         }
     }
 
+    public void parkFromStack(int maxColor) {
+            lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
+        if (maxColor == MM_EOCVDetection.BLUE) {
+            drivetrain.microscopicStrafeInches(1);
+            runSlideandDrive(MM_Slide.SlidePosition.COLLECT, -20, 4, false);
+        } else if (maxColor == MM_EOCVDetection.YELLOW) {
+            drivetrain.microscopicStrafeInches(1);
+            runSlideandDrive(MM_Slide.SlidePosition.COLLECT, -44, 5, false);
+        } else {
+            runSlideandDrive(MM_Slide.SlidePosition.COLLECT, -4, 3, false);
+        }
+    }
+
     public void runSlideandDrive(MM_Slide.SlidePosition slidePosition, double inches, double timeoutTime, boolean flipTurner) {
         drivetrain.prepareToDrive(inches);
         lift.slide.moveTowardTarget(slidePosition);
@@ -126,6 +140,7 @@ public class MM_Robot {
             opMode.telemetry.addData("slide target", ticks);
             opMode.telemetry.update();
         }
+        timedOut = (slideDone && driveDone);
     }
 
     public void microscopicRunSlideandDrive(MM_Slide.SlidePosition slidePosition, double inches, double timeoutTime) {
@@ -160,6 +175,12 @@ public class MM_Robot {
                 opMode.telemetry.update();
             }
         }
+    }
+
+    public boolean getTimedOut() {
+
+
+        return timedOut;
     }
 
     public void init(){
