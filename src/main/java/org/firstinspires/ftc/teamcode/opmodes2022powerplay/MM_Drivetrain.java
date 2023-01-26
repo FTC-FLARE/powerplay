@@ -821,7 +821,7 @@ public class MM_Drivetrain {
     private void initServos(){
         distanceServo = opMode.hardwareMap.get(Servo.class, "distanceServo");
         if(opMode.getClass() == MM_TeleOp.class){
-            indicator = opMode.hardwareMap.get(Servo.class, "autoScore");
+            indicator = opMode.hardwareMap.get(Servo.class, "floppyServo");
             leftOdomLift = opMode.hardwareMap.get(Servo.class,"leftOdometryLift");
             rightOdomLift = opMode.hardwareMap.get(Servo.class,"rightOdometryLift");
             backOdomLift = opMode.hardwareMap.get(Servo.class,"backOdometryLift");
@@ -832,7 +832,7 @@ public class MM_Drivetrain {
             distanceServo.setPosition(1);
             indicator.setPosition(1);
         } else {
-            scorer = opMode.hardwareMap.get(Servo.class, "autoScore");
+            scorer = opMode.hardwareMap.get(Servo.class, "floppyServo");
             distanceServo.setPosition(0);
             scorer.setPosition(1);
         }
@@ -842,7 +842,7 @@ public class MM_Drivetrain {
         distanceServo.setPosition(1);
     }
 
-    public void scoreAndUnscore() {
+    public void autoScore() {
         scorer.setPosition(0);
         runtime.reset();
         while (opMode.opModeIsActive() && runtime.seconds() < 0.65) {

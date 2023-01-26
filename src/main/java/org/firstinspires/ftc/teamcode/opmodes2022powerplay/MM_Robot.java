@@ -79,6 +79,16 @@ public class MM_Robot {
         }
     }
 
+    public void parkFromJunction(int maxColor) {
+        if (maxColor == MM_EOCVDetection.RED) {
+            runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, 35, -1, 2, 0,5,false);
+        } else if (maxColor == MM_EOCVDetection.BLUE) {
+            runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, 9, -1, 2, 0,5,false);
+        } else {
+            runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, -16, -1, 2, 0,5,false);
+        }
+    }
+
     public void parkFromStack(int maxColor) {
             lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
         if (maxColor == MM_EOCVDetection.BLUE) {
@@ -87,9 +97,22 @@ public class MM_Robot {
         } else if (maxColor == MM_EOCVDetection.YELLOW) {
             drivetrain.microscopicStrafeInches(1);
             runSlideandDrive(MM_Slide.SlidePosition.COLLECT, -44, 5, false);
+            if (drivetrain.stuckOnCone()) {
+                drivetrain.strafe(1);
+                drivetrain.diagonalDriveInches(0, 0, MM_Drivetrain.STRAFE, 50);
+            }
         } else {
             runSlideandDrive(MM_Slide.SlidePosition.COLLECT, -4, 3, false);
         }
+    }
+
+    public boolean timeToScore(double totalTime, int maxColor) {
+        if (maxColor == MM_EOCVDetection.RED && totalTime > 24.5) {
+            return false;
+        } else if (maxColor == MM_EOCVDetection.YELLOW && totalTime > 25.5) {
+            return false;
+        }
+        return !(totalTime > 26); //blue
     }
 
     public void runSlideandDrive(MM_Slide.SlidePosition slidePosition, double inches, double timeoutTime, boolean flipTurner) {

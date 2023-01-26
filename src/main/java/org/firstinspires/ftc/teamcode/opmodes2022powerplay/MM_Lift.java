@@ -18,13 +18,27 @@ public class MM_Lift {
     }
 
     public void autoStackCollect(int stackLevel){
-        slide.moveTowardTarget(MM_Slide.STACK_LEVEL_INCREMENT * (stackLevel - 1) - 8);
-        while (opMode.opModeIsActive() && !slide.reachedPosition()) {
-            opMode.telemetry.update();
-        }
-        chomper.toggle();
+        slide.waitToReachPosition(slide.lowerStackTicks(stackLevel));
+/*      slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(stackLevel) + 200); //guess
+        turner.jiggle(0.15);
+        slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(stackLevel));*/
+        chomper.choke();
         runtime.reset();
-        opMode.waitSeconds(.8);
+        while (opMode.opModeIsActive() && runtime.seconds() < 0.25) {
+        }
+        slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
+        turner.changePosition(MM_Turner.SIDE);
+    }
+
+    public void scoreCone() {
+        chomper.release();
+        runtime.reset();
+        while (opMode.opModeIsActive() && runtime.seconds() < 0.2) {
+        }
+        turner.changePosition(MM_Turner.FRONT);
+        runtime.reset();
+        while (opMode.opModeIsActive() && runtime.seconds() < 0.1) {
+        }
     }
 
     public void autoScore(boolean flipfirst, boolean lastMove, int sleeveColor){

@@ -20,6 +20,7 @@ public class MM_Auto_Test extends MM_OpMode {
     OpenCvCamera camera;
 
     private ElapsedTime runtime = new ElapsedTime();
+    private ElapsedTime totalTime = new ElapsedTime();
 
     @Override
     public void runOpMode() {
@@ -33,11 +34,12 @@ public class MM_Auto_Test extends MM_OpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        int color = detector.getMaxColor();
+        totalTime.reset();
+        int sleeveColor = detector.getMaxColor();
         robot.lift.chomper.release();
         robot.drivetrain.microscopicDriveInches(1.40);
         robot.drivetrain.strafeInches(-8);
-        robot.drivetrain.scoreAndUnscore();
+        robot.drivetrain.autoScore();
         while (opModeIsActive() && runtime.seconds() < 0.3) {
         }
         robot.drivetrain.diagonalDriveInches(2, 8);
@@ -46,100 +48,50 @@ public class MM_Auto_Test extends MM_OpMode {
         robot.drivetrain.rotateToMicroscopicAngle(90);
         robot.drivetrain.correctForTape(MM_OpMode.RED);
         if (!robot.drivetrain.correctForCone()) {
-            robot.parkFromStack(color);
+            robot.parkFromStack(sleeveColor);
         } else {
             robot.drivetrain.resetEncoders();
-            robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(5));
-/*            robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(5) + 200); //guess
-            robot.lift.turner.jiggle(0.15);
-            robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(5));*/
-            robot.lift.chomper.choke();
-            runtime.reset();
-            while (opModeIsActive() && runtime.seconds() < 0.25) {
-            }
-            robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
-            robot.lift.turner.changePosition(MM_Turner.SIDE);
+            robot.lift.autoStackCollect(5);
             robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -10.5,4, false);
             robot.drivetrain.rotateToMicroscopicAngle(90);
             robot.drivetrain.microscopicStrafeInches(2.5);
-            robot.lift.chomper.release();
-            runtime.reset();
-            while (opModeIsActive() && runtime.seconds() < 0.25) {
-            }
-            robot.lift.turner.changePosition(MM_Turner.FRONT);
-            runtime.reset();
-            while (opModeIsActive() && runtime.seconds() < 0.1) {
-            }
+            robot.lift.scoreCone();
             robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 10.2, -1, 2, 0,5,false);
             robot.drivetrain.rotateToMicroscopicAngle(90);
             robot.drivetrain.correctForTape(MM_OpMode.RED);
             if (!robot.drivetrain.correctForCone()) {
-                robot.parkFromStack(color);
+                robot.parkFromStack(sleeveColor);
             } else {
-                robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(4));
-                /*robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(4) + 200); //guess
-                robot.lift.turner.jiggle(0.15);
-                robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(4));*/
-                robot.lift.chomper.choke();
-                runtime.reset();
-                while (opModeIsActive() && runtime.seconds() < 0.25) {
-                }
-                robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
-                robot.lift.turner.changePosition(MM_Turner.SIDE);
+                robot.lift.autoStackCollect(4);
                 robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -10.2,4, false);
                 robot.drivetrain.rotateToMicroscopicAngle(90);
                 robot.drivetrain.microscopicStrafeInches(2.5);
-                robot.lift.chomper.release();
-                runtime.reset();
-                while (opModeIsActive() && runtime.seconds() < 0.25) {
-                }
-                robot.lift.turner.changePosition(MM_Turner.FRONT);
-                runtime.reset();
-                while (opModeIsActive() && runtime.seconds() < 0.1) {
-                }
+                robot.lift.scoreCone();
                 robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 9.2, -2, 2, 0,5,false);
                 robot.drivetrain.rotateToMicroscopicAngle(90);
                 robot.drivetrain.correctForTape(MM_OpMode.RED);
                 if (!robot.drivetrain.correctForCone()) { //add another parameter to check for time because being parked is more worth
-                    robot.parkFromStack(color);
+                    robot.parkFromStack(sleeveColor);
                 } else {
-                    robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(3));
-                    /*robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(3) + 200); //guess
-                    robot.lift.turner.jiggle(0.15);
-                    robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(3));*/
-                    robot.lift.chomper.choke();
-                    runtime.reset();
-                    while (opModeIsActive() && runtime.seconds() < 0.25) {
-                    }
-                    robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
+                    robot.lift.autoStackCollect(3);
                     robot.drivetrain.resetEncoders();
-                    robot.drivetrain.microscopicStrafeInches(0.9);
-                    robot.lift.turner.changePosition(MM_Turner.SIDE);
-                    robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, -34.2, 5, false);
-                    if (robot.timedOut() && robot.drivetrain.stuckOnCone()) {
-                        robot.drivetrain.strafe(1); //left
-                        runtime.reset();
-                        while (opModeIsActive() && runtime.seconds() < 2) {
-                        }
+                    if (!robot.timeToScore(totalTime.seconds(), sleeveColor)) {
+                        robot.parkFromStack(sleeveColor);
                     } else {
-                        robot.drivetrain.rotateToMicroscopicAngle(90);
-                        robot.drivetrain.microscopicStrafeInches(1.3);
-                        robot.lift.chomper.release();
-                        runtime.reset();
-                        while (opModeIsActive() && runtime.seconds() < 0.25) {
+                        robot.drivetrain.microscopicStrafeInches(0.9);
+                        robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, -34.2, 5, false);
+                        if (robot.timedOut() && robot.drivetrain.stuckOnCone()) {
+                            robot.drivetrain.strafe(1); //left
+                            runtime.reset();
+                            while (opModeIsActive() && runtime.seconds() < 2) {
+                            }
+                        } else {
+                            robot.drivetrain.rotateToMicroscopicAngle(90);
+                            robot.drivetrain.microscopicStrafeInches(1.3);
+                            robot.lift.scoreCone();
+                            robot.drivetrain.resetEncoders();
                         }
-                        robot.lift.turner.changePosition(MM_Turner.FRONT);
-                        runtime.reset();
-                        while (opModeIsActive() && runtime.seconds() < 0.2) {
-                        }
-                        robot.drivetrain.resetEncoders();
-                    }
-                    if (color == MM_EOCVDetection.RED) {
-                        robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, 35, -1, 2, 0,5,false);
-                    } else if (color == MM_EOCVDetection.BLUE) {
-                        robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, 9, -1, 2, 0,5,false);
-                    } else {
-                        robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, -16, -1, 2, 0,5,false);
+                        robot.parkFromJunction(sleeveColor);
                     }
                 }
             }
