@@ -30,11 +30,10 @@ public class MM_Auto_Test extends MM_OpMode {
         initCamera();
         robot.init();
 
-        int color = detector.getMaxColor();
-
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
+        int color = detector.getMaxColor();
         robot.lift.chomper.release();
         robot.drivetrain.microscopicDriveInches(1.40);
         robot.drivetrain.strafeInches(-8);
@@ -108,17 +107,24 @@ public class MM_Auto_Test extends MM_OpMode {
                     robot.drivetrain.microscopicStrafeInches(0.9);
                     robot.lift.turner.changePosition(MM_Turner.SIDE);
                     robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, -34.2, 5, false);
-                    robot.drivetrain.rotateToMicroscopicAngle(90);
-                    robot.drivetrain.microscopicStrafeInches(1.3);
-                    robot.lift.chomper.release();
-                    runtime.reset();
-                    while (opModeIsActive() && runtime.seconds() < 0.25) {
+                    if (robot.timedOut() && robot.drivetrain.stuckOnCone()) {
+                        robot.drivetrain.strafe(1); //left
+                        runtime.reset();
+                        while (opModeIsActive() && runtime.seconds() < 2) {
+                        }
+                    } else {
+                        robot.drivetrain.rotateToMicroscopicAngle(90);
+                        robot.drivetrain.microscopicStrafeInches(1.3);
+                        robot.lift.chomper.release();
+                        runtime.reset();
+                        while (opModeIsActive() && runtime.seconds() < 0.25) {
+                        }
+                        robot.lift.turner.changePosition(MM_Turner.FRONT);
+                        runtime.reset();
+                        while (opModeIsActive() && runtime.seconds() < 0.2) {
+                        }
+                        robot.drivetrain.resetEncoders();
                     }
-                    robot.lift.turner.changePosition(MM_Turner.FRONT);
-                    runtime.reset();
-                    while (opModeIsActive() && runtime.seconds() < 0.2) {
-                    }
-                    robot.drivetrain.resetEncoders();
                     if (color == MM_EOCVDetection.RED) {
                         robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, 35, -1, 2, 0,5,false);
                     } else if (color == MM_EOCVDetection.BLUE) {

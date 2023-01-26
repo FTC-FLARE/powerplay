@@ -177,9 +177,7 @@ public class MM_Robot {
         }
     }
 
-    public boolean getTimedOut() {
-
-
+    public boolean timedOut() {
         return timedOut;
     }
 

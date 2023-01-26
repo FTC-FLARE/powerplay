@@ -664,6 +664,10 @@ public class MM_Drivetrain {
         return angle;
     }
 
+    public boolean stuckOnCone() {
+        return Math.abs(leftEncoder.getCurrentPosition() - leftPriorEncoderTarget) > 4000;
+    }
+
     public boolean withinJunctionRange() {
         return distance.getDistance(DistanceUnit.INCH) < 5;
     }
