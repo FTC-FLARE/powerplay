@@ -716,25 +716,41 @@ public class MM_Drivetrain {
         return corrected;
     }
 
-    public void correctForTape() {
+    public void correctForTape(int allianceColor) {
         //if during the drive, strafe with a P coefficent maybe or just add powers somehow, you will have to change the prior encoders tho
         backCurrentTicks = backEncoder.getCurrentPosition();
         leftCurrentTicks = leftEncoder.getCurrentPosition();
         rightCurrentTicks = rightEncoder.getCurrentPosition();
 
         boolean corrected = true;
-        if (tapeSensor2.red() < 280) {
-            strafe(RIGHT);
-            corrected = false;
-        } else if (tapeSensor.red() < 300) {
-            strafe(LEFT);
-            corrected = false;
+        if (allianceColor == MM_OpMode.BLUE) {
+            if (tapeSensor2.blue() < 280) {
+                strafe(RIGHT);
+                corrected = false;
+            } else if (tapeSensor.blue() < 300) {
+                strafe(LEFT);
+                corrected = false;
+            }
+            runtime.reset();
+            while (opMode.opModeIsActive() && !corrected && runtime.seconds() < 1) {
+                corrected = (tapeSensor.blue() > 270 && tapeSensor2.blue() > 290);
+            }
+        } else {
+            if (tapeSensor2.red() < 280) {
+                strafe(RIGHT);
+                corrected = false;
+            } else if (tapeSensor.red() < 300) {
+                strafe(LEFT);
+                corrected = false;
+            }
+            runtime.reset();
+            while (opMode.opModeIsActive() && !corrected && runtime.seconds() < 1) {
+                corrected = (tapeSensor.red() > 270 && tapeSensor2.red() > 290);
+            }
         }
 
-        runtime.reset();
-        while (opMode.opModeIsActive() && !corrected && runtime.seconds() < 1) {
-            corrected = (tapeSensor.red() > 270 && tapeSensor2.red() > 290);
-        }
+
+
         backPriorEncoderTarget = backPriorEncoderTarget + (backEncoder.getCurrentPosition() - backCurrentTicks);
         leftPriorEncoderTarget = leftPriorEncoderTarget + (leftEncoder.getCurrentPosition() - leftCurrentTicks);
         rightPriorEncoderTarget = rightPriorEncoderTarget + (rightEncoder.getCurrentPosition() - rightCurrentTicks);

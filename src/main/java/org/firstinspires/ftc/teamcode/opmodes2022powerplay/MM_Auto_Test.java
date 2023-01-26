@@ -44,12 +44,15 @@ public class MM_Auto_Test extends MM_OpMode {
         robot.drivetrain.rotateToAngle(90); //1/25 - -56.75 under this
         robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 24.5, -57.5, MM_Drivetrain.DRIVE, 70, 8, false);
         robot.drivetrain.rotateToMicroscopicAngle(90);
-        robot.drivetrain.correctForTape();
+        robot.drivetrain.correctForTape(MM_OpMode.RED);
         if (!robot.drivetrain.correctForCone()) {
             robot.parkFromStack(color);
         } else {
             robot.drivetrain.resetEncoders();
             robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(5));
+/*            robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(5) + 200); //guess
+            robot.lift.turner.jiggle(0.15);
+            robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(5));*/
             robot.lift.chomper.choke();
             runtime.reset();
             while (opModeIsActive() && runtime.seconds() < 0.25) {
@@ -69,11 +72,14 @@ public class MM_Auto_Test extends MM_OpMode {
             }
             robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 10.2, -1, 2, 0,5,false);
             robot.drivetrain.rotateToMicroscopicAngle(90);
-            robot.drivetrain.correctForTape();
+            robot.drivetrain.correctForTape(MM_OpMode.RED);
             if (!robot.drivetrain.correctForCone()) {
                 robot.parkFromStack(color);
             } else {
                 robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(4));
+                /*robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(4) + 200); //guess
+                robot.lift.turner.jiggle(0.15);
+                robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(4));*/
                 robot.lift.chomper.choke();
                 runtime.reset();
                 while (opModeIsActive() && runtime.seconds() < 0.25) {
@@ -93,11 +99,14 @@ public class MM_Auto_Test extends MM_OpMode {
                 }
                 robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 9.2, -2, 2, 0,5,false);
                 robot.drivetrain.rotateToMicroscopicAngle(90);
-                robot.drivetrain.correctForTape();
-                if (!robot.drivetrain.correctForCone()) {
+                robot.drivetrain.correctForTape(MM_OpMode.RED);
+                if (!robot.drivetrain.correctForCone()) { //add another parameter to check for time because being parked is more worth
                     robot.parkFromStack(color);
                 } else {
                     robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(3));
+                    /*robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(3) + 200); //guess
+                    robot.lift.turner.jiggle(0.15);
+                    robot.lift.slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(3));*/
                     robot.lift.chomper.choke();
                     runtime.reset();
                     while (opModeIsActive() && runtime.seconds() < 0.25) {

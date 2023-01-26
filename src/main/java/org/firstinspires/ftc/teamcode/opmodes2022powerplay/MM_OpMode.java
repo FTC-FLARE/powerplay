@@ -23,8 +23,10 @@ public abstract class MM_OpMode extends LinearOpMode {
     static final double STRAFE_P_COEFFICIENT = 0.0000555;
     static final double TURN_P_COEFFICIENT = .015;
 
-    final int GAMEPAD1 = 0;
-    final int GAMEPAD2 = 1;
+    static final int GAMEPAD1 = 0;
+    static final int GAMEPAD2 = 1;
+    static final int BLUE = 1;
+    static final int RED = 0;
 
     private final ElapsedTime runtime = new ElapsedTime();
 
