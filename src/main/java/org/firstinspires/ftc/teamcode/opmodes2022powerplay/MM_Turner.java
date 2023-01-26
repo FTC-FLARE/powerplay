@@ -63,6 +63,19 @@ public class MM_Turner{
         return false;
     }
 
+    public void jiggle(double timerlength) {
+        turner.setPosition(JIGGLE_LEFT);
+        timer.reset();
+        while (opMode.opModeIsActive() && timer.seconds() < timerlength) { //0.2 was enough
+        }
+        turner.setPosition(JIGGLE_RIGHT);
+        timer.reset();
+        while (opMode.opModeIsActive() && timer.seconds() < timerlength) {
+        }
+        turner.setPosition(FRONT);
+        //to get jiggle working drop the slide to just under the top of the cone to where the belt is not taught but in a place that if you move it, the belt goes over the cone.
+    }
+
     public void changePosition(double position){
         turner.setPosition(position);
     }
