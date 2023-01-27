@@ -443,6 +443,8 @@ public class MM_Drivetrain {
             setMotorPower(flPower, frPower, blPower, brPower);
         }
 
+        opMode.telemetry.addData("rightTape", tapeSensor2.blue());
+        opMode.telemetry.addData("leftTape", tapeSensor.blue());
         opMode.telemetry.addData("first heading", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
     }
 

@@ -12,7 +12,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Config
-@Autonomous(name="MM_Auto_Test", group="MM")
+@Autonomous(name="MM_Auto_Test_Right", group="MM")
 public class MM_Auto_Test_Right extends MM_OpMode {
     private final MM_Robot robot = new MM_Robot(this);
 
