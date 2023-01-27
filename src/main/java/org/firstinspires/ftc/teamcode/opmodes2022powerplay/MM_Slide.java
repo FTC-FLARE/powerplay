@@ -141,7 +141,7 @@ public class MM_Slide {
     }
 
     public int stackTicks(int stackLevel) {
-        return STACK_LEVEL_INCREMENT * (stackLevel - 1) + 400;
+        return STACK_LEVEL_INCREMENT * (stackLevel - 1) + SlidePosition.HOVER_FLOOR.ticks;
     }
 
     public int lowerStackTicks(int stackLevel) {
