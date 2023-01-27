@@ -1,0 +1,105 @@
+package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+
+@Config
+@Autonomous(name="MM_Auto_Test", group="MM")
+public class MM_Auto_Test_Right extends MM_OpMode {
+    private final MM_Robot robot = new MM_Robot(this);
+
+    MM_EOCVDetection detector = new MM_EOCVDetection();
+    OpenCvCamera camera;
+
+    private ElapsedTime runtime = new ElapsedTime();
+    private ElapsedTime totalTime = new ElapsedTime();
+
+    @Override
+    public void runOpMode() {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+        telemetry.addData("Status", "Wait for initialization");
+        telemetry.update();
+        initCamera();
+        robot.init();
+
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+        waitForStart();
+        totalTime.reset();
+        int sleeveColor = detector.getMaxColor();
+        //check to see if you can see color during init with a cone
+        robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.LOW.ticks, 15, 5, MM_Drivetrain.STRAFE, 70, 6, true); //test
+        robot.lift.scoreCone();
+        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 30, -10, 2, 0,5, false );
+        robot.drivetrain.driveInches(-6);
+        robot.drivetrain.rotateToAngle(-90);
+        robot.drivetrain.driveInches(12);
+        robot.drivetrain.correctForTape(MM_EOCVDetection.BLUE);
+        if (!robot.drivetrain.correctForCone()) {
+            robot.parkFromStack(sleeveColor);
+        } else {
+            robot.lift.autoStackCollect(5);
+        }
+    }
+        //start collection code
+
+    private void initCamera() {
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
+        // Connect to the camera
+        // Use the SkystoneDetector pipeline
+        // processFrame() will be called to process the frame
+        camera.setPipeline(detector);
+        // Remember to change the camera rotation
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                camera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode) {
+
+            }
+
+        });
+
+        FtcDashboard.getInstance().startCameraStream(camera, 0);
+
+    }
+}
+//*/
+//    private void firstInitCamera() {
+//        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+//        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
+//        // Connect to the camera
+//        // Use the SkystoneDetector pipeline
+//        // processFrame() will be called to process the frame
+//        camera.setPipeline(detector);
+//        // Remember to change the camera rotation
+//        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+//            @Override
+//            public void onOpened() {
+//                camera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+//            }
+//
+//            @Override
+//            public void onError(int errorCode) {
+//
+//            }
+//
+//        });
+//
+//        FtcDashboard.getInstance().startCameraStream(camera, 0);
+//
+//    }
+//}
