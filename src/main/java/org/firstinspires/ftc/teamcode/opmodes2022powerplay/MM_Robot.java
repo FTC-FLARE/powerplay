@@ -79,31 +79,61 @@ public class MM_Robot {
         }
     }
 
-    public void parkFromJunction(int maxColor) {
-        if (maxColor == MM_EOCVDetection.RED) {
-            runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, 35, -1, 2, 0,5,false);
-        } else if (maxColor == MM_EOCVDetection.BLUE) {
-            runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, 9, -1, 2, 0,5,false);
+    public void parkFromJunction(int maxColor, boolean left) {
+        if (left) {
+            if (maxColor == MM_EOCVDetection.RED) {
+                runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, 35, -1, 2, 0,5,false);
+            } else if (maxColor == MM_EOCVDetection.BLUE) {
+                runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, 9, -1, 2, 0,5,false);
+            } else {
+                runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, -16, -1, 2, 0,5,false);
+            }
         } else {
-            runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, -16, -1, 2, 0,5,false);
+            if (maxColor == MM_EOCVDetection.YELLOW) {
+                runSlideandDrive(MM_Slide.SlidePosition.COLLECT, 24, 3, false);
+            } else if (maxColor == MM_EOCVDetection.BLUE) {
+                lift.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT.ticks);
+            } else {
+                runSlideandDrive(MM_Slide.SlidePosition.COLLECT, -24, 3, false);
+            }
         }
     }
 
-    public void parkFromStack(int maxColor) {
-            lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
-        if (maxColor == MM_EOCVDetection.BLUE) {
-            drivetrain.microscopicStrafeInches(1);
-            runSlideandDrive(MM_Slide.SlidePosition.COLLECT, -20, 4, false);
-        } else if (maxColor == MM_EOCVDetection.YELLOW) {
-            drivetrain.microscopicStrafeInches(1);
-            runSlideandDrive(MM_Slide.SlidePosition.COLLECT, -44, 5, false);
-            if (drivetrain.stuckOnCone()) {
-                drivetrain.strafe(1);
-                drivetrain.diagonalDriveInches(0, 0, MM_Drivetrain.STRAFE, 50);
+    public void parkFromStack(int maxColor, boolean left) {
+        drivetrain.resetEncoders();
+        lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_POSITION);
+        if (left) {
+            if (maxColor == MM_EOCVDetection.BLUE) {
+                drivetrain.microscopicStrafeInches(1);
+                drivetrain.driveInches(-20);
+            } else if (maxColor == MM_EOCVDetection.YELLOW) {
+                drivetrain.microscopicStrafeInches(1);
+                drivetrain.driveInches(-44);
+                if (drivetrain.stuckOnCone()) {
+                    drivetrain.strafe(1);
+                    drivetrain.diagonalDriveInches(0, 0, MM_Drivetrain.STRAFE, 50);
+                }
+            } else {
+                drivetrain.microscopicStrafeInches(-1);
+                drivetrain.driveInches(-5);
             }
         } else {
-            runSlideandDrive(MM_Slide.SlidePosition.COLLECT, -4, 3, false);
+            if (maxColor == MM_EOCVDetection.BLUE) {
+                drivetrain.microscopicStrafeInches(1);
+                drivetrain.driveInches(-20);
+            } else if (maxColor == MM_EOCVDetection.RED) {
+                drivetrain.microscopicStrafeInches(1);
+                drivetrain.driveInches(-44);
+                if (drivetrain.stuckOnCone()) {
+                    drivetrain.strafe(1);
+                    drivetrain.diagonalDriveInches(0, 0, MM_Drivetrain.STRAFE, 50);
+                }
+            } else {
+                drivetrain.microscopicStrafeInches(-1);
+                drivetrain.driveInches(-5);
+            }
         }
+
     }
 
     public boolean timeToScore(double totalTime, int maxColor) {

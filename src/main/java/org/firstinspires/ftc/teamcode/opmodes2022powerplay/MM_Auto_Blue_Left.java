@@ -4,7 +4,6 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -12,10 +11,9 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-@Disabled
 @Config
-@Autonomous(name="MM_Auto_Test", group="MM")
-public class MM_Auto_Test extends MM_OpMode {
+@Autonomous(name="MM_Auto_Blue_Left", group="MM")
+public class MM_Auto_Blue_Left extends MM_OpMode {
     private final MM_Robot robot = new MM_Robot(this);
 
     MM_EOCVDetection detector = new MM_EOCVDetection();
@@ -48,7 +46,7 @@ public class MM_Auto_Test extends MM_OpMode {
         robot.drivetrain.rotateToAngle(90); //1/25 - -56.75 under this
         robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 24.5, -57.5, MM_Drivetrain.DRIVE, 70, 8, false);
         robot.drivetrain.rotateToMicroscopicAngle(90);
-        robot.drivetrain.correctForTape(MM_OpMode.RED);
+        robot.drivetrain.correctForTape(MM_OpMode.BLUE);
         if (!robot.drivetrain.correctForCone()) {
             robot.parkFromStack(sleeveColor, true);
         } else {
@@ -60,7 +58,7 @@ public class MM_Auto_Test extends MM_OpMode {
             robot.lift.scoreCone();
             robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 10.2, -1, 2, 0,5,false);
             robot.drivetrain.rotateToMicroscopicAngle(90);
-            robot.drivetrain.correctForTape(MM_OpMode.RED);
+            robot.drivetrain.correctForTape(MM_OpMode.BLUE);
             if (!robot.drivetrain.correctForCone()) {
                 robot.parkFromStack(sleeveColor, true);
             } else {
@@ -72,7 +70,7 @@ public class MM_Auto_Test extends MM_OpMode {
                 robot.drivetrain.resetEncoders();
                 robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 9.2, -1, 2, 0,5,false);
                 robot.drivetrain.rotateToMicroscopicAngle(90);
-                robot.drivetrain.correctForTape(MM_OpMode.RED);
+                robot.drivetrain.correctForTape(MM_OpMode.BLUE);
                 if (!robot.drivetrain.correctForCone()) { //add another parameter to check for time because being parked is more worth
                     robot.parkFromStack(sleeveColor, true);
                 } else {

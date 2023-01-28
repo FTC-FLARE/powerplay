@@ -28,7 +28,7 @@ public class MM_Slide {
 
 
     public enum SlidePosition {
-        RESET(-4436),
+        RESET(-200),
         UNUSED(0),
         COLLECT(0),
         HOVER_FLOOR(525),

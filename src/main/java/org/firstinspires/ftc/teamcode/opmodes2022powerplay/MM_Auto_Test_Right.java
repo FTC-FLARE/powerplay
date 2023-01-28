@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -11,6 +12,7 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
+@Disabled
 @Config
 @Autonomous(name="MM_Auto_Test_Right", group="MM")
 public class MM_Auto_Test_Right extends MM_OpMode {
@@ -35,19 +37,47 @@ public class MM_Auto_Test_Right extends MM_OpMode {
         telemetry.update();
         waitForStart();
         totalTime.reset();
+        robot.lift.slide.waitToReachPosition(robot.lift.slide.stackTicks(1));
+        robot.lift.chomper.release();
+        robot.drivetrain.microscopicDriveInches(2);
+        robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
+        robot.lift.chomper.choke();
+        runtime.reset();
+        while (opModeIsActive() && runtime.seconds() < 0.3) {
+        }
+        robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.DETECT);
         int sleeveColor = detector.getMaxColor();
         //check to see if you can see color during init with a cone
-        robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.LOW.ticks, 15, 5, MM_Drivetrain.STRAFE, 70, 6, true); //test
+        robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.LOW.ticks, 15, 2, MM_Drivetrain.STRAFE, 70, 6, true); //test
         robot.lift.scoreCone();
-        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 30, -10, 2, 0,5, false );
-        robot.drivetrain.driveInches(-6);
+        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 41, -1.5, 2, 0,8, false );
+        robot.drivetrain.driveInches(-4);
         robot.drivetrain.rotateToAngle(-90);
-        robot.drivetrain.driveInches(12);
-        robot.drivetrain.correctForTape(MM_EOCVDetection.BLUE);
+        robot.drivetrain.driveInches(23);
+        robot.drivetrain.rotateToMicroscopicAngle(-90);
+        robot.drivetrain.resetEncoders();
+        robot.drivetrain.correctForTape(MM_EOCVDetection.RED);
         if (!robot.drivetrain.correctForCone()) {
-            robot.parkFromStack(sleeveColor);
+            robot.parkFromStack(sleeveColor, false);
         } else {
-            robot.lift.autoStackCollect(5);
+            robot.lift.autoStackCollect(5, false);
+            robot.drivetrain.resetEncoders();
+            robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.LOW.ticks, -21, -12, MM_Drivetrain.STRAFE, 90, 7, false);
+            robot.lift.scoreCone();
+            robot.drivetrain.driveInches(-8);
+            robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 23, 14, 2, 0, 7, false);
+            robot.drivetrain.correctForTape(MM_EOCVDetection.RED);
+            if (!robot.drivetrain.correctForCone()) {
+                robot.parkFromStack(sleeveColor, false);
+            } else {
+                robot.lift.autoStackCollect(4, false);
+                robot.lift.turner.changePosition(MM_Turner.BACK);
+                robot.drivetrain.resetEncoders();
+                robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -26, -12.2, MM_Drivetrain.STRAFE, 90, 7, false);
+                robot.lift.scoreCone();
+                robot.drivetrain.strafeInches(13);
+                robot.parkFromJunction(sleeveColor, false);
+            }
         }
     }
         //start collection code

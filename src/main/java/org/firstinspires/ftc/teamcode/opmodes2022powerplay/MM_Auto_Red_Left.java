@@ -4,7 +4,6 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -12,10 +11,9 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-@Disabled
 @Config
-@Autonomous(name="MM_Auto_Test", group="MM")
-public class MM_Auto_Test extends MM_OpMode {
+@Autonomous(name="MM_Auto_Red_Left", group="MM")
+public class MM_Auto_Red_Left extends MM_OpMode {
     private final MM_Robot robot = new MM_Robot(this);
 
     MM_EOCVDetection detector = new MM_EOCVDetection();

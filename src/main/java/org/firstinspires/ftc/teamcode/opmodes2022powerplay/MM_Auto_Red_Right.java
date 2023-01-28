@@ -4,7 +4,6 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -12,10 +11,9 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-@Disabled
 @Config
-@Autonomous(name="MM_Auto_Test", group="MM")
-public class MM_Auto_Test extends MM_OpMode {
+@Autonomous(name="MM_Auto_Red_Right", group="MM")
+public class MM_Auto_Red_Right extends MM_OpMode {
     private final MM_Robot robot = new MM_Robot(this);
 
     MM_EOCVDetection detector = new MM_EOCVDetection();
@@ -37,69 +35,51 @@ public class MM_Auto_Test extends MM_OpMode {
         telemetry.update();
         waitForStart();
         totalTime.reset();
-        int sleeveColor = detector.getMaxColor();
+        robot.lift.slide.waitToReachPosition(robot.lift.slide.stackTicks(1));
         robot.lift.chomper.release();
-        robot.drivetrain.microscopicDriveInches(1.40);
-        robot.drivetrain.strafeInches(-8);
-        robot.drivetrain.autoScore();
+        robot.drivetrain.microscopicDriveInches(2);
+        robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
+        robot.lift.chomper.choke();
+        runtime.reset();
         while (opModeIsActive() && runtime.seconds() < 0.3) {
         }
-        robot.drivetrain.diagonalDriveInches(2, 8);
-        robot.drivetrain.rotateToAngle(90); //1/25 - -56.75 under this
-        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 24.5, -57.5, MM_Drivetrain.DRIVE, 70, 8, false);
-        robot.drivetrain.rotateToMicroscopicAngle(90);
-        robot.drivetrain.correctForTape(MM_OpMode.RED);
+        robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.DETECT);
+        int sleeveColor = detector.getMaxColor();
+        //check to see if you can see color during init with a cone
+        robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.LOW.ticks, 15, 2, MM_Drivetrain.STRAFE, 70, 6, true); //test
+        robot.lift.scoreCone();
+        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 41, -1.5, 2, 0,8, false );
+        robot.drivetrain.driveInches(-4);
+        robot.drivetrain.rotateToAngle(-90);
+        robot.drivetrain.driveInches(23);
+        robot.drivetrain.rotateToMicroscopicAngle(-90);
+        robot.drivetrain.resetEncoders();
+        robot.drivetrain.correctForTape(MM_EOCVDetection.RED);
         if (!robot.drivetrain.correctForCone()) {
-            robot.parkFromStack(sleeveColor, true);
+            robot.parkFromStack(sleeveColor, false);
         } else {
+            robot.lift.autoStackCollect(5, false);
             robot.drivetrain.resetEncoders();
-            robot.lift.autoStackCollect(5, true);
-            robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -10.5,4, false);
-            robot.drivetrain.rotateToMicroscopicAngle(90);
-            robot.drivetrain.microscopicStrafeInches(2.5);
+            robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.LOW.ticks, -21, -12, MM_Drivetrain.STRAFE, 90, 7, false);
             robot.lift.scoreCone();
-            robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 10.2, -1, 2, 0,5,false);
-            robot.drivetrain.rotateToMicroscopicAngle(90);
-            robot.drivetrain.correctForTape(MM_OpMode.RED);
+            robot.drivetrain.driveInches(-8);
+            robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 23, 14, 2, 0, 7, false);
+            robot.drivetrain.correctForTape(MM_EOCVDetection.RED);
             if (!robot.drivetrain.correctForCone()) {
-                robot.parkFromStack(sleeveColor, true);
+                robot.parkFromStack(sleeveColor, false);
             } else {
-                robot.lift.autoStackCollect(4, true);
-                robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -10.2,4, false);
-                robot.drivetrain.rotateToMicroscopicAngle(90);
-                robot.drivetrain.microscopicStrafeInches(2.5);
-                robot.lift.scoreCone();
+                robot.lift.autoStackCollect(4, false);
+                robot.lift.turner.changePosition(MM_Turner.BACK);
                 robot.drivetrain.resetEncoders();
-                robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 9.2, -1, 2, 0,5,false);
-                robot.drivetrain.rotateToMicroscopicAngle(90);
-                robot.drivetrain.correctForTape(MM_OpMode.RED);
-                if (!robot.drivetrain.correctForCone()) { //add another parameter to check for time because being parked is more worth
-                    robot.parkFromStack(sleeveColor, true);
-                } else {
-                    robot.lift.autoStackCollect(3, true);
-                    robot.drivetrain.resetEncoders();
-                    if (!robot.timeToScore(totalTime.seconds(), sleeveColor)) {
-                        robot.parkFromStack(sleeveColor, true);
-                    } else {
-                        robot.drivetrain.microscopicStrafeInches(0.9);
-                        robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, -34.2, 5, false);
-                        if (robot.timedOut() && robot.drivetrain.stuckOnCone()) {
-                            robot.drivetrain.strafe(1); //left
-                            runtime.reset();
-                            while (opModeIsActive() && runtime.seconds() < 2) {
-                            }
-                        } else {
-                            robot.drivetrain.rotateToMicroscopicAngle(90);
-                            robot.lift.scoreCone();
-                            robot.drivetrain.resetEncoders();
-                        }
-                        robot.parkFromJunction(sleeveColor, true);
-                    }
-                }
+                robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -26, -12.2, MM_Drivetrain.STRAFE, 90, 7, false);
+                robot.lift.scoreCone();
+                robot.drivetrain.strafeInches(13);
+                robot.parkFromJunction(sleeveColor, false);
             }
         }
-        //start collection code
     }
+        //start collection code
+
     private void initCamera() {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);

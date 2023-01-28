@@ -442,10 +442,6 @@ public class MM_Drivetrain {
         }else {
             setMotorPower(flPower, frPower, blPower, brPower);
         }
-
-        opMode.telemetry.addData("rightTape", tapeSensor2.blue());
-        opMode.telemetry.addData("leftTape", tapeSensor.blue());
-        opMode.telemetry.addData("first heading", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
     }
 
     private void switchEncoderMode(DcMotor.RunMode runMode) {
@@ -707,11 +703,10 @@ public class MM_Drivetrain {
         }
 
         runtime.reset();
-        while (opMode.opModeIsActive() && !corrected) {
+        while (opMode.opModeIsActive() && !corrected && runtime.seconds() < 3) {
             double distance = getFrontDistance();
             corrected = (distance < 4.2 && distance > 2.8);
         }
-
         leftPriorEncoderTarget = leftPriorEncoderTarget + (leftEncoder.getCurrentPosition() - leftCurrentTicks);
         rightPriorEncoderTarget = rightPriorEncoderTarget + (rightEncoder.getCurrentPosition() - rightCurrentTicks);
         stop();
@@ -726,32 +721,42 @@ public class MM_Drivetrain {
 
         boolean corrected = true;
         if (allianceColor == MM_OpMode.BLUE) {
-            if (tapeSensor2.blue() < 280) {
+            int direction = 0;
+            if (tapeSensor2.blue() < 300) {
                 strafe(RIGHT);
                 corrected = false;
-            } else if (tapeSensor.blue() < 300) {
+                direction = RIGHT;
+            } else if (tapeSensor.blue() < 320) {
                 strafe(LEFT);
                 corrected = false;
+                direction = LEFT;
             }
             runtime.reset();
-            while (opMode.opModeIsActive() && !corrected && runtime.seconds() < 1) {
-                corrected = (tapeSensor.blue() > 270 && tapeSensor2.blue() > 290);
+            while (opMode.opModeIsActive() && !corrected && runtime.seconds() < 2.5) {
+                corrected = (tapeSensor.blue() > 290 && tapeSensor2.blue() > 310);
+                if (runtime.seconds() > 1.25) {
+                    strafe(-direction);
+                }
             }
         } else {
+            int direction = 0;
             if (tapeSensor2.red() < 280) {
                 strafe(RIGHT);
                 corrected = false;
+                direction = RIGHT;
             } else if (tapeSensor.red() < 300) {
                 strafe(LEFT);
                 corrected = false;
+                direction = LEFT;
             }
             runtime.reset();
-            while (opMode.opModeIsActive() && !corrected && runtime.seconds() < 1) {
+            while (opMode.opModeIsActive() && !corrected && runtime.seconds() < 2.5) {
                 corrected = (tapeSensor.red() > 270 && tapeSensor2.red() > 290);
+                if (runtime.seconds() > 1.25) {
+                    strafe(-direction);
+                }
             }
         }
-
-
 
         backPriorEncoderTarget = backPriorEncoderTarget + (backEncoder.getCurrentPosition() - backCurrentTicks);
         leftPriorEncoderTarget = leftPriorEncoderTarget + (leftEncoder.getCurrentPosition() - leftCurrentTicks);
@@ -787,6 +792,7 @@ public class MM_Drivetrain {
         leftPriorEncoderTarget = 0;
         rightPriorEncoderTarget = 0;
     }
+
     private void init() {
         frontLeftDrive = opMode.hardwareMap.get(DcMotorEx.class, "FLMotor");
         frontRightDrive = opMode.hardwareMap.get(DcMotorEx.class, "FRMotor");

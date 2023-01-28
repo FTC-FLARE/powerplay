@@ -17,17 +17,16 @@ public class MM_Lift {
         turner = new MM_Turner(opMode);
     }
 
-    public void autoStackCollect(int stackLevel){
+    public void autoStackCollect(int stackLevel, boolean left){
         slide.waitToReachPosition(slide.lowerStackTicks(stackLevel));
-/*      slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(stackLevel) + 200); //guess
-        turner.jiggle(0.15);
-        slide.waitToReachPosition(robot.lift.slide.lowerStackTicks(stackLevel));*/
         chomper.choke();
         runtime.reset();
         while (opMode.opModeIsActive() && runtime.seconds() < 0.25) {
         }
         slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
-        turner.changePosition(MM_Turner.SIDE);
+        if (left) {
+            turner.changePosition(MM_Turner.SIDE);
+        }
     }
 
     public void scoreCone() {
