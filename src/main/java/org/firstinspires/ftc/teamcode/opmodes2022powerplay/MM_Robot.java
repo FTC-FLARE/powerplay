@@ -21,64 +21,6 @@ public class MM_Robot {
         this.opMode = opMode;
     }
 
-    public void sleevePark(int sleeveColor, boolean secondCone, boolean thirdCone, boolean right) {
-        if (thirdCone && sleeveColor == 0) {
-            lift.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
-        } else if(secondCone){
-            drivetrain.rotateToAngle(0);
-            if (!thirdCone) {
-                microscopicRunSlideandDrive(MM_Slide.SlidePosition.COLLECT,3.5, 5);
-            } else {
-                drivetrain.microscopicDriveInches(3.5);
-            }
-
-            if (sleeveColor == MM_EOCVDetection.BLUE){
-                if (right) {
-                    drivetrain.strafeInches(22);
-                } else {
-                    drivetrain.strafeInches(-22);
-                }
-            }else if (sleeveColor == MM_EOCVDetection.YELLOW){
-                if (right) {
-
-                } else {
-                    drivetrain.strafeInches(-46);
-                }
-            } else {
-                if (right) {
-                    drivetrain.strafeInches(46);
-                }
-            }
-
-            if (thirdCone) {
-                lift.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
-            }
-
-        }else{
-            if (sleeveColor == MM_EOCVDetection.RED || sleeveColor == MM_EOCVDetection.YELLOW) {
-                drivetrain.driveInches(5); //get away from wall
-                double angleTarget = 90;
-                if (sleeveColor == MM_EOCVDetection.YELLOW) {
-                    angleTarget = -angleTarget;
-                    opMode.telemetry.addLine("Traveling to Yellow");
-                } else {
-                    opMode.telemetry.addLine("Traveling to Red");
-                }
-                drivetrain.rotateToAngle(angleTarget);
-                drivetrain.driveInches(24);
-                drivetrain.rotateToAngle(0);
-                drivetrain.driveInches(31);
-            } else {
-                opMode.telemetry.addLine("Traveling to Blue");
-                drivetrain.driveInches(42);
-                drivetrain.driveInches(-8);
-            }
-            lift.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
-            opMode.telemetry.update();
-
-        }
-    }
-
     public void parkFromJunction(int maxColor, boolean left) {
         if (left) {
             if (maxColor == MM_EOCVDetection.RED) {
@@ -160,6 +102,31 @@ public class MM_Robot {
                 if (!slideDone) {
                     slideDone = lift.reachedPositionTurner(); //watch out
                    }
+            } else {
+                slideDone = lift.slide.reachedPosition();
+            }
+
+            opMode.telemetry.addData("inches target", inches);
+            opMode.telemetry.addData("slide target", slidePosition);
+            opMode.telemetry.update();
+        }
+    }
+
+    public void runSlideandStrafe(int slidePosition, double inches, double timeoutTime, boolean flipTurner) {
+        drivetrain.prepareToStrafe(inches);
+        lift.slide.moveTowardTarget(slidePosition);
+
+        boolean strafeDone = false;
+        boolean slideDone = false;
+        runtime.reset();
+
+        while (opMode.opModeIsActive() && (!strafeDone || !slideDone) && runtime.seconds() < timeoutTime) {
+            strafeDone = drivetrain.reachedPositionStrafe();
+
+            if (flipTurner) {
+                if (!slideDone) {
+                    slideDone = lift.reachedPositionTurner(); //watch out
+                }
             } else {
                 slideDone = lift.slide.reachedPosition();
             }

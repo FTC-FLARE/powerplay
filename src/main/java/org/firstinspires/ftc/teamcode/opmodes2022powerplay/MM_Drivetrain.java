@@ -859,7 +859,11 @@ public class MM_Drivetrain {
         runtime.reset();
         while (opMode.opModeIsActive() && runtime.seconds() < 0.2) {
         }
-        scorer.setPosition(1);
+        scorer.setPosition(0.62);
+    }
+
+    public void handleIndicator() {
+        scorer.setPosition(0.62);
     }
 
     public double getFrontDistance() {

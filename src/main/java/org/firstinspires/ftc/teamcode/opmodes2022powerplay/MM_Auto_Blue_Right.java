@@ -35,6 +35,7 @@ public class MM_Auto_Blue_Right extends MM_OpMode {
         telemetry.update();
         waitForStart();
         totalTime.reset();
+        robot.drivetrain.handleIndicator();
         robot.lift.slide.waitToReachPosition(robot.lift.slide.stackTicks(1));
         robot.lift.chomper.release();
         robot.drivetrain.microscopicDriveInches(2);
@@ -71,7 +72,7 @@ public class MM_Auto_Blue_Right extends MM_OpMode {
                 robot.lift.autoStackCollect(4, false);
                 robot.lift.turner.changePosition(MM_Turner.BACK);
                 robot.drivetrain.resetEncoders();
-                robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -26, -12.2, MM_Drivetrain.STRAFE, 90, 7, false);
+                robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -25, -12.2, MM_Drivetrain.STRAFE, 90, 7, false);
                 robot.lift.scoreCone();
                 robot.drivetrain.strafeInches(13);
                 robot.parkFromJunction(sleeveColor, false);
