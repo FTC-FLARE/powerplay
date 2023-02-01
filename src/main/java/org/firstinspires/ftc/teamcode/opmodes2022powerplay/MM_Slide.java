@@ -14,7 +14,9 @@ public class MM_Slide {
     private ColorSensor slowerizationModule;
 
 
-    private final static double SLIDE_NORMAL_SPEED = 0.85;
+    private final static double SLIDE_NORMAL_SPEED = 0.77;
+    private final static double SLIDE_AUTO_SPEED = 0.85;
+
     private final static int MANUAL_INCREMENT = 150;
     private final static double SLIDE_SLOW_SPEED = 0.3;
     public final static int STACK_LEVEL_INCREMENT = 150;
@@ -153,7 +155,7 @@ public class MM_Slide {
     }
 
     public void moveTowardTarget(int ticks) {
-        slide.setPower(SLIDE_NORMAL_SPEED);
+        slide.setPower(SLIDE_AUTO_SPEED);
         setSlideTarget(ticks);
         slide.setTargetPosition(getSlideTarget());
     }

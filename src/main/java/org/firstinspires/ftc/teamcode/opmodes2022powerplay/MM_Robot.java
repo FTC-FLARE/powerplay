@@ -39,6 +39,7 @@ public class MM_Robot {
                 runSlideandDrive(MM_Slide.SlidePosition.COLLECT, -24, 3, false);
             }
         }
+        lift.chomper.choke();
     }
 
     public void parkFromStack(int maxColor, boolean left) {
@@ -50,7 +51,7 @@ public class MM_Robot {
                 drivetrain.driveInches(-20);
             } else if (maxColor == MM_EOCVDetection.YELLOW) {
                 drivetrain.microscopicStrafeInches(1);
-                drivetrain.driveInches(-44);
+                drivetrain.driveInches(-48);
                 if (drivetrain.stuckOnCone()) {
                     drivetrain.strafe(1);
                     drivetrain.diagonalDriveInches(0, 0, MM_Drivetrain.STRAFE, 50);
@@ -65,7 +66,7 @@ public class MM_Robot {
                 drivetrain.driveInches(-20);
             } else if (maxColor == MM_EOCVDetection.RED) {
                 drivetrain.microscopicStrafeInches(1);
-                drivetrain.driveInches(-44);
+                drivetrain.driveInches(-48);
                 if (drivetrain.stuckOnCone()) {
                     drivetrain.strafe(1);
                     drivetrain.diagonalDriveInches(0, 0, MM_Drivetrain.STRAFE, 50);
@@ -75,7 +76,7 @@ public class MM_Robot {
                 drivetrain.driveInches(-5);
             }
         }
-
+        lift.chomper.choke();
     }
 
     public boolean timeToScore(double totalTime, int maxColor) {

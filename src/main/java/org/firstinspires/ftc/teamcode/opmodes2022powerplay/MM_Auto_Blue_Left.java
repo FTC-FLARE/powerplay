@@ -44,7 +44,7 @@ public class MM_Auto_Blue_Left extends MM_OpMode {
         }
         robot.drivetrain.diagonalDriveInches(2, 8);
         robot.drivetrain.rotateToAngle(90); //1/25 - -56.75 under this
-        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 24.5, -57.5, MM_Drivetrain.DRIVE, 70, 8, false);
+        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 22, -57.5, MM_Drivetrain.DRIVE, 70, 8, false);
         robot.drivetrain.rotateToMicroscopicAngle(90);
         robot.drivetrain.correctForTape(MM_OpMode.BLUE);
         if (!robot.drivetrain.correctForCone()) {

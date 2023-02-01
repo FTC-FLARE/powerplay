@@ -442,6 +442,7 @@ public class MM_Drivetrain {
         }else {
             setMotorPower(flPower, frPower, blPower, brPower);
         }
+
     }
 
     private void switchEncoderMode(DcMotor.RunMode runMode) {
@@ -740,18 +741,21 @@ public class MM_Drivetrain {
             }
         } else {
             int direction = 0;
-            if (tapeSensor2.red() < 280) {
+            if (tapeSensor2.red() < 200) {
                 strafe(RIGHT);
                 corrected = false;
                 direction = RIGHT;
-            } else if (tapeSensor.red() < 300) {
+            } else if (tapeSensor.red() < 230) {
                 strafe(LEFT);
                 corrected = false;
                 direction = LEFT;
             }
             runtime.reset();
             while (opMode.opModeIsActive() && !corrected && runtime.seconds() < 2.5) {
-                corrected = (tapeSensor.red() > 270 && tapeSensor2.red() > 290);
+                corrected = (tapeSensor.red() > 190 && tapeSensor2.red() > 220);
+                opMode.telemetry.addData("left tape", tapeSensor2.red());
+                opMode.telemetry.addData("right tape", tapeSensor.red());
+                opMode.telemetry.update();
                 if (runtime.seconds() > 1.25) {
                     strafe(-direction);
                 }
