@@ -40,8 +40,7 @@ public class MM_Auto_Blue_Left extends MM_OpMode {
         robot.drivetrain.microscopicDriveInches(1.40);
         robot.drivetrain.strafeInches(-8);
         robot.drivetrain.autoScore();
-        while (opModeIsActive() && runtime.seconds() < 0.3) {
-        }
+        waitSeconds(0.3);
         robot.drivetrain.diagonalDriveInches(2, 8);
         robot.drivetrain.rotateToAngle(90); //1/25 - -56.75 under this
         robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 22, -57.5, MM_Drivetrain.DRIVE, 70, 8, false);
@@ -84,8 +83,7 @@ public class MM_Auto_Blue_Left extends MM_OpMode {
                         if (robot.timedOut() && robot.drivetrain.stuckOnCone()) {
                             robot.drivetrain.strafe(1); //left
                             runtime.reset();
-                            while (opModeIsActive() && runtime.seconds() < 2) {
-                            }
+                            waitSeconds(2);
                         } else {
                             robot.drivetrain.rotateToMicroscopicAngle(90);
                             robot.lift.scoreCone();

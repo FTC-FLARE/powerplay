@@ -803,13 +803,12 @@ public class MM_Drivetrain {
         imu = opMode.hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
-        distance = opMode.hardwareMap.get(DistanceSensor.class, "distance");
-        rightTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "tapeSensor");
-        leftTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "tapeSensor2");
+        distance = opMode.hardwareMap.get(DistanceSensor.class, "coneSensor");
+        rightTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "rightTapeSensor");
+        leftTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "leftTapeSensor");
     }
 
     private void initServos(){
-        distanceServo = opMode.hardwareMap.get(Servo.class, "distanceServo");
         if(opMode.getClass() == MM_TeleOp.class){
             indicator = opMode.hardwareMap.get(Servo.class, "floppyServo");
             leftOdomLift = opMode.hardwareMap.get(Servo.class,"leftOdometryLift");
@@ -819,11 +818,9 @@ public class MM_Drivetrain {
             leftOdomLift.setPosition(1);
             rightOdomLift.setPosition(0);
             backOdomLift.setPosition(1);
-            distanceServo.setPosition(1);
             indicator.setPosition(1);
         } else {
             scorer = opMode.hardwareMap.get(Servo.class, "floppyServo");
-            distanceServo.setPosition(0);
             scorer.setPosition(1);
         }
     }

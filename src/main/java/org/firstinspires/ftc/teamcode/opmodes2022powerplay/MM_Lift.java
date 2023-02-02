@@ -1,14 +1,10 @@
 package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 
-import com.qualcomm.robotcore.util.ElapsedTime;
-
 public class MM_Lift {
     private final MM_OpMode opMode;
     public MM_Slide slide;
     public MM_Chomper chomper;
     public MM_Turner turner;
-
-    ElapsedTime runtime = new ElapsedTime();
 
     public MM_Lift(MM_OpMode opMode){
         this.opMode = opMode;
@@ -20,9 +16,7 @@ public class MM_Lift {
     public void autoStackCollect(int stackLevel, boolean left){
         slide.waitToReachPosition(slide.lowerStackTicks(stackLevel));
         chomper.choke();
-        runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 0.25) {
-        }
+        opMode.waitSeconds(0.25);
         slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
         if (left) {
             turner.changePosition(MM_Turner.SIDE);
@@ -31,30 +25,9 @@ public class MM_Lift {
 
     public void scoreCone() {
         chomper.release();
-        runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 0.2) {
-        }
+        opMode.waitSeconds(0.2);
         turner.changePosition(MM_Turner.FRONT);
-        runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 0.1) {
-        }
-    }
-
-    public void autoScore(boolean flipfirst, boolean lastMove, int sleeveColor){
-        if (flipfirst){
-            runtime.reset();
-            opMode.waitSeconds(4);
-            turner.changePosition(MM_Turner.BACK);
-            runtime.reset();
-            opMode.waitSeconds(1.25);
-        }
-        slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_POSITION);
-        chomper.toggle();
-        runtime.reset();
-        slide.waitToReachPosition(MM_Slide.SlidePosition.LOW);
-        turner.changePosition(0.885);
-        runtime.reset();
-        opMode.waitSeconds(1.25);
+        opMode.waitSeconds(0.1);
     }
 
     public boolean reachedPositionTurner() {

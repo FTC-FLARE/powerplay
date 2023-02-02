@@ -164,40 +164,6 @@ public class MM_Robot {
         timedOut = (slideDone && driveDone);
     }
 
-    public void microscopicRunSlideandDrive(MM_Slide.SlidePosition slidePosition, double inches, double timeoutTime) {
-        microscopicRunSlideandDrive(slidePosition, inches, timeoutTime, false);
-    }
-
-    public void microscopicRunSlideandDrive(MM_Slide.SlidePosition slidePosition, double inches, double timeoutTime, boolean flipTurner) {
-        drivetrain.prepareToDrive(inches);
-        lift.slide.moveTowardTarget(slidePosition);
-        boolean driveDone = false;
-        boolean slideDone = false;
-        runtime.reset();
-
-        if (flipTurner) {
-            boolean turnerDone = false;
-            while (opMode.opModeIsActive() && (!driveDone || !slideDone || !turnerDone) && runtime.seconds() < timeoutTime) {
-                driveDone = drivetrain.reachedPositionMicroscopicDrive();
-                slideDone = lift.slide.reachedPosition();
-                if (!turnerDone) {
-                    turnerDone = opMode.robot.lift.turner.reachedPosition(lift.slide.tooLowToPivot());
-                }
-                opMode.telemetry.addData("inches target", inches);
-                opMode.telemetry.addData("slide target", slidePosition);
-                opMode.telemetry.update();
-            }
-        } else {
-            while (opMode.opModeIsActive() && (!driveDone || !slideDone) && runtime.seconds() < timeoutTime) {
-                driveDone = drivetrain.reachedPositionMicroscopicDrive();
-                slideDone = lift.slide.reachedPosition();
-                opMode.telemetry.addData("inches target", inches);
-                opMode.telemetry.addData("slide target", slidePosition);
-                opMode.telemetry.update();
-            }
-        }
-    }
-
     public boolean timedOut() {
         return timedOut;
     }

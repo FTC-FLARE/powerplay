@@ -6,13 +6,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class MM_Chomper {
     private Servo chomper = null;
 
-    private static final double CHOKE = 0.75;  // tighten belt to collect (was .36???)
-    public static final double RELEASE = 0.0;
+    private static final double CHOKE = 0.75;  // tighten belt to collect (was .36????????????????)
+    private static final double RELEASE = 0.0;
 
     private double position = RELEASE;
 
     public MM_Chomper(HardwareMap hardwareMap) {
-        chomper = hardwareMap.get(Servo.class, "Grabber");
+        chomper = hardwareMap.get(Servo.class, "Chokerizer");
         changePosition(CHOKE);
     }
 
@@ -31,6 +31,7 @@ public class MM_Chomper {
     public void choke(){
         changePosition(CHOKE);
     }
+
     public void release(){
         changePosition(RELEASE);
     }
@@ -38,6 +39,5 @@ public class MM_Chomper {
     private void changePosition(double position) {
         chomper.setPosition(position);
         this.position = position;
-
     }
 }
