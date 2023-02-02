@@ -35,7 +35,7 @@ public class MM_Auto_Blue_Circuit_Right extends MM_OpMode {
         telemetry.update();
         waitForStart();
         totalTime.reset();
-        robot.drivetrain.handleIndicator();
+        robot.drivetrain.getScorerOutOfTheWay();
         robot.lift.slide.waitToReachPosition(robot.lift.slide.stackTicks(1));
         robot.lift.chomper.release();
         robot.drivetrain.microscopicDriveInches(2);
@@ -76,7 +76,7 @@ public class MM_Auto_Blue_Circuit_Right extends MM_OpMode {
                 robot.lift.turner.changePosition(MM_Turner.BACK);
                 robot.drivetrain.resetEncoders();
                 robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.HIGH.ticks, -48, -11.25, MM_Drivetrain.STRAFE, 92, 7, false);
-                robot.drivetrain.handleIndicator();
+                robot.drivetrain.getScorerOutOfTheWay();
                 robot.lift.scoreCone();
                 robot.drivetrain.strafeInches(13);
                 if (sleeveColor == MM_EOCVDetection.YELLOW) {

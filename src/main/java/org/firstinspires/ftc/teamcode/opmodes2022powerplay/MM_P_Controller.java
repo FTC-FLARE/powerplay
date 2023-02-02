@@ -59,6 +59,11 @@ public class MM_P_Controller {
         inputRange = maxInput - minInput;
     }
 
+    public void setup(double start, double target) {
+        setSetpoint(target);
+        setInputRange(start, target);
+    }
+
     public void setOutputRange(double minOutput, double maxOutput) {
         this.minOutput = minOutput;
         this.maxOutput = maxOutput;

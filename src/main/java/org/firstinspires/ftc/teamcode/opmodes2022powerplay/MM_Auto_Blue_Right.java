@@ -35,7 +35,7 @@ public class MM_Auto_Blue_Right extends MM_OpMode {
         telemetry.update();
         waitForStart();
         totalTime.reset();
-        robot.drivetrain.handleIndicator();
+        robot.drivetrain.getScorerOutOfTheWay();
         robot.lift.slide.waitToReachPosition(robot.lift.slide.stackTicks(1));
         robot.lift.chomper.release();
         robot.drivetrain.microscopicDriveInches(2);

@@ -135,6 +135,7 @@ public abstract class MM_OpMode extends LinearOpMode {
     }
 
     public void waitSeconds(double seconds) {
+        runtime.reset();
         while (opModeIsActive() && runtime.seconds() < seconds){
         }
     }
