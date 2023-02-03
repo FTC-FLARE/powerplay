@@ -28,6 +28,8 @@ public abstract class MM_OpMode extends LinearOpMode {
     static final int BLUE = 1;
     static final int RED = 0;
 
+    public int alliance = RED;
+
     private final ElapsedTime runtime = new ElapsedTime();
 
     public boolean aPressed(int gamepad) {

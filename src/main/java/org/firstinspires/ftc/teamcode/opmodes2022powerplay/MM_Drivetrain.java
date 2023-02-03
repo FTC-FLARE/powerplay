@@ -9,13 +9,13 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcontroller.external.samples.SensorColor;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class MM_Drivetrain {
-    public static final double MIN_STRAFE_POWER = 0.292;
     private final MM_OpMode opMode;
 
     BNO055IMU imu;
@@ -42,10 +42,12 @@ public class MM_Drivetrain {
 
     private final ElapsedTime runtime = new ElapsedTime();
 
+    public static final double MIN_STRAFE_POWER = 0.292;
     private static final double SECONDS_PER_DEGREE = 0.025;//??
     private static final double STRAIGHTEN_P = .0840; //.0780
     private static final double STRAFE_P = .089;
     private static final double CORRECTION_COEFFICIENT = 0.000055; //Gain per tick
+    private static final double DISTANCE_P_COEFFICIENT = 0.013;
     public static final double SLOW_MULTIPLIER = 0.65;
     public static final double SUPER_SLOW_MULTIPLIER = 0.35;
     public static final double MIN_DRIVE_POWER = 0.16;
@@ -59,6 +61,11 @@ public class MM_Drivetrain {
     private static final int SUPER_SLOW = 2;
     public static final int DRIVE = 0;
     public static final int STRAFE = 1;
+
+    private static final double LEFT_TAPE_RED = 280;
+    private static final double RIGHT_TAPE_RED = 300;
+    private static final double LEFT_TAPE_BLUE = 300;
+    private static final double RIGHT_TAPE_BLUE = 320;
 
     private int slowMode = SLOW;
     private int previousSlowMode = SLOW;
@@ -84,13 +91,13 @@ public class MM_Drivetrain {
     private int secondMove = DRIVE;
     private int direction = 0;
     private int kickInTicks = 0;
+    private boolean colorKickOut = false;
     private boolean strafing = false;
     private boolean driving = false;
 
     private double leftTapeVal = 0;
     private double rightTapeVal = 0;
-    private int alliance = 0;
-
+    private boolean tapeHandled = false;
     public MM_Drivetrain(MM_OpMode opMode) {
         this.opMode = opMode;
         init();
@@ -119,7 +126,7 @@ public class MM_Drivetrain {
     }
 
     public void diagonalDriveInches(double forwardInches, double strafeInches, int move, int percentKickIn) {
-        prepareToDiagonalDrive(forwardInches, strafeInches, percentKickIn, move);
+        prepareToDiagonalDrive(forwardInches, strafeInches, percentKickIn, move, false);
         runtime.reset();
         while (opMode.opModeIsActive() && runtime.seconds() < 10 && !reachedPositionDiagonalDrive()) {
             opMode.telemetry.addData("forward inches target", forwardInches);
@@ -146,6 +153,24 @@ public class MM_Drivetrain {
         }
     }
 
+    public void driveToStack() {
+        prepareToTapeDrive();
+        runtime.reset();
+        while (opMode.opModeIsActive() && runtime.seconds() < 5 && !reachedPositionTapeDrive()) {
+            opMode.telemetry.update();
+        }
+/*        if ((opMode.pLeftDiagDriveController.reachedTarget() || opMode.pRightDiagDriveController.reachedTarget() || opMode.pLeftDriveController.reachedTarget() || opMode.pRightDriveController.reachedTarget()) && opMode.pBackDriveController.reachedTarget()) {
+            correctForTape();
+            correctForCone();
+        } else {
+            prepareToTapeDrive();
+            runtime.reset();
+            while (opMode.opModeIsActive() && runtime.seconds() < 5 && !reachedPositionTape()) {
+                opMode.telemetry.update();
+            }
+        }*/
+    }
+
     public void prepareToDrive(double inches) {
         int leftTargetTicks = leftPriorEncoderTarget + MM_Util.inchesToTicks(inches);
         int rightTargetTicks = rightPriorEncoderTarget + MM_Util.inchesToTicks(inches);
@@ -163,11 +188,12 @@ public class MM_Drivetrain {
         backPriorEncoderTarget = backTargetTicks;
     }
 
-    public void prepareToDiagonalDrive(double driveInches, double strafeInches, int kickInPercent, int secondMove) {
+    public void prepareToDiagonalDrive(double driveInches, double strafeInches, int kickInPercent, int secondMove, boolean colorKickOut) {
         int backTargetTicks = backPriorEncoderTarget + MM_Util.inchesToTicks(strafeInches);
         int leftTargetTicks = leftPriorEncoderTarget + MM_Util.inchesToTicks(driveInches);
         int rightTargetTicks = rightPriorEncoderTarget + MM_Util.inchesToTicks(driveInches);
 
+        this.colorKickOut = colorKickOut;
         this.secondMove = secondMove;
         if (secondMove == DRIVE) {
             if (strafeInches < 0) {
@@ -209,8 +235,8 @@ public class MM_Drivetrain {
         opMode.pLeftDriveController.calculatePower(10000);
     }
 
-    public void prepareToTapeDrive(int alliance) {
-        this.alliance = alliance;
+    public void prepareToTapeDrive() {
+        tapeHandled = false;
     }
 
     public boolean reachedPositionDrive() { //this also sets the motor power
@@ -234,6 +260,9 @@ public class MM_Drivetrain {
     public boolean reachedPositionDiagonalDrive() {
         setDiagonalPower();
 
+        if (colorKickOut) {
+            return checkColors();
+        }
         if (strafing) {
             strafing = !opMode.pBackDriveController.reachedTarget();
         }
@@ -278,6 +307,17 @@ public class MM_Drivetrain {
         }
         return false;
     }
+
+    public boolean reachedPositionTapeDrive() {
+        setTapePower();
+        double frontDistance = getFrontDistance();
+        if (frontDistance < 4.2 && frontDistance > 3.2) {
+            stop();
+            return true;
+        }
+        return false;
+    }
+
 
     private void setStraightPower() {
         leftCurrentTicks = leftEncoder.getCurrentPosition();
@@ -373,19 +413,24 @@ public class MM_Drivetrain {
         setMotorPower(flPower, frPower, blPower, brPower);
     }
     
-/*    private void setTapePower() {
-        if (//tapeHandled) {
-            //all distance sensor p
+    private void setTapePower() {
+        if (tapeHandled) {
+            double frontDistance = getFrontDistance();
+            double power = (getFrontDistance() * DISTANCE_P_COEFFICIENT) + MIN_DRIVE_POWER;
+            if (frontDistance < 3.2) {
+                power *= -1;
+            }
+            setPowerVariables(power, power, power, power);
         } else {
-            flPower = leftDrivePower;
-            frPower = rightDrivePower;
-            blPower = leftDrivePower;
-            brPower = rightDrivePower;
+            leftDrivePower = opMode.pLeftDriveController.calculatePower(leftEncoder.getCurrentPosition());
+            rightDrivePower = opMode.pRightDriveController.calculatePower(rightEncoder.getCurrentPosition());
+            setPowerVariables(leftDrivePower, rightDrivePower, leftDrivePower, rightDrivePower);
         }
-
-        //correctForTape2()
-        //replace when working with correct for tape
-    }*/
+        correctForTape2();
+        angleStraighten(STRAIGHTEN_P, flPower, frPower);
+        normalize();
+        setMotorPower(flPower, frPower, blPower, brPower);
+    }
 
     public void driveWithSticks() {
         double drive = -opMode.gamepad1.left_stick_y;
@@ -526,11 +571,64 @@ public class MM_Drivetrain {
         brPower += rightCorrectPower;
     }
 
-    private void tapeCorrect2() {
-        if (alliance == MM_EOCVDetection.RED) {
+    private void correctForTape2() {
+        double correctPower = tapeCorrectPower(tapeError(LEFT), tapeError(RIGHT));
 
+        flPower += correctPower;
+        frPower -= correctPower;
+        blPower -= correctPower;
+        brPower += correctPower;
+    }
+
+    private double tapeError(int sensorSide) {
+        if (opMode.alliance == MM_EOCVDetection.RED) {
+            if (sensorSide == LEFT) {
+                return LEFT_TAPE_RED - leftTapeSensor.red();
+            }
+            return RIGHT_TAPE_RED - rightTapeSensor.red();
+        }
+        if (sensorSide == LEFT) {
+            return LEFT_TAPE_BLUE - leftTapeSensor.blue();
+        }
+        return RIGHT_TAPE_BLUE - rightTapeSensor.blue();
+    }
+
+    private double tapeCorrectPower(double leftDifference, double rightDifference) {
+        double correctPower = 0;
+        if (leftDifference > 0 || rightDifference > 0) {
+            correctPower = 0.2;
+            double comparedError = Math.abs(leftDifference - rightDifference);
+            if (comparedError < 40) {
+                if (leftDifference < 120) {
+                    correctPower = -0.05;
+                }
+            } else if (comparedError < 80) {
+                correctPower = 0.1;
+                if (leftDifference > rightDifference) {
+                    correctPower = -correctPower;
+                }
+            } else if (comparedError < 120) {
+                correctPower = 0.15;
+                if (leftDifference > rightDifference) {
+                    correctPower = -correctPower;
+                }
+            } else if (leftDifference < rightDifference) {
+                correctPower = -correctPower;
+            }
+        } else {
+            tapeHandled = true;
+        }
+        return correctPower;
+    }
+
+    private boolean checkColors() {
+        if (opMode.alliance == MM_EOCVDetection.BLUE) {
+            return (leftTapeSensor.blue() > 200 || rightTapeSensor.blue() > 220);
+        } else {
+            return (leftTapeSensor.red() > 180 || rightTapeSensor.red() > 200);
         }
     }
+
 
     private void angleStraighten(double pCoefficient, double leftCalculated, double rightCalculated) {
         double headingError = correctedAngle(priorAngle - imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
@@ -605,14 +703,14 @@ public class MM_Drivetrain {
         return corrected;
     }
 
-    public void correctForTape(int allianceColor) {
+    public void correctForTape() {
         //if during the drive, strafe with a P coefficent maybe or just add powers somehow, you will have to change the prior encoders tho
         backCurrentTicks = backEncoder.getCurrentPosition();
         leftCurrentTicks = leftEncoder.getCurrentPosition();
         rightCurrentTicks = rightEncoder.getCurrentPosition();
 
         boolean corrected = true;
-        if (allianceColor == MM_OpMode.BLUE) {
+        if (opMode.alliance == MM_OpMode.BLUE) {
             int direction = 0;
             if (leftTapeSensor.blue() < 300) {
                 strafe(RIGHT);

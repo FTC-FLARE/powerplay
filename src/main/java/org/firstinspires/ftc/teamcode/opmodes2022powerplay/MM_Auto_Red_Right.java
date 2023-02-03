@@ -25,6 +25,7 @@ public class MM_Auto_Red_Right extends MM_OpMode {
     @Override
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        alliance = MM_EOCVDetection.RED;
 
         telemetry.addData("Status", "Wait for initialization");
         telemetry.update();
@@ -47,32 +48,32 @@ public class MM_Auto_Red_Right extends MM_OpMode {
         robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.DETECT);
         int sleeveColor = detector.getMaxColor();
         //check to see if you can see color during init with a cone
-        robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.LOW.ticks, 15, 2, MM_Drivetrain.STRAFE, 70, 6, true); //test
+        robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.LOW.ticks, 15, 2, MM_Drivetrain.STRAFE, 70, 6, true, false); //test
         robot.lift.scoreCone();
-        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 41, -1.5, 2, 0,8, false );
+        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 41, -1.5, 2, 0,8, false, false);
         robot.drivetrain.driveInches(-4);
         robot.drivetrain.rotateToAngle(-90);
         robot.drivetrain.driveInches(23);
         robot.drivetrain.rotateToMicroscopicAngle(-90);
         robot.drivetrain.resetEncoders();
-        robot.drivetrain.correctForTape(MM_EOCVDetection.RED);
+        robot.drivetrain.correctForTape();
         if (!robot.drivetrain.correctForCone()) {
             robot.parkFromStack(sleeveColor, false);
         } else {
             robot.lift.autoStackCollect(5, false);
             robot.drivetrain.resetEncoders();
-            robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.LOW.ticks, -21, -12, MM_Drivetrain.STRAFE, 90, 7, false);
+            robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.LOW.ticks, -21, -12, MM_Drivetrain.STRAFE, 90, 7, false, false);
             robot.lift.scoreCone();
             robot.drivetrain.driveInches(-8);
-            robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 23, 14, 2, 0, 7, false);
-            robot.drivetrain.correctForTape(MM_EOCVDetection.RED);
+            robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 23, 14, 2, 0, 7, false, false);
+            robot.drivetrain.correctForTape();
             if (!robot.drivetrain.correctForCone()) {
                 robot.parkFromStack(sleeveColor, false);
             } else {
                 robot.lift.autoStackCollect(4, false);
                 robot.lift.turner.changePosition(MM_Turner.BACK);
                 robot.drivetrain.resetEncoders();
-                robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -25, -12.2, MM_Drivetrain.STRAFE, 90, 7, false);
+                robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -25, -12.2, MM_Drivetrain.STRAFE, 90, 7, false, false);
                 robot.lift.scoreCone();
                 robot.drivetrain.strafeInches(13);
                 robot.parkFromJunction(sleeveColor, false);

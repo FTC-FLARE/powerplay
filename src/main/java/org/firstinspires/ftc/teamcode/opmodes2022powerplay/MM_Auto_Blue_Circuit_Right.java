@@ -47,15 +47,15 @@ public class MM_Auto_Blue_Circuit_Right extends MM_OpMode {
         robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.DETECT);
         int sleeveColor = detector.getMaxColor();
         //check to see if you can see color during init with a cone
-        robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.LOW.ticks, 15, 2, MM_Drivetrain.STRAFE, 70, 6, true); //test
+        robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.LOW.ticks, 15, 2, MM_Drivetrain.STRAFE, 70, 6, true, false); //test
         robot.lift.scoreCone();
-        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 41, -1.5, 2, 0,8, false );
+        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 41, -1.5, 2, 0,8, false, false);
         robot.drivetrain.driveInches(-4);
         robot.drivetrain.rotateToAngle(-90);
         robot.drivetrain.driveInches(23);
         robot.drivetrain.rotateToMicroscopicAngle(-90);
         robot.drivetrain.resetEncoders();
-        robot.drivetrain.correctForTape(MM_EOCVDetection.BLUE);
+        robot.drivetrain.correctForTape();
         if (!robot.drivetrain.correctForCone()) {
             robot.parkFromStack(sleeveColor, false);
         } else {
@@ -68,14 +68,14 @@ public class MM_Auto_Blue_Circuit_Right extends MM_OpMode {
             robot.runSlideandStrafe(robot.lift.slide.stackTicks(5), 50, 6, false);
             robot.drivetrain.rotateToMicroscopicAngle(-90);
             robot.drivetrain.microscopicDriveInches(-1);
-            robot.drivetrain.correctForTape(MM_EOCVDetection.BLUE);
+            robot.drivetrain.correctForTape();
             if (!robot.drivetrain.correctForCone()) {
                 robot.parkFromStack(sleeveColor, false);
             } else {
                 robot.lift.autoStackCollect(4, false);
                 robot.lift.turner.changePosition(MM_Turner.BACK);
                 robot.drivetrain.resetEncoders();
-                robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.HIGH.ticks, -48, -11.25, MM_Drivetrain.STRAFE, 92, 7, false);
+                robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.HIGH.ticks, -48, -11.25, MM_Drivetrain.STRAFE, 92, 7, false, false);
                 robot.drivetrain.getScorerOutOfTheWay();
                 robot.lift.scoreCone();
                 robot.drivetrain.strafeInches(13);

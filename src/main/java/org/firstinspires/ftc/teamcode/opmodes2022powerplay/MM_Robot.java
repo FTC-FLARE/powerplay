@@ -24,11 +24,11 @@ public class MM_Robot {
     public void parkFromJunction(int maxColor, boolean left) {
         if (left) {
             if (maxColor == MM_EOCVDetection.RED) {
-                runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, 35, -1, 2, 0,5,false);
+                runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, 35, -1, 2, 0,5,false, false);
             } else if (maxColor == MM_EOCVDetection.BLUE) {
-                runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, 9, -1, 2, 0,5,false);
+                runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, 9, -1, 2, 0,5,false, false);
             } else {
-                runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, -16, -1, 2, 0,5,false);
+                runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, -16, -1, 2, 0,5,false, false);
             }
         } else {
             if (maxColor == MM_EOCVDetection.YELLOW) {
@@ -138,8 +138,8 @@ public class MM_Robot {
         }
     }
 
-    public void runSlideandDiagonalDrive(int ticks, double forwardInches, double strafeInches, int move, int kickInPercent, double timeoutTime, boolean flipTurner) {
-        drivetrain.prepareToDiagonalDrive(forwardInches, strafeInches, kickInPercent, move);
+    public void runSlideandDiagonalDrive(int ticks, double forwardInches, double strafeInches, int move, int kickInPercent, double timeoutTime, boolean flipTurner, boolean colorKickOut) {
+        drivetrain.prepareToDiagonalDrive(forwardInches, strafeInches, kickInPercent, move, colorKickOut);
         lift.slide.moveTowardTarget(ticks);
 
         boolean driveDone = false;

@@ -37,69 +37,11 @@ public class MM_Auto_Test extends MM_OpMode {
         telemetry.update();
         waitForStart();
         totalTime.reset();
-        int sleeveColor = detector.getMaxColor();
-        robot.lift.chomper.release();
-        robot.drivetrain.microscopicDriveInches(1.40);
-        robot.drivetrain.strafeInches(-8);
-        robot.drivetrain.autoScore();
-        while (opModeIsActive() && runtime.seconds() < 0.3) {
-        }
-        robot.drivetrain.diagonalDriveInches(2, 8);
-        robot.drivetrain.rotateToAngle(90); //1/25 - -56.75 under this
-        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 24.5, -57.5, MM_Drivetrain.DRIVE, 70, 8, false);
-        robot.drivetrain.rotateToMicroscopicAngle(90);
-        robot.drivetrain.correctForTape(MM_OpMode.RED);
-        if (!robot.drivetrain.correctForCone()) {
-            robot.parkFromStack(sleeveColor, true);
-        } else {
-            robot.drivetrain.resetEncoders();
-            robot.lift.autoStackCollect(5, true);
-            robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -10.5,4, false);
-            robot.drivetrain.rotateToMicroscopicAngle(90);
-            robot.drivetrain.microscopicStrafeInches(2.5);
-            robot.lift.scoreCone();
-            robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 10.2, -1, 2, 0,5,false);
-            robot.drivetrain.rotateToMicroscopicAngle(90);
-            robot.drivetrain.correctForTape(MM_OpMode.RED);
-            if (!robot.drivetrain.correctForCone()) {
-                robot.parkFromStack(sleeveColor, true);
-            } else {
-                robot.lift.autoStackCollect(4, true);
-                robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -10.2,4, false);
-                robot.drivetrain.rotateToMicroscopicAngle(90);
-                robot.drivetrain.microscopicStrafeInches(2.5);
-                robot.lift.scoreCone();
-                robot.drivetrain.resetEncoders();
-                robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 9.2, -1, 2, 0,5,false);
-                robot.drivetrain.rotateToMicroscopicAngle(90);
-                robot.drivetrain.correctForTape(MM_OpMode.RED);
-                if (!robot.drivetrain.correctForCone()) { //add another parameter to check for time because being parked is more worth
-                    robot.parkFromStack(sleeveColor, true);
-                } else {
-                    robot.lift.autoStackCollect(3, true);
-                    robot.drivetrain.resetEncoders();
-                    if (!robot.timeToScore(totalTime.seconds(), sleeveColor)) {
-                        robot.parkFromStack(sleeveColor, true);
-                    } else {
-                        robot.drivetrain.microscopicStrafeInches(0.9);
-                        robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, -34.2, 5, false);
-                        if (robot.timedOut() && robot.drivetrain.stuckOnCone()) {
-                            robot.drivetrain.strafe(1); //left
-                            runtime.reset();
-                            while (opModeIsActive() && runtime.seconds() < 2) {
-                            }
-                        } else {
-                            robot.drivetrain.rotateToMicroscopicAngle(90);
-                            robot.lift.scoreCone();
-                            robot.drivetrain.resetEncoders();
-                        }
-                        robot.parkFromJunction(sleeveColor, true);
-                    }
-                }
-            }
-        }
+        robot.drivetrain.prepareToDrive(24);
+        robot.drivetrain.driveToStack();
         //start collection code
     }
+
     private void initCamera() {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
