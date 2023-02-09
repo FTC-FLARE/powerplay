@@ -42,6 +42,12 @@ public class MM_Robot {
         lift.chomper.choke();
     }
 
+    public void driveToStack() {
+        if (opMode.startingPosition == MM_OpMode.LEFT) {
+            runSlideandDiagonalDrive(lift.slide.stackTicks(5), 22, -57.5, MM_Drivetrain.DRIVE, 70, 8, false, true);
+        }
+    }
+
     public void parkFromStack(int maxColor, boolean left) {
         drivetrain.resetEncoders();
         lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_POSITION);

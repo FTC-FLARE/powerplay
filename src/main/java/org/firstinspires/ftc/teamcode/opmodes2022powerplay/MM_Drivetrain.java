@@ -896,11 +896,6 @@ public class MM_Drivetrain {
         switchEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         switchEncoderMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-
-        imu = opMode.hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
-
         distance = opMode.hardwareMap.get(DistanceSensor.class, "coneSensor");
         rightTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "rightTapeSensor");
         leftTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "leftTapeSensor");
@@ -921,6 +916,16 @@ public class MM_Drivetrain {
             scorer = opMode.hardwareMap.get(Servo.class, "floppyServo");
             scorer.setPosition(1);
         }
+    }
+
+    public void initializeGyroAndEncoders() {
+        BNO055IMU.Parameters gyroParameters = new BNO055IMU.Parameters();
+        gyroParameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        gyroParameters.calibrationDataFile = "BNO055IMUCalibration.json";
+
+        imu  = opMode.hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(gyroParameters);
+        resetEncoders();
     }
 
     public void autoScore() {

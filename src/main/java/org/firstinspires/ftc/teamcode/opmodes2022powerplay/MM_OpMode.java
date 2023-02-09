@@ -27,8 +27,11 @@ public abstract class MM_OpMode extends LinearOpMode {
     static final int GAMEPAD2 = 1;
     static final int BLUE = 1;
     static final int RED = 0;
+    static final int LEFT = 0;
+    static final int RIGHT = 1;
 
     public int alliance = RED;
+    public int startingPosition = LEFT;
 
     private final ElapsedTime runtime = new ElapsedTime();
 
