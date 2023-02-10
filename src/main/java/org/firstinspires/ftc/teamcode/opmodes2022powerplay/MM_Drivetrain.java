@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcontroller.external.samples.SensorColor;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -153,22 +152,12 @@ public class MM_Drivetrain {
         }
     }
 
-    public void driveToStack() {
+    public void followTapeToStack() {
         prepareToTapeDrive();
         runtime.reset();
         while (opMode.opModeIsActive() && runtime.seconds() < 5 && !reachedPositionTapeDrive()) {
             opMode.telemetry.update();
         }
-/*        if ((opMode.pLeftDiagDriveController.reachedTarget() || opMode.pRightDiagDriveController.reachedTarget() || opMode.pLeftDriveController.reachedTarget() || opMode.pRightDriveController.reachedTarget()) && opMode.pBackDriveController.reachedTarget()) {
-            correctForTape();
-            correctForCone();
-        } else {
-            prepareToTapeDrive();
-            runtime.reset();
-            while (opMode.opModeIsActive() && runtime.seconds() < 5 && !reachedPositionTape()) {
-                opMode.telemetry.update();
-            }
-        }*/
     }
 
     public void prepareToDrive(double inches) {

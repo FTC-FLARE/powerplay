@@ -38,7 +38,7 @@ public class MM_Auto_Test extends MM_OpMode {
         waitForStart();
         totalTime.reset();
         robot.drivetrain.prepareToDrive(24);
-        robot.drivetrain.driveToStack();
+        robot.drivetrain.followTapeToStack();
         //start collection code
     }
 

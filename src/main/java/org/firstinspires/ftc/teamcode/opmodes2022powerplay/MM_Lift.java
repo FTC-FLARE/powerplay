@@ -13,12 +13,12 @@ public class MM_Lift {
         turner = new MM_Turner(opMode);
     }
 
-    public void autoStackCollect(int stackLevel, boolean left){
+    public void autoStackCollect(int stackLevel){
         slide.waitToReachPosition(slide.lowerStackTicks(stackLevel));
         chomper.choke();
         opMode.waitSeconds(0.25);
         slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
-        if (left) {
+        if (opMode.startingPosition == MM_OpMode.LEFT) {
             turner.changePosition(MM_Turner.SIDE);
         }
     }

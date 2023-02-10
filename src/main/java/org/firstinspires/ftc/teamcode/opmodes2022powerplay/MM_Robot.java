@@ -14,8 +14,14 @@ public class MM_Robot {
     static final double MIN_ROTATE_POWER = 0.24;
     static final double MAX_ROTATE_POWER = 0.6;
 
+    static final int HIGH = 2;
+    static final int MEDIUM = 1;
+    static final int LOW = 0;
+
     ElapsedTime runtime = new ElapsedTime();
     private boolean timedOut = false;
+    private int conesScored = 0;
+    private int lastScored = 0;
 
     public MM_Robot(MM_OpMode opMode){
         this.opMode = opMode;
@@ -42,10 +48,42 @@ public class MM_Robot {
         lift.chomper.choke();
     }
 
-    public void driveToStack() {
-        if (opMode.startingPosition == MM_OpMode.LEFT) {
-            runSlideandDiagonalDrive(lift.slide.stackTicks(5), 22, -57.5, MM_Drivetrain.DRIVE, 70, 8, false, true);
+    public void collectFromStack() {
+        if (conesScored == 0) {
+            if (opMode.startingPosition == MM_OpMode.LEFT) {
+                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 22, -63.5, MM_Drivetrain.DRIVE, 75, 8, false, true);
+            } else {
+
+            }
+        } else {
+            if (lastScored == LOW) {
+                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 10.2, -6, 2, 0,5,false, true);
+            } else if (lastScored == MEDIUM) {
+                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 34.2, -6, 2, 0,5,false, true);
+            } else {
+                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 58.2, -6, 2, 0, 5, false, true);
+            }
         }
+        drivetrain.followTapeToStack();
+        if (!drivetrain.correctForCone()) { //TODO NEW METHOD THAT CHECKS DISTANCE FOR CONE FOR FAILSAFE
+
+        } else {
+            drivetrain.rotateToMicroscopicAngle(90);
+            lift.autoStackCollect(5 - conesScored);
+        }
+    }
+
+    public void scoreOnJuntion(int scoreTarget) {
+        if (scoreTarget == LOW) {
+
+        } else if (scoreTarget == MEDIUM) {
+
+        } else {
+
+        }
+        //distance sensor line up
+        lift.scoreCone();
+        lastScored = scoreTarget;
     }
 
     public void parkFromStack(int maxColor, boolean left) {

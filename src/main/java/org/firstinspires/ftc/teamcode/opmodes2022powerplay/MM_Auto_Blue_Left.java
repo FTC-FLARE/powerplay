@@ -51,7 +51,7 @@ public class MM_Auto_Blue_Left extends MM_OpMode {
             robot.parkFromStack(sleeveColor, true);
         } else {
             robot.drivetrain.resetEncoders();
-            robot.lift.autoStackCollect(5, true);
+            robot.lift.autoStackCollect(5);
             robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -10.5,4, false);
             robot.drivetrain.rotateToMicroscopicAngle(90);
             robot.drivetrain.microscopicStrafeInches(2.5);
@@ -62,7 +62,7 @@ public class MM_Auto_Blue_Left extends MM_OpMode {
             if (!robot.drivetrain.correctForCone()) {
                 robot.parkFromStack(sleeveColor, true);
             } else {
-                robot.lift.autoStackCollect(4, true);
+                robot.lift.autoStackCollect(4);
                 robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -10.2,4, false);
                 robot.drivetrain.rotateToMicroscopicAngle(90);
                 robot.drivetrain.microscopicStrafeInches(2.5);
@@ -74,7 +74,7 @@ public class MM_Auto_Blue_Left extends MM_OpMode {
                 if (!robot.drivetrain.correctForCone()) { //add another parameter to check for time because being parked is more worth
                     robot.parkFromStack(sleeveColor, true);
                 } else {
-                    robot.lift.autoStackCollect(3, true);
+                    robot.lift.autoStackCollect(3);
                     robot.drivetrain.resetEncoders();
                     if (!robot.timeToScore(totalTime.seconds(), sleeveColor)) {
                         robot.parkFromStack(sleeveColor, true);

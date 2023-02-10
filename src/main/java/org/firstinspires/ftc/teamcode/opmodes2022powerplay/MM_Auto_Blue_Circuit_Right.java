@@ -59,7 +59,7 @@ public class MM_Auto_Blue_Circuit_Right extends MM_OpMode {
         if (!robot.drivetrain.correctForCone()) {
             robot.parkFromStack(sleeveColor, false);
         } else {
-            robot.lift.autoStackCollect(5, false);
+            robot.lift.autoStackCollect(5);
             robot.drivetrain.resetEncoders();
             robot.drivetrain.strafeInches(-4);
             robot.runSlideandStrafe(MM_Slide.SlidePosition.COLLECT.ticks, -44, 6, false);
@@ -72,7 +72,7 @@ public class MM_Auto_Blue_Circuit_Right extends MM_OpMode {
             if (!robot.drivetrain.correctForCone()) {
                 robot.parkFromStack(sleeveColor, false);
             } else {
-                robot.lift.autoStackCollect(4, false);
+                robot.lift.autoStackCollect(4);
                 robot.lift.turner.changePosition(MM_Turner.BACK);
                 robot.drivetrain.resetEncoders();
                 robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.HIGH.ticks, -48, -11.25, MM_Drivetrain.STRAFE, 92, 7, false, false);

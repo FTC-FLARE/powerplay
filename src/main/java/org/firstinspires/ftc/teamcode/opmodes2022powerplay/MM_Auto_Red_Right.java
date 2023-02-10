@@ -60,7 +60,7 @@ public class MM_Auto_Red_Right extends MM_OpMode {
         if (!robot.drivetrain.correctForCone()) {
             robot.parkFromStack(sleeveColor, false);
         } else {
-            robot.lift.autoStackCollect(5, false);
+            robot.lift.autoStackCollect(5);
             robot.drivetrain.resetEncoders();
             robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.LOW.ticks, -21, -12, MM_Drivetrain.STRAFE, 90, 7, false, false);
             robot.lift.scoreCone();
@@ -70,7 +70,7 @@ public class MM_Auto_Red_Right extends MM_OpMode {
             if (!robot.drivetrain.correctForCone()) {
                 robot.parkFromStack(sleeveColor, false);
             } else {
-                robot.lift.autoStackCollect(4, false);
+                robot.lift.autoStackCollect(4);
                 robot.lift.turner.changePosition(MM_Turner.BACK);
                 robot.drivetrain.resetEncoders();
                 robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -25, -12.2, MM_Drivetrain.STRAFE, 90, 7, false, false);
