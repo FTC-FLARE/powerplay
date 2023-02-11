@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -143,5 +144,13 @@ public abstract class MM_OpMode extends LinearOpMode {
         runtime.reset();
         while (opModeIsActive() && runtime.seconds() < seconds){
         }
+    }
+    public void updateController() {
+        try{
+            gamepad1Prior.copy(gamepad1Current);
+            gamepad1Current.copy(gamepad1);
+            gamepad2Prior.copy(gamepad2Current);
+            gamepad2Current.copy(gamepad2);
+        } catch(RobotCoreException e){}
     }
 }

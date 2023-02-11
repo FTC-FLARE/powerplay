@@ -23,13 +23,4 @@ public class MM_TeleOp extends MM_OpMode {
             telemetry.update();
         }
     }
-
-    private void updateController() {
-        try{
-            gamepad1Prior.copy(gamepad1Current);
-            gamepad1Current.copy(gamepad1);
-            gamepad2Prior.copy(gamepad2Current);
-            gamepad2Current.copy(gamepad2);
-        } catch(RobotCoreException e){}
-    }
 }
