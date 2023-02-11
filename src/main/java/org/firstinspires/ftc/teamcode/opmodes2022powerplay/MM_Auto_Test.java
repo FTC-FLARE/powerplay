@@ -12,7 +12,6 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-@Disabled
 @Config
 @Autonomous(name="MM_Auto_Test", group="MM")
 public class MM_Auto_Test extends MM_OpMode {
@@ -32,13 +31,17 @@ public class MM_Auto_Test extends MM_OpMode {
         telemetry.update();
         initCamera();
         robot.init();
+        robot.lift.chomper.release();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
         totalTime.reset();
-        robot.drivetrain.prepareToDrive(24);
-        robot.drivetrain.followTapeToStack();
+        robot.drivetrain.initializeGyroAndEncoders();
+        robot.drivetrain.strafeInches(-15);
+        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 26, -38, MM_Drivetrain.DRIVE, 96,6, false, true);
+        robot.drivetrain.correctForTape();
+        robot.lift.autoStackCollect(5);
         //start collection code
     }
 

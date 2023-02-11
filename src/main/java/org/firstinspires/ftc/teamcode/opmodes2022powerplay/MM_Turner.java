@@ -11,10 +11,10 @@ public class MM_Turner{
     static final double FRONT = 0.885;
     static final double SIDE = 0.5325;
     static final double BACK = 0;
-    static final double FRONT_TURN_INCREMENT = 0.03;
-    static final double SIDE_TURN_INCREMENT_BACK = 0.03;
-    static final double SIDE_TURN_INCREMENT_FRONT = -0.03;
-    static final double BACK_TURN_INCREMENT = -0.03;
+    static final double FRONT_TURN_INCREMENT = 0.031;
+    static final double SIDE_TURN_INCREMENT_BACK = 0.0301;
+    static final double SIDE_TURN_INCREMENT_FRONT = -0.0302;
+    static final double BACK_TURN_INCREMENT = -0.0303;
 
     private final ElapsedTime timer = new ElapsedTime();
     private boolean isMoving = false;

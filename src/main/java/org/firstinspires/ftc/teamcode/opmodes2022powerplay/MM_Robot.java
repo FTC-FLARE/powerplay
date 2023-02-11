@@ -73,7 +73,7 @@ public class MM_Robot {
         }
     }
 
-    public void scoreOnJuntion(int scoreTarget) {
+    public void scoreOnJunction(int scoreTarget) {
         if (scoreTarget == LOW) {
 
         } else if (scoreTarget == MEDIUM) {
@@ -81,9 +81,11 @@ public class MM_Robot {
         } else {
 
         }
-        //distance sensor line up
-        lift.scoreCone();
-        lastScored = scoreTarget;
+        if (drivetrain.alignedWithJunction()) {
+            lift.scoreCone();
+            lastScored = scoreTarget;
+        }
+
     }
 
     public void parkFromStack(int maxColor, boolean left) {
@@ -98,7 +100,7 @@ public class MM_Robot {
                 drivetrain.driveInches(-48);
                 if (drivetrain.stuckOnCone()) {
                     drivetrain.strafe(1);
-                    drivetrain.diagonalDriveInches(0, 0, MM_Drivetrain.STRAFE, 50);
+                    drivetrain.diagonalDriveInches(0, 0, MM_Drivetrain.STRAFE, 50, false);
                 }
             } else {
                 drivetrain.microscopicStrafeInches(-1);
@@ -113,7 +115,7 @@ public class MM_Robot {
                 drivetrain.driveInches(-48);
                 if (drivetrain.stuckOnCone()) {
                     drivetrain.strafe(1);
-                    drivetrain.diagonalDriveInches(0, 0, MM_Drivetrain.STRAFE, 50);
+                    drivetrain.diagonalDriveInches(0, 0, MM_Drivetrain.STRAFE, 50, false);
                 }
             } else {
                 drivetrain.microscopicStrafeInches(-1);
@@ -182,16 +184,24 @@ public class MM_Robot {
         }
     }
 
-    public void runSlideandDiagonalDrive(int ticks, double forwardInches, double strafeInches, int move, int kickInPercent, double timeoutTime, boolean flipTurner, boolean colorKickOut) {
+    public void runSlideandDiagonalDrive(int slideTicks, double forwardInches, double strafeInches, int move, int kickInPercent, double timeoutTime, boolean flipTurner, boolean colorKickOut) {
         drivetrain.prepareToDiagonalDrive(forwardInches, strafeInches, kickInPercent, move, colorKickOut);
-        lift.slide.moveTowardTarget(ticks);
+        if (colorKickOut) {
+            drivetrain.prepareToTapeDrive();
+        }
+        lift.slide.moveTowardTarget(slideTicks);
 
         boolean driveDone = false;
+        boolean tapeDone = !colorKickOut;
         boolean slideDone = false;
         runtime.reset();
 
-        while (opMode.opModeIsActive() && (!driveDone || !slideDone) && runtime.seconds() < timeoutTime) {
-            driveDone = drivetrain.reachedPositionDiagonalDrive();
+        while (opMode.opModeIsActive() && (!driveDone || !slideDone || !tapeDone) && runtime.seconds() < timeoutTime) {
+            if (!tapeDone && driveDone) {
+                tapeDone = drivetrain.reachedPositionTapeDrive();
+            } else {
+                driveDone = drivetrain.reachedPositionDiagonalDrive();
+            }
 
             if (flipTurner) {
                 if (!slideDone) {
@@ -202,7 +212,10 @@ public class MM_Robot {
             }
             opMode.telemetry.addData("forward inches target", forwardInches);
             opMode.telemetry.addData("strafe inches target", strafeInches);
-            opMode.telemetry.addData("slide target", ticks);
+            opMode.telemetry.addData("slide target", slideTicks);
+            opMode.telemetry.addData("robot drive done", driveDone);
+            opMode.telemetry.addData("robot slide done", slideDone);
+            opMode.telemetry.addData("robot tape done", tapeDone);
             opMode.telemetry.update();
         }
         timedOut = (slideDone && driveDone);

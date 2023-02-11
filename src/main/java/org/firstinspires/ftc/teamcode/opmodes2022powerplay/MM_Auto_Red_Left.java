@@ -31,6 +31,7 @@ public class MM_Auto_Red_Left extends MM_OpMode {
         telemetry.update();
         initCamera();
         robot.init();
+        robot.drivetrain.initializeGyroAndEncoders();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -45,7 +46,7 @@ public class MM_Auto_Red_Left extends MM_OpMode {
         }
         robot.drivetrain.diagonalDriveInches(2, 8);
         robot.drivetrain.rotateToAngle(90); //1/25 - -56.75 under this
-        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 22, -57.5, MM_Drivetrain.DRIVE, 70, 8, false, true);
+        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 22, -57.5, MM_Drivetrain.DRIVE, 70, 8, false, false);
         robot.drivetrain.rotateToMicroscopicAngle(90);
         robot.drivetrain.correctForTape();
         if (!robot.drivetrain.correctForCone()) {

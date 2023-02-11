@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -46,7 +47,7 @@ public class MM_Drivetrain {
     private static final double STRAIGHTEN_P = .0840; //.0780
     private static final double STRAFE_P = .089;
     private static final double CORRECTION_COEFFICIENT = 0.000055; //Gain per tick
-    private static final double DISTANCE_P_COEFFICIENT = 0.013;
+    private static final double DISTANCE_P_COEFFICIENT = 0.01175;
     public static final double SLOW_MULTIPLIER = 0.65;
     public static final double SUPER_SLOW_MULTIPLIER = 0.35;
     public static final double MIN_DRIVE_POWER = 0.16;
@@ -61,8 +62,8 @@ public class MM_Drivetrain {
     public static final int DRIVE = 0;
     public static final int STRAFE = 1;
 
-    private static final double LEFT_TAPE_RED = 280;
-    private static final double RIGHT_TAPE_RED = 300;
+    private static final double LEFT_TAPE_RED = 630;
+    private static final double RIGHT_TAPE_RED = 650;
     private static final double LEFT_TAPE_BLUE = 300;
     private static final double RIGHT_TAPE_BLUE = 320;
 
@@ -96,7 +97,7 @@ public class MM_Drivetrain {
 
     private double leftTapeVal = 0;
     private double rightTapeVal = 0;
-    private boolean tapeHandled = false;
+    private boolean beenOnTapeOnce = false;
     public MM_Drivetrain(MM_OpMode opMode) {
         this.opMode = opMode;
         init();
@@ -121,11 +122,11 @@ public class MM_Drivetrain {
     }
 
     public void diagonalDriveInches(double forwardInches, double strafeInches) {
-        diagonalDriveInches(forwardInches, strafeInches, 100,0);
+        diagonalDriveInches(forwardInches, strafeInches, 100,0, false);
     }
 
-    public void diagonalDriveInches(double forwardInches, double strafeInches, int move, int percentKickIn) {
-        prepareToDiagonalDrive(forwardInches, strafeInches, percentKickIn, move, false);
+    public void diagonalDriveInches(double forwardInches, double strafeInches, int move, int percentKickIn, boolean colorKickOut) {
+        prepareToDiagonalDrive(forwardInches, strafeInches, percentKickIn, move, colorKickOut);
         runtime.reset();
         while (opMode.opModeIsActive() && runtime.seconds() < 10 && !reachedPositionDiagonalDrive()) {
             opMode.telemetry.addData("forward inches target", forwardInches);
@@ -190,7 +191,7 @@ public class MM_Drivetrain {
             } else {
                 direction = LEFT;
             }
-            kickInTicks = (kickInPercent/100) * (backTargetTicks - backPriorEncoderTarget) + backPriorEncoderTarget;
+            kickInTicks = ((kickInPercent) * (backTargetTicks - backPriorEncoderTarget) + backPriorEncoderTarget)/100;
             strafing = true;
             driving = false;
         } else if (secondMove == STRAFE) {
@@ -199,7 +200,7 @@ public class MM_Drivetrain {
             } else {
                 direction = FORWARD;
             }
-            kickInTicks = (kickInPercent/100) * (leftTargetTicks - leftPriorEncoderTarget) + leftPriorEncoderTarget;
+            kickInTicks = ((kickInPercent) * (leftTargetTicks - leftPriorEncoderTarget) + leftPriorEncoderTarget)/100;
             strafing = false;
             driving = true;
         } else {
@@ -225,7 +226,7 @@ public class MM_Drivetrain {
     }
 
     public void prepareToTapeDrive() {
-        tapeHandled = false;
+        beenOnTapeOnce = false;
     }
 
     public boolean reachedPositionDrive() { //this also sets the motor power
@@ -249,9 +250,6 @@ public class MM_Drivetrain {
     public boolean reachedPositionDiagonalDrive() {
         setDiagonalPower();
 
-        if (colorKickOut) {
-            return checkColors();
-        }
         if (strafing) {
             strafing = !opMode.pBackDriveController.reachedTarget();
         }
@@ -271,6 +269,11 @@ public class MM_Drivetrain {
             }
         }
 
+        if (driving) {
+            if (colorKickOut) {
+                return checkColors();
+            }
+        }
         if (!driving && !strafing) {
             stop();
             return true;
@@ -300,7 +303,7 @@ public class MM_Drivetrain {
     public boolean reachedPositionTapeDrive() {
         setTapePower();
         double frontDistance = getFrontDistance();
-        if (frontDistance < 4.2 && frontDistance > 3.2) {
+        if (frontDistance < 4.7 && frontDistance > 3.2) {
             stop();
             return true;
         }
@@ -403,16 +406,18 @@ public class MM_Drivetrain {
     }
     
     private void setTapePower() {
-        if (tapeHandled) {
+        if (beenOnTapeOnce) {
             double frontDistance = getFrontDistance();
-            double power = (getFrontDistance() * DISTANCE_P_COEFFICIENT) + MIN_DRIVE_POWER;
+            double power = Range.clip((getFrontDistance() * DISTANCE_P_COEFFICIENT) + 0.0625, 0.09, 0.3);
             if (frontDistance < 3.2) {
                 power *= -1;
             }
             setPowerVariables(power, power, power, power);
+            leftDrivePower = 0;
+            rightDrivePower = 0;
         } else {
-            leftDrivePower = opMode.pLeftDriveController.calculatePower(leftEncoder.getCurrentPosition());
-            rightDrivePower = opMode.pRightDriveController.calculatePower(rightEncoder.getCurrentPosition());
+            leftDrivePower = (opMode.pLeftDriveController.calculatePower(leftEncoder.getCurrentPosition()))/1.3;
+            rightDrivePower = (opMode.pRightDriveController.calculatePower(rightEncoder.getCurrentPosition()))/1.3;
             setPowerVariables(leftDrivePower, rightDrivePower, leftDrivePower, rightDrivePower);
         }
         correctForTape2();
@@ -456,6 +461,9 @@ public class MM_Drivetrain {
         }else {
             setMotorPower(flPower, frPower, blPower, brPower);
         }
+
+        opMode.telemetry.addData("left color", leftTapeSensor.red());
+        opMode.telemetry.addData("right color", rightTapeSensor.red());
 
     }
 
@@ -562,11 +570,17 @@ public class MM_Drivetrain {
 
     private void correctForTape2() {
         double correctPower = tapeCorrectPower(tapeError(LEFT), tapeError(RIGHT));
+        if (correctPower != 0) {
+            flPower += correctPower;
+            frPower -= correctPower;
+            blPower -= correctPower;
+            brPower += correctPower;
 
-        flPower += correctPower;
-        frPower -= correctPower;
-        blPower -= correctPower;
-        brPower += correctPower;
+            flPower /= 1.05;
+            frPower /= 1.05;
+            blPower /= 1.05;
+            brPower /= 1.05;
+        }
     }
 
     private double tapeError(int sensorSide) {
@@ -587,16 +601,19 @@ public class MM_Drivetrain {
         if (leftDifference > 0 || rightDifference > 0) {
             correctPower = 0.2;
             double comparedError = Math.abs(leftDifference - rightDifference);
-            if (comparedError < 40) {
+            if (comparedError < 80) {
                 if (leftDifference < 120) {
-                    correctPower = -0.05;
+                    correctPower = 0.075;
+                    if (leftDifference > rightDifference) {
+                        correctPower = -correctPower;
+                    }
                 }
-            } else if (comparedError < 80) {
+            } else if (comparedError < 160) {
                 correctPower = 0.1;
-                if (leftDifference > rightDifference) {
+            if (leftDifference > rightDifference) {
                     correctPower = -correctPower;
                 }
-            } else if (comparedError < 120) {
+            } else if (comparedError < 240) {
                 correctPower = 0.15;
                 if (leftDifference > rightDifference) {
                     correctPower = -correctPower;
@@ -605,16 +622,16 @@ public class MM_Drivetrain {
                 correctPower = -correctPower;
             }
         } else {
-            tapeHandled = true;
+            beenOnTapeOnce = true;
         }
         return correctPower;
     }
 
     private boolean checkColors() {
         if (opMode.alliance == MM_EOCVDetection.BLUE) {
-            return (leftTapeSensor.blue() > 200 || rightTapeSensor.blue() > 220);
+            return (leftTapeSensor.blue() > 500 || rightTapeSensor.blue() > 500);
         } else {
-            return (leftTapeSensor.red() > 180 || rightTapeSensor.red() > 200);
+            return (leftTapeSensor.red() > 500 || rightTapeSensor.red() > 500);
         }
     }
 
@@ -649,24 +666,24 @@ public class MM_Drivetrain {
         return distance.getDistance(DistanceUnit.INCH) < 5;
     }
 
-    public boolean correctForJunction(int direction) {
-        strafe(direction);
-        runtime.reset();
-        double startingDistance = distance.getDistance(DistanceUnit.INCH);
-        double currentDistance = startingDistance;
-        while (opMode.opModeIsActive() && runtime.seconds() < 3) {
-            if(currentDistance > 5){
-                if (runtime.seconds() > 1.5 ) {
-                    strafe(-direction);
+    public boolean alignedWithJunction() {
+        if (!withinJunctionRange()) {
+            runtime.reset();
+            double startingDistance = distance.getDistance(DistanceUnit.INCH);
+            double currentDistance = startingDistance;
+            strafe(LEFT);
+            while (opMode.opModeIsActive() && runtime.seconds() < 1.5) {
+                if(currentDistance > 5){
+                }else{
+                    stop();
+                    return true;
                 }
-            }else{
-                stop();
-                return true;
+                currentDistance = distance.getDistance(DistanceUnit.INCH);
             }
-            currentDistance = distance.getDistance(DistanceUnit.INCH);
+            stop();
+            return false;
         }
-        stop();
-        return false;
+        return true;
     }
 
     public boolean correctForCone() {
