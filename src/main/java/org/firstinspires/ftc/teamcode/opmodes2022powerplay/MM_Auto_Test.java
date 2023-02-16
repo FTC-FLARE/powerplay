@@ -31,18 +31,27 @@ public class MM_Auto_Test extends MM_OpMode {
         telemetry.update();
         initCamera();
         robot.init();
+        robot.drivetrain.initializeGyroAndEncoders();
         robot.lift.chomper.release();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+
         waitForStart();
+
+        alliance = BLUE;
+
         totalTime.reset();
-        robot.drivetrain.initializeGyroAndEncoders();
-        robot.drivetrain.strafeInches(-15);
-        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 26, -38, MM_Drivetrain.DRIVE, 96,6, false, true);
-        robot.drivetrain.correctForTape();
-        robot.lift.autoStackCollect(5);
+        robot.drivetrain.prepareToDrive(36);
+        robot.drivetrain.followTapeToStack();
         //start collection code
+
+        while (opModeIsActive()){
+            telemetry.addData("Distance", robot.drivetrain.getFrontDistance());
+            telemetry.addData("Left Blueness", robot.drivetrain.tempGetLeftBlue());
+            telemetry.addData("Right Blueness", robot.drivetrain.tempGetRightBlue());
+            telemetry.update();
+        }
     }
 
     private void initCamera() {

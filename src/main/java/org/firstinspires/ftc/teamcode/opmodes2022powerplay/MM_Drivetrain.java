@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -47,7 +46,8 @@ public class MM_Drivetrain {
     private static final double STRAIGHTEN_P = .0840; //.0780
     private static final double STRAFE_P = .089;
     private static final double CORRECTION_COEFFICIENT = 0.000055; //Gain per tick
-    private static final double DISTANCE_P_COEFFICIENT = 0.01175;
+    private static final double DISTANCE_P_COEFFICIENT = 0.0125;
+    private static final double TAPE_P_COEFFICIENT = 0.000677; // .000377
     public static final double SLOW_MULTIPLIER = 0.65;
     public static final double SUPER_SLOW_MULTIPLIER = 0.35;
     public static final double MIN_DRIVE_POWER = 0.16;
@@ -66,6 +66,14 @@ public class MM_Drivetrain {
     private static final double RIGHT_TAPE_RED = 650;
     private static final double LEFT_TAPE_BLUE = 300;
     private static final double RIGHT_TAPE_BLUE = 320;
+    private static final int TAPE_BLUE = 360;
+    private static final int TAPE_RED = 360;  // Need correct value
+    private final int ALLIANCE_TAPE_TARGET;  // Set in constructor
+    private final int MIN_TAPE_TARGET;  // Set in constructor
+    private static final int TAPE_TOLERANCE = 110;
+    private static final double MAX_TAPE_POWER = 0.4;
+    private static final double STACK_DISTANCE = 5.2;
+    private static final double STACK_DISTANCE_TOLERANCE = 0.2;
 
     private int slowMode = SLOW;
     private int previousSlowMode = SLOW;
@@ -97,10 +105,18 @@ public class MM_Drivetrain {
 
     private double leftTapeVal = 0;
     private double rightTapeVal = 0;
-    private boolean beenOnTapeOnce = false;
+    private boolean bothWereOnTape = false;
+
     public MM_Drivetrain(MM_OpMode opMode) {
         this.opMode = opMode;
         init();
+
+        if (opMode.alliance == MM_OpMode.RED){
+            ALLIANCE_TAPE_TARGET = TAPE_RED;
+        } else {
+            ALLIANCE_TAPE_TARGET = TAPE_BLUE;
+        }
+        MIN_TAPE_TARGET = ALLIANCE_TAPE_TARGET - TAPE_TOLERANCE;
     }
 
     public void driveInches(double inches) {
@@ -149,14 +165,6 @@ public class MM_Drivetrain {
         runtime.reset();
         while (opMode.opModeIsActive() && runtime.seconds() < 0.7 && !reachedPositionMicroscopicStrafe()) {
             opMode.telemetry.addData("inches target", inches);
-            opMode.telemetry.update();
-        }
-    }
-
-    public void followTapeToStack() {
-        prepareToTapeDrive();
-        runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 5 && !reachedPositionTapeDrive()) {
             opMode.telemetry.update();
         }
     }
@@ -226,7 +234,7 @@ public class MM_Drivetrain {
     }
 
     public void prepareToTapeDrive() {
-        beenOnTapeOnce = false;
+        bothWereOnTape = false;
     }
 
     public boolean reachedPositionDrive() { //this also sets the motor power
@@ -300,17 +308,6 @@ public class MM_Drivetrain {
         return false;
     }
 
-    public boolean reachedPositionTapeDrive() {
-        setTapePower();
-        double frontDistance = getFrontDistance();
-        if (frontDistance < 4.7 && frontDistance > 3.2) {
-            stop();
-            return true;
-        }
-        return false;
-    }
-
-
     private void setStraightPower() {
         leftCurrentTicks = leftEncoder.getCurrentPosition();
         rightCurrentTicks = rightEncoder.getCurrentPosition();
@@ -321,7 +318,7 @@ public class MM_Drivetrain {
         setPowerVariables(leftDrivePower, rightDrivePower, leftDrivePower, rightDrivePower);
 
         angleStraighten(STRAIGHTEN_P, leftDrivePower, rightDrivePower);
-        normalize();
+        normalize(1);
         setMotorPower(flPower, frPower, blPower, brPower);
     }
 
@@ -337,7 +334,7 @@ public class MM_Drivetrain {
 
         opMode.telemetry.addData("leftPriorEncoder", leftPriorEncoderTarget);
         angleStraighten(STRAIGHTEN_P, flPower, frPower);
-        normalize();
+        normalize(1);
         setMotorPower(flPower, frPower, blPower, brPower);
     }
 
@@ -387,7 +384,7 @@ public class MM_Drivetrain {
 
         strafeCorrect(calculatedPower, leftPriorEncoderTarget, rightPriorEncoderTarget);
         angleStraighten(STRAFE_P, calculatedPower, calculatedPower);
-        normalize();
+        normalize(1);
         setMotorPower(flPower, frPower, blPower, brPower);
     }
 
@@ -401,31 +398,10 @@ public class MM_Drivetrain {
         setPowerVariables(-strafePower, strafePower, strafePower, -strafePower);
 
         angleStraighten(STRAIGHTEN_P, flPower, frPower);
-        normalize();
+        normalize(1);
         setMotorPower(flPower, frPower, blPower, brPower);
     }
     
-    private void setTapePower() {
-        if (beenOnTapeOnce) {
-            double frontDistance = getFrontDistance();
-            double power = Range.clip((getFrontDistance() * DISTANCE_P_COEFFICIENT) + 0.0625, 0.09, 0.3);
-            if (frontDistance < 3.2) {
-                power *= -1;
-            }
-            setPowerVariables(power, power, power, power);
-            leftDrivePower = 0;
-            rightDrivePower = 0;
-        } else {
-            leftDrivePower = (opMode.pLeftDriveController.calculatePower(leftEncoder.getCurrentPosition()))/1.3;
-            rightDrivePower = (opMode.pRightDriveController.calculatePower(rightEncoder.getCurrentPosition()))/1.3;
-            setPowerVariables(leftDrivePower, rightDrivePower, leftDrivePower, rightDrivePower);
-        }
-        correctForTape2();
-        angleStraighten(STRAIGHTEN_P, flPower, frPower);
-        normalize();
-        setMotorPower(flPower, frPower, blPower, brPower);
-    }
-
     public void driveWithSticks() {
         double drive = -opMode.gamepad1.left_stick_y;
         double turn = opMode.gamepad1.right_stick_x;
@@ -448,7 +424,7 @@ public class MM_Drivetrain {
         blPower = (drive + turn - strafe);
         brPower = (drive - turn + strafe);
 
-        normalize();
+        normalize(1);
         handleSlowMode();
         if (opMode.gamepad1.right_trigger > 0.1){
             if (slowMode == 1){
@@ -568,63 +544,76 @@ public class MM_Drivetrain {
         brPower += rightCorrectPower;
     }
 
-    private void correctForTape2() {
-        double correctPower = tapeCorrectPower(tapeError(LEFT), tapeError(RIGHT));
-        if (correctPower != 0) {
-            flPower += correctPower;
-            frPower -= correctPower;
-            blPower -= correctPower;
-            brPower += correctPower;
+    public boolean followTapeToStack() {
+        bothWereOnTape = false;
 
-            flPower /= 1.05;
-            frPower /= 1.05;
-            blPower /= 1.05;
-            brPower /= 1.05;
+        runtime.reset();
+        while (opMode.opModeIsActive() && !reachedPositionTapeDrive()) {
+            opMode.telemetry.update();
+            if (runtime.seconds() > 5) return false;
         }
+
+        return true;
     }
 
-    private double tapeError(int sensorSide) {
+    public boolean reachedPositionTapeDrive() {
+        double frontDistance = getFrontDistance();
+        double distanceError = frontDistance - STACK_DISTANCE;
+        opMode.telemetry.addData("Distance", frontDistance);
+
+        if (Math.abs(distanceError) <= STACK_DISTANCE_TOLERANCE) {
+            stop();
+            opMode.telemetry.addLine("*** At stopping distance");
+            return true;
+        }
+        setTapePower(distanceError);
+        return false;
+    }
+
+    private void setTapePower(double distanceError) {
+        if (bothWereOnTape) {  // set base power according to distance from stack
+            double power = Math.max(MIN_DRIVE_POWER, distanceError * DISTANCE_P_COEFFICIENT);
+            if (distanceError < 0) {
+                opMode.telemetry.addLine("*** Too close to stack");
+                power *= -1;
+            }
+            setPowerVariables(power, power, power, power);
+        } else {  // set base power according to P-Controllers & encoder targets
+            leftDrivePower = (opMode.pLeftDriveController.calculatePower(leftEncoder.getCurrentPosition()))/1.3;
+            rightDrivePower = (opMode.pRightDriveController.calculatePower(rightEncoder.getCurrentPosition()))/1.3;
+            setPowerVariables(leftDrivePower, rightDrivePower, leftDrivePower, rightDrivePower);
+        }
+        tapeCorrect();
+        angleStraighten(STRAIGHTEN_P, flPower, frPower);
+        normalize(MAX_TAPE_POWER);
+        setMotorPower(flPower, frPower, blPower, brPower);
+    }
+
+    private void tapeCorrect() {
+        double leftTapeValue = tapeValue(leftTapeSensor);
+        double rightTapeValue = tapeValue(rightTapeSensor);
+        double correctPower = (rightTapeValue - leftTapeValue) * TAPE_P_COEFFICIENT;
+
+        if (leftTapeValue >= MIN_TAPE_TARGET && rightTapeValue >= MIN_TAPE_TARGET){
+            bothWereOnTape = true;
+        }
+
+        flPower += correctPower;
+        frPower -= correctPower;
+        blPower -= correctPower;
+        brPower += correctPower;
+
+        opMode.telemetry.addData("Left Blueness", leftTapeValue);
+        opMode.telemetry.addData("Right Blueness", rightTapeValue);
+        opMode.telemetry.addData("Tape Power", "%.2f", correctPower);
+    }
+
+    public int tapeValue(ColorSensor colorSensor) {
         if (opMode.alliance == MM_EOCVDetection.RED) {
-            if (sensorSide == LEFT) {
-                return LEFT_TAPE_RED - leftTapeSensor.red();
-            }
-            return RIGHT_TAPE_RED - rightTapeSensor.red();
+            return colorSensor.red();
+        } else{
+            return colorSensor.blue();
         }
-        if (sensorSide == LEFT) {
-            return LEFT_TAPE_BLUE - leftTapeSensor.blue();
-        }
-        return RIGHT_TAPE_BLUE - rightTapeSensor.blue();
-    }
-
-    private double tapeCorrectPower(double leftDifference, double rightDifference) {
-        double correctPower = 0;
-        if (leftDifference > 0 || rightDifference > 0) {
-            correctPower = 0.2;
-            double comparedError = Math.abs(leftDifference - rightDifference);
-            if (comparedError < 80) {
-                if (leftDifference < 120) {
-                    correctPower = 0.075;
-                    if (leftDifference > rightDifference) {
-                        correctPower = -correctPower;
-                    }
-                }
-            } else if (comparedError < 160) {
-                correctPower = 0.1;
-            if (leftDifference > rightDifference) {
-                    correctPower = -correctPower;
-                }
-            } else if (comparedError < 240) {
-                correctPower = 0.15;
-                if (leftDifference > rightDifference) {
-                    correctPower = -correctPower;
-                }
-            } else if (leftDifference < rightDifference) {
-                correctPower = -correctPower;
-            }
-        } else {
-            beenOnTapeOnce = true;
-        }
-        return correctPower;
     }
 
     private boolean checkColors() {
@@ -634,7 +623,6 @@ public class MM_Drivetrain {
             return (leftTapeSensor.red() > 500 || rightTapeSensor.red() > 500);
         }
     }
-
 
     private void angleStraighten(double pCoefficient, double leftCalculated, double rightCalculated) {
         double headingError = correctedAngle(priorAngle - imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
@@ -812,16 +800,20 @@ public class MM_Drivetrain {
         setMotorPower(0,0,0,0);
     }
 
-    private void normalize() {
+    private void normalize(double maxPower) {
         double max = Math.max(Math.abs(flPower), Math.abs(frPower));
         max = Math.max(max, Math.abs(blPower));
         max =  Math.max(max, Math.abs(brPower));
 
-        if (max > 1) {
-            flPower /= max;
-            frPower /= max;
-            blPower /= max;
-            brPower /= max;
+        if (max > maxPower) {
+            flPower = (flPower * maxPower)/max;
+            frPower = (frPower * maxPower)/max;
+            blPower = (blPower * maxPower)/max;
+            brPower = (brPower * maxPower)/max;
+//            flPower /= max;
+//            frPower /= max;
+//            blPower /= max;
+//            brPower /= max;
         }
     }
 
@@ -832,7 +824,7 @@ public class MM_Drivetrain {
             blPower /= 1.25;
             brPower /= 1.25;
         }
-        normalize();
+        normalize(1);
     }
 
     private void handleSlowMode() {
@@ -949,4 +941,13 @@ public class MM_Drivetrain {
     public double getFrontDistance() {
         return distance.getDistance(DistanceUnit.INCH);
     }
+
+    public int tempGetLeftBlue() {
+        return leftTapeSensor.blue();
+    }
+
+    public int tempGetRightBlue() {
+        return rightTapeSensor.blue();
+    }
+
 }
