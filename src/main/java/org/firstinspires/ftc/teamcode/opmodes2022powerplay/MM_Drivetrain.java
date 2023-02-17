@@ -46,7 +46,7 @@ public class MM_Drivetrain {
     private static final double STRAIGHTEN_P = .0840; //.0780
     private static final double STRAFE_P = .089;
     private static final double CORRECTION_COEFFICIENT = 0.000055; //Gain per tick
-    private static final double DISTANCE_P_COEFFICIENT = 0.0125;
+    private static final double DISTANCE_P_COEFFICIENT = 0.0345;
     private static final double TAPE_P_COEFFICIENT = 0.000677; // .000377
     public static final double SLOW_MULTIPLIER = 0.65;
     public static final double SUPER_SLOW_MULTIPLIER = 0.35;
@@ -62,17 +62,13 @@ public class MM_Drivetrain {
     public static final int DRIVE = 0;
     public static final int STRAFE = 1;
 
-    private static final double LEFT_TAPE_RED = 630;
-    private static final double RIGHT_TAPE_RED = 650;
-    private static final double LEFT_TAPE_BLUE = 300;
-    private static final double RIGHT_TAPE_BLUE = 320;
     private static final int TAPE_BLUE = 360;
     private static final int TAPE_RED = 245;  // Need correct value
     private final int ALLIANCE_TAPE_TARGET;  // Set in constructor
     private final int MIN_TAPE_TARGET;  // Set in constructor
     private static final int TAPE_TOLERANCE_BLUE = 110;
     private static final int TAPE_TOLERANCE_RED = 70;
-    private static final double MAX_TAPE_POWER = 0.4;
+    private static final double MAX_TAPE_POWER = 0.45;
     private static final double STACK_DISTANCE = 5.2;
     private static final double STACK_DISTANCE_TOLERANCE = 0.2;
 
