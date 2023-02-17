@@ -57,7 +57,7 @@ public class MM_Auto_Blue_Circuit_Right extends MM_OpMode {
         robot.drivetrain.resetEncoders();
         robot.drivetrain.correctForTape();
         if (!robot.drivetrain.correctForCone()) {
-            robot.parkFromStack(sleeveColor, false);
+            robot.parkFromStack(sleeveColor);
         } else {
             robot.lift.autoStackCollect(5);
             robot.drivetrain.resetEncoders();
@@ -70,7 +70,7 @@ public class MM_Auto_Blue_Circuit_Right extends MM_OpMode {
             robot.drivetrain.microscopicDriveInches(-1);
             robot.drivetrain.correctForTape();
             if (!robot.drivetrain.correctForCone()) {
-                robot.parkFromStack(sleeveColor, false);
+                robot.parkFromStack(sleeveColor);
             } else {
                 robot.lift.autoStackCollect(4);
                 robot.lift.turner.changePosition(MM_Turner.BACK);

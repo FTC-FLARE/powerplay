@@ -65,7 +65,7 @@ public class MM_Auto extends MM_OpMode {
             robot.drivetrain.rotateToMicroscopicAngle(90);
             robot.drivetrain.correctForTape();
             if (!robot.drivetrain.correctForCone()) {
-                robot.parkFromStack(sleeveColor, true);
+                robot.parkFromStack(sleeveColor);
             } else {
                 robot.drivetrain.resetEncoders();
                 robot.lift.autoStackCollect(5);
@@ -77,7 +77,7 @@ public class MM_Auto extends MM_OpMode {
                 robot.drivetrain.rotateToMicroscopicAngle(90);
                 robot.drivetrain.correctForTape();
                 if (!robot.drivetrain.correctForCone()) {
-                    robot.parkFromStack(sleeveColor, true);
+                    robot.parkFromStack(sleeveColor);
                 } else {
                     robot.lift.autoStackCollect(4);
                     robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -10.2,4, false);
@@ -89,12 +89,12 @@ public class MM_Auto extends MM_OpMode {
                     robot.drivetrain.rotateToMicroscopicAngle(90);
                     robot.drivetrain.correctForTape();
                     if (!robot.drivetrain.correctForCone()) { //add another parameter to check for time because being parked is more worth
-                        robot.parkFromStack(sleeveColor, true);
+                        robot.parkFromStack(sleeveColor);
                     } else {
                         robot.lift.autoStackCollect(3);
                         robot.drivetrain.resetEncoders();
                         if (!robot.timeToScore(totalTime.seconds(), sleeveColor)) {
-                            robot.parkFromStack(sleeveColor, true);
+                            robot.parkFromStack(sleeveColor);
                         } else {
                             robot.drivetrain.microscopicStrafeInches(0.9);
                             robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, -34.2, 5, false);
@@ -137,7 +137,7 @@ public class MM_Auto extends MM_OpMode {
             robot.drivetrain.resetEncoders();
             robot.drivetrain.correctForTape();
             if (!robot.drivetrain.correctForCone()) {
-                robot.parkFromStack(sleeveColor, false);
+                robot.parkFromStack(sleeveColor);
             } else {
                 robot.lift.autoStackCollect(5);
                 robot.drivetrain.resetEncoders();
@@ -147,7 +147,7 @@ public class MM_Auto extends MM_OpMode {
                 robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 23, 14, 2, 0, 7, false, false);
                 robot.drivetrain.correctForTape();
                 if (!robot.drivetrain.correctForCone()) {
-                    robot.parkFromStack(sleeveColor, false);
+                    robot.parkFromStack(sleeveColor);
                 } else {
                     robot.lift.autoStackCollect(4);
                     robot.lift.turner.changePosition(MM_Turner.BACK);

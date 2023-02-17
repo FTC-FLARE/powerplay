@@ -88,10 +88,10 @@ public class MM_Robot {
 
     }
 
-    public void parkFromStack(int maxColor, boolean left) {
+    public void parkFromStack(int maxColor) {
         drivetrain.resetEncoders();
         lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_POSITION);
-        if (left) {
+        if (opMode.startingPosition == MM_OpMode.LEFT) {
             if (maxColor == MM_EOCVDetection.BLUE) {
                 drivetrain.microscopicStrafeInches(1);
                 drivetrain.driveInches(-20);

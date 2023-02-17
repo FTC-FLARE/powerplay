@@ -67,10 +67,11 @@ public class MM_Drivetrain {
     private static final double LEFT_TAPE_BLUE = 300;
     private static final double RIGHT_TAPE_BLUE = 320;
     private static final int TAPE_BLUE = 360;
-    private static final int TAPE_RED = 360;  // Need correct value
+    private static final int TAPE_RED = 245;  // Need correct value
     private final int ALLIANCE_TAPE_TARGET;  // Set in constructor
     private final int MIN_TAPE_TARGET;  // Set in constructor
-    private static final int TAPE_TOLERANCE = 110;
+    private static final int TAPE_TOLERANCE_BLUE = 110;
+    private static final int TAPE_TOLERANCE_RED = 70;
     private static final double MAX_TAPE_POWER = 0.4;
     private static final double STACK_DISTANCE = 5.2;
     private static final double STACK_DISTANCE_TOLERANCE = 0.2;
@@ -113,10 +114,12 @@ public class MM_Drivetrain {
 
         if (opMode.alliance == MM_OpMode.RED){
             ALLIANCE_TAPE_TARGET = TAPE_RED;
+            MIN_TAPE_TARGET = ALLIANCE_TAPE_TARGET - TAPE_TOLERANCE_RED;
         } else {
             ALLIANCE_TAPE_TARGET = TAPE_BLUE;
+            MIN_TAPE_TARGET = ALLIANCE_TAPE_TARGET - TAPE_TOLERANCE_BLUE;
         }
-        MIN_TAPE_TARGET = ALLIANCE_TAPE_TARGET - TAPE_TOLERANCE;
+
     }
 
     public void driveInches(double inches) {
@@ -406,7 +409,7 @@ public class MM_Drivetrain {
         double drive = -opMode.gamepad1.left_stick_y;
         double turn = opMode.gamepad1.right_stick_x;
         double strafe = opMode.gamepad1.left_stick_x;
-
+        opMode.telemetry.addData("dis", getFrontDistance());
         if(opMode.leftBumperPressed(opMode.GAMEPAD1)){
             backwardsMode = !backwardsMode;
         }
@@ -571,7 +574,7 @@ public class MM_Drivetrain {
     }
 
     private void setTapePower(double distanceError) {
-        if (bothWereOnTape) {  // set base power according to distance from stack
+/*        if (bothWereOnTape) {  // set base power according to distance from stack
             double power = Math.max(MIN_DRIVE_POWER, distanceError * DISTANCE_P_COEFFICIENT);
             if (distanceError < 0) {
                 opMode.telemetry.addLine("*** Too close to stack");
@@ -582,7 +585,13 @@ public class MM_Drivetrain {
             leftDrivePower = (opMode.pLeftDriveController.calculatePower(leftEncoder.getCurrentPosition()))/1.3;
             rightDrivePower = (opMode.pRightDriveController.calculatePower(rightEncoder.getCurrentPosition()))/1.3;
             setPowerVariables(leftDrivePower, rightDrivePower, leftDrivePower, rightDrivePower);
+        }*/
+        double power = Math.max(MIN_DRIVE_POWER, distanceError * DISTANCE_P_COEFFICIENT);
+        if (distanceError < 0) {
+            opMode.telemetry.addLine("*** Too close to stack");
+            power *= -1;
         }
+        setPowerVariables(power, power, power, power);
         tapeCorrect();
         angleStraighten(STRAIGHTEN_P, flPower, frPower);
         normalize(MAX_TAPE_POWER);
@@ -618,9 +627,9 @@ public class MM_Drivetrain {
 
     private boolean checkColors() {
         if (opMode.alliance == MM_EOCVDetection.BLUE) {
-            return (leftTapeSensor.blue() > 500 || rightTapeSensor.blue() > 500);
+            return (leftTapeSensor.blue() > MIN_TAPE_TARGET || rightTapeSensor.blue() > MIN_TAPE_TARGET);
         } else {
-            return (leftTapeSensor.red() > 500 || rightTapeSensor.red() > 500);
+            return (leftTapeSensor.red() > MIN_TAPE_TARGET || rightTapeSensor.red() > MIN_TAPE_TARGET);
         }
     }
 
@@ -927,15 +936,19 @@ public class MM_Drivetrain {
     }
 
     public void autoScore() {
-        scorer.setPosition(0);
+        scorer.setPosition(0.45);
+        opMode.waitSeconds(0.25);
+        scorer.setPosition(0.22);
         opMode.waitSeconds(0.65);
-        scorer.setPosition(0.15);
+        scorer.setPosition(0.35);
         opMode.waitSeconds(0.2);
-        scorer.setPosition(0.62);
+        scorer.setPosition(0.6);
+        opMode.waitSeconds(0.2);
+        scorer.setPosition(0);
     }
 
     public void getScorerOutOfTheWay() {
-        scorer.setPosition(0.62);
+        scorer.setPosition(0.6);
     }
 
     public double getFrontDistance() {
@@ -943,11 +956,11 @@ public class MM_Drivetrain {
     }
 
     public int tempGetLeftBlue() {
-        return leftTapeSensor.blue();
+        return leftTapeSensor.red();
     }
 
     public int tempGetRightBlue() {
-        return rightTapeSensor.blue();
+        return rightTapeSensor.red();
     }
 
 }

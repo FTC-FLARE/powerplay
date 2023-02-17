@@ -36,14 +36,19 @@ public class MM_Auto_Test extends MM_OpMode {
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-
+        robot.drivetrain.initializeGyroAndEncoders();
         waitForStart();
 
-        alliance = BLUE;
+        alliance = RED;
 
         totalTime.reset();
-        robot.drivetrain.prepareToDrive(36);
+        robot.drivetrain.getScorerOutOfTheWay();
+        robot.drivetrain.strafeInches(-11.3);
+        robot.drivetrain.autoScore();
+        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 20, -40, MM_Drivetrain.DRIVE, 96,6, false, true);
         robot.drivetrain.followTapeToStack();
+        robot.lift.autoStackCollect(5);
+        robot.drivetrain.rotateToMicroscopicAngle(0);
         //start collection code
 
         while (opModeIsActive()){
