@@ -38,10 +38,12 @@ public class MM_Drivetrain {
     private ColorSensor rightTapeSensor = null;
     private ColorSensor leftTapeSensor = null;
     private DistanceSensor distance = null;
+    private DistanceSensor detectorOfTheScaryYellowJunctions = null;
+
 
     private final ElapsedTime runtime = new ElapsedTime();
 
-    public static final double MIN_STRAFE_POWER = 0.292;
+    public static final double MIN_STRAFE_POWER = 0.4;
     private static final double SECONDS_PER_DEGREE = 0.025;//??
     private static final double STRAIGHTEN_P = .0840; //.0780
     private static final double STRAFE_P = .089;
@@ -665,23 +667,22 @@ public class MM_Drivetrain {
     public boolean alignedWithJunction() {
         if (!withinJunctionRange()) {
             runtime.reset();
-            double startingDistance = distance.getDistance(DistanceUnit.INCH);
+            double startingDistance = detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH);
             double currentDistance = startingDistance;
             strafe(LEFT);
-            while (opMode.opModeIsActive() && runtime.seconds() < 1.5) {
+            while (opMode.opModeIsActive() && runtime.seconds() < 5) {
                 if(currentDistance > 5){
                 }else{
                     stop();
                     return true;
                 }
-                currentDistance = distance.getDistance(DistanceUnit.INCH);
+                currentDistance = detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH);
             }
             stop();
             return false;
         }
         return true;
     }
-
     public boolean correctForCone() {
         leftCurrentTicks = leftEncoder.getCurrentPosition();
         rightCurrentTicks = rightEncoder.getCurrentPosition();
@@ -903,6 +904,8 @@ public class MM_Drivetrain {
         switchEncoderMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         distance = opMode.hardwareMap.get(DistanceSensor.class, "coneSensor");
+        detectorOfTheScaryYellowJunctions = opMode.hardwareMap.get(DistanceSensor.class, "detectorOfTheScaryYellowJunctions");
+
         rightTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "rightTapeSensor");
         leftTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "leftTapeSensor");
     }
@@ -955,6 +958,9 @@ public class MM_Drivetrain {
 
     public double getFrontDistance() {
         return distance.getDistance(DistanceUnit.INCH);
+    }
+    public double getJunctionDistance() {
+        return detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH);
     }
 
     public int tempGetLeftBlue() {

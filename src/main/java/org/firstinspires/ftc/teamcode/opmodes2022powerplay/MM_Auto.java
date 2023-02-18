@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -169,31 +167,6 @@ public class MM_Auto extends MM_OpMode {
         robot.init();
         initCamera();
 
-/*
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
-        // Connect to the camera
-        // Use the SkystoneDetector pipeline
-        // processFrame() will be called to process the frame
-        camera.setPipeline(detector);
-        // Remember to change the camera rotation
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                camera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-            }
-
-            @Override
-            public void onError(int errorCode) {
-
-            }
-
-        });
-
-        FtcDashboard.getInstance().startCameraStream(camera, 0);
-*/
-
-
         telemetry.addData("Status", "Initialized");
         telemetry.update();
     }
@@ -215,7 +188,6 @@ public class MM_Auto extends MM_OpMode {
             public void onError(int errorCode) {
 
             }
-
         });
 
         FtcDashboard.getInstance().startCameraStream(camera, 0);
