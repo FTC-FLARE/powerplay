@@ -100,6 +100,7 @@ public class MM_Drivetrain {
     private int kickInTicks = 0;
     private boolean colorKickOut = false;
     private boolean distanceKickOut = false;
+    private boolean distanceKickedOut = false;
     private boolean strafing = false;
     private boolean driving = false;
 
@@ -173,6 +174,7 @@ public class MM_Drivetrain {
 
     public void prepareToDrive(double inches, boolean distanceKickOut) {
         this.distanceKickOut = distanceKickOut;
+        distanceKickedOut = false;
         int leftTargetTicks = leftPriorEncoderTarget + MM_Util.inchesToTicks(inches);
         int rightTargetTicks = rightPriorEncoderTarget + MM_Util.inchesToTicks(inches);
 
@@ -241,9 +243,16 @@ public class MM_Drivetrain {
     }
 
     public boolean reachedPositionDrive() { //this also sets the motor power
-        setStraightPower();
+        if (!distanceKickedOut) {
+            setStraightPower();
+        }
+
         if (distanceKickOut) {
-            //return check distance
+            if (withinJunctionRange() || distanceKickedOut) {
+                stop();
+                distanceKickedOut = true;
+                return true;
+            }
         }
 
         if (opMode.pLeftDriveController.reachedTarget() || opMode.pRightDriveController.reachedTarget()) {
@@ -947,7 +956,6 @@ public class MM_Drivetrain {
     public void autoScore() {
         scorer.setPosition(0.6);
         strafeInches(-11.3);
-        autoScore();
         scorer.setPosition(0.45);
         opMode.waitSeconds(0.25);
         scorer.setPosition(0.22);
@@ -966,8 +974,13 @@ public class MM_Drivetrain {
     public double getFrontDistance() {
         return distance.getDistance(DistanceUnit.INCH);
     }
+
     public double getJunctionDistance() {
         return detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH);
+    }
+
+    public boolean withinJunctionRange() {
+        return getJunctionDistance() < 9;
     }
 
     public int tempGetLeftBlue() {

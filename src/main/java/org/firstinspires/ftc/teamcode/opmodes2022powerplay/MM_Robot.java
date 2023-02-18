@@ -71,6 +71,7 @@ public class MM_Robot {
         drivetrain.followTapeToStack();
         drivetrain.rotateToMicroscopicAngle(90);
         lift.autoStackCollect(5 - conesScored);
+        drivetrain.resetEncoders();
 /*    if (!drivetrain.correctForCone()) { //TODO NEW METHOD THAT CHECKS DISTANCE FOR CONE FOR FAILSAFE
 
     } else {
