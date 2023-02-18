@@ -15,6 +15,8 @@
             <goBILDA5202SeriesMotor name="FRMotor" port="1" />
             <goBILDA5202SeriesMotor name="BLMotor" port="2" />
             <goBILDA5202SeriesMotor name="BRMotor" port="3" />
+            <Servo name="right" port="3"/>
+
             <LynxEmbeddedIMU name="imu" port="0" bus="0" />
             <Servo name="floppyServo" port="1"/>
             <REV_VL53L0X_RANGE_SENSOR name="coneSensor" port="0" bus="1" />

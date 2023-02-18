@@ -661,7 +661,7 @@ public class MM_Drivetrain {
     }
 
     public boolean withinJunctionRange() {
-        return distance.getDistance(DistanceUnit.INCH) < 5;
+        return detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH) < 5;
     }
 
     public boolean alignedWithJunction() {
@@ -669,13 +669,17 @@ public class MM_Drivetrain {
             runtime.reset();
             double startingDistance = detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH);
             double currentDistance = startingDistance;
-            strafe(LEFT);
-            while (opMode.opModeIsActive() && runtime.seconds() < 5) {
-                if(currentDistance > 5){
-                }else{
+
+            leftPriorEncoderTarget = leftEncoder.getCurrentPosition();
+            rightPriorEncoderTarget = rightEncoder.getCurrentPosition();
+
+            while (opMode.opModeIsActive() && currentDistance > 3) {
+                if(runtime.seconds() > 5){
                     stop();
                     return true;
                 }
+                strafe(LEFT);
+//                normalize(MIN_STRAFE_POWER);
                 currentDistance = detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH);
             }
             stop();
@@ -764,9 +768,12 @@ public class MM_Drivetrain {
         //right is negative
         double power = -MIN_STRAFE_POWER * direction;
         flPower = power;
-        frPower = -power + (0.045 * -direction);
-        blPower = -power + (0.045 * -direction);
+        frPower = -power;
+        blPower = -power;
         brPower = power;
+
+        strafeCorrect(power, leftPriorEncoderTarget, rightPriorEncoderTarget);
+
         //angleStraighten(STRAIGHTEN_P, power, power);
         setMotorPower(flPower, frPower, blPower, brPower);
     }
