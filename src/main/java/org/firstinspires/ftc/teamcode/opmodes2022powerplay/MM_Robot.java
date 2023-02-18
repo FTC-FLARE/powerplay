@@ -38,39 +38,44 @@ public class MM_Robot {
             }
         } else {
             if (maxColor == MM_EOCVDetection.YELLOW) {
-                runSlideandDrive(MM_Slide.SlidePosition.COLLECT, 24, 3, false);
+                runSlideandDrive(MM_Slide.SlidePosition.COLLECT, 24, 3, false, false);
             } else if (maxColor == MM_EOCVDetection.BLUE) {
                 lift.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT.ticks);
             } else {
-                runSlideandDrive(MM_Slide.SlidePosition.COLLECT, -24, 3, false);
+                runSlideandDrive(MM_Slide.SlidePosition.COLLECT, -24, 3, false, false);
             }
         }
         lift.chomper.choke();
     }
 
     public void collectFromStack() {
+        lift.turner.changePosition(MM_Turner.FRONT);
         if (conesScored == 0) {
             if (opMode.startingPosition == MM_OpMode.LEFT) {
-                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 22, -63.5, MM_Drivetrain.DRIVE, 75, 8, false, true);
-            } else {
-
+                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 20, -40, MM_Drivetrain.DRIVE, 96,6, false, true);
+                drivetrain.followTapeToStack();
+                lift.autoStackCollect(5);
+                drivetrain.rotateToMicroscopicAngle(0);
+            }
+            else {
             }
         } else {
             if (lastScored == LOW) {
-                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 10.2, -6, 2, 0,5,false, true);
+                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 10.2, -4, MM_Drivetrain.DRIVE, 40,5,false, true);
             } else if (lastScored == MEDIUM) {
-                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 34.2, -6, 2, 0,5,false, true);
+                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 28, -9, 3, 0,5,false, true);
             } else {
                 runSlideandDiagonalDrive(lift.slide.stackTicks(5), 58.2, -6, 2, 0, 5, false, true);
             }
         }
         drivetrain.followTapeToStack();
-        if (!drivetrain.correctForCone()) { //TODO NEW METHOD THAT CHECKS DISTANCE FOR CONE FOR FAILSAFE
+        drivetrain.rotateToMicroscopicAngle(90);
+        lift.autoStackCollect(5 - conesScored);
+/*    if (!drivetrain.correctForCone()) { //TODO NEW METHOD THAT CHECKS DISTANCE FOR CONE FOR FAILSAFE
 
-        } else {
-            drivetrain.rotateToMicroscopicAngle(90);
-            lift.autoStackCollect(5 - conesScored);
-        }
+    } else {
+
+    }*/
     }
 
     public void scoreOnJunction(int scoreTarget) {
@@ -134,8 +139,8 @@ public class MM_Robot {
         return !(totalTime > 26); //blue
     }
 
-    public void runSlideandDrive(MM_Slide.SlidePosition slidePosition, double inches, double timeoutTime, boolean flipTurner) {
-        drivetrain.prepareToDrive(inches);
+    public void runSlideandDrive(MM_Slide.SlidePosition slidePosition, double inches, double timeoutTime, boolean flipTurner, boolean distanceKickOut) {
+        drivetrain.prepareToDrive(inches, distanceKickOut);
         lift.slide.moveTowardTarget(slidePosition);
 
         boolean driveDone = false;
@@ -236,5 +241,10 @@ public class MM_Robot {
         opMode.pBackDriveController.setOutputRange(MIN_STRAFE_POWER, MAX_STRAFE_POWER);
         opMode.pLeftDiagDriveController.setOutputRange(0.15, MAX_DRIVE_SPEED);
         opMode.pRightDiagDriveController.setOutputRange(0.15, MAX_DRIVE_SPEED);
+    }
+
+    public void setLastScored(int score) {
+        lastScored = score;
+        conesScored = 1;
     }
 }

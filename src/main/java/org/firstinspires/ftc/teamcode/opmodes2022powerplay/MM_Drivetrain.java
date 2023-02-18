@@ -97,6 +97,7 @@ public class MM_Drivetrain {
     private int direction = 0;
     private int kickInTicks = 0;
     private boolean colorKickOut = false;
+    private boolean distanceKickOut = false;
     private boolean strafing = false;
     private boolean driving = false;
 
@@ -119,7 +120,7 @@ public class MM_Drivetrain {
     }
 
     public void driveInches(double inches) {
-        prepareToDrive(inches);
+        prepareToDrive(inches, false);
         runtime.reset();
         while (opMode.opModeIsActive() && runtime.seconds() < 5 && !reachedPositionDrive()) {
             opMode.telemetry.addData("inches target", inches);
@@ -128,7 +129,7 @@ public class MM_Drivetrain {
     }
 
     public void microscopicDriveInches(double inches) {
-        prepareToDrive(inches);
+        prepareToDrive(inches,false);
         runtime.reset();
         while (opMode.opModeIsActive() && runtime.seconds() < 1.5 && !reachedPositionMicroscopicDrive()) {
             opMode.telemetry.addData("inches target", inches);
@@ -168,7 +169,8 @@ public class MM_Drivetrain {
         }
     }
 
-    public void prepareToDrive(double inches) {
+    public void prepareToDrive(double inches, boolean distanceKickOut) {
+        this.distanceKickOut = distanceKickOut;
         int leftTargetTicks = leftPriorEncoderTarget + MM_Util.inchesToTicks(inches);
         int rightTargetTicks = rightPriorEncoderTarget + MM_Util.inchesToTicks(inches);
 
@@ -238,6 +240,10 @@ public class MM_Drivetrain {
 
     public boolean reachedPositionDrive() { //this also sets the motor power
         setStraightPower();
+        if (distanceKickOut) {
+            //return check distance
+        }
+
         if (opMode.pLeftDriveController.reachedTarget() || opMode.pRightDriveController.reachedTarget()) {
             stop();
             return true;
@@ -413,9 +419,6 @@ public class MM_Drivetrain {
         if (backwardsMode){
             drive = -drive;
             strafe = -strafe;
-            indicator.setPosition(0.52);
-        } else {
-            indicator.setPosition(0.62);
         }
 
         flPower = (drive + turn + strafe);
@@ -914,7 +917,7 @@ public class MM_Drivetrain {
             leftOdomLift.setPosition(1);
             rightOdomLift.setPosition(0);
             backOdomLift.setPosition(1);
-            indicator.setPosition(1);
+            indicator.setPosition(0);
         } else {
             scorer = opMode.hardwareMap.get(Servo.class, "floppyServo");
             scorer.setPosition(1);
@@ -932,6 +935,9 @@ public class MM_Drivetrain {
     }
 
     public void autoScore() {
+        scorer.setPosition(0.6);
+        strafeInches(-11.3);
+        autoScore();
         scorer.setPosition(0.45);
         opMode.waitSeconds(0.25);
         scorer.setPosition(0.22);
@@ -944,7 +950,7 @@ public class MM_Drivetrain {
     }
 
     public void getScorerOutOfTheWay() {
-        scorer.setPosition(0.6);
+        scorer.setPosition(0);
     }
 
     public double getFrontDistance() {

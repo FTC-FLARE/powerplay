@@ -42,14 +42,15 @@ public class MM_Auto_Test extends MM_OpMode {
         alliance = RED;
 
         totalTime.reset();
-        robot.drivetrain.getScorerOutOfTheWay();
-        robot.drivetrain.strafeInches(-11.3);
-        robot.drivetrain.autoScore();
-        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 20, -40, MM_Drivetrain.DRIVE, 96,6, false, true);
+        robot.setLastScored(MM_Robot.LOW);
+        //start collection code
+        robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.MEDIUM);
+        robot.lift.turner.changePosition(MM_Turner.SIDE);
+        sleep(1000);
+        robot.lift.turner.changePosition(MM_Turner.FRONT);
+        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 28, -9, 3, 0,5,false, true);
         robot.drivetrain.followTapeToStack();
         robot.lift.autoStackCollect(5);
-        robot.drivetrain.rotateToMicroscopicAngle(0);
-        //start collection code
 
         while (opModeIsActive()){
             telemetry.addData("Distance", robot.drivetrain.getFrontDistance());
