@@ -33,7 +33,8 @@ public class MM_Drivetrain {
     private Servo backOdomLift = null;
     private Servo indicator = null;
     private Servo scorer = null;
-    private Servo distanceServo = null;
+    private Servo conePusher = null;
+
 
     private ColorSensor rightTapeSensor = null;
     private ColorSensor leftTapeSensor = null;
@@ -423,6 +424,13 @@ public class MM_Drivetrain {
         double turn = opMode.gamepad1.right_stick_x;
         double strafe = opMode.gamepad1.left_stick_x;
         opMode.telemetry.addData("dis", getFrontDistance());
+
+        if (opMode.dpadUpPressed(opMode.GAMEPAD2)){
+            conePusher.setPosition(0);
+        }else if (opMode.dpadDownPressed(opMode.GAMEPAD2)){
+            conePusher.setPosition(1);
+        }
+
         if(opMode.leftBumperPressed(opMode.GAMEPAD1)){
             backwardsMode = !backwardsMode;
         }
@@ -667,10 +675,6 @@ public class MM_Drivetrain {
 
     public boolean stuckOnCone() {
         return Math.abs(leftEncoder.getCurrentPosition() - leftPriorEncoderTarget) > 4000;
-    }
-
-    public boolean withinJunctionRange() {
-        return detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH) < 5;
     }
 
     public boolean alignedWithJunction() {
@@ -932,11 +936,14 @@ public class MM_Drivetrain {
             leftOdomLift = opMode.hardwareMap.get(Servo.class,"leftOdometryLift");
             rightOdomLift = opMode.hardwareMap.get(Servo.class,"rightOdometryLift");
             backOdomLift = opMode.hardwareMap.get(Servo.class,"backOdometryLift");
+            conePusher = opMode.hardwareMap.get(Servo.class,"theUltimateConePusher");
 
             leftOdomLift.setPosition(1);
             rightOdomLift.setPosition(0);
             backOdomLift.setPosition(1);
             indicator.setPosition(0);
+            conePusher.setPosition(0);
+
         } else {
             scorer = opMode.hardwareMap.get(Servo.class, "floppyServo");
             scorer.setPosition(1);
