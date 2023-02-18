@@ -23,6 +23,7 @@
             <DigitalDevice name="bottomStop" port="3"/>
             <RevColorSensorV3 name="rightTapeSensor" port="0" bus="3"/>
             <RevColorSensorV3 name="leftTapeSensor" port="0" bus="0"/>
+            <AnalogInput name="sonar" port="0"/>
         </LynxModule>
     </LynxUsbDevice>
     <Webcam serialNumber="87BE527F" name="Webcam"/>

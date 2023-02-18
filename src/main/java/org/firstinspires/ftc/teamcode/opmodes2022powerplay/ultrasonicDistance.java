@@ -55,12 +55,11 @@ glass wall reading greater inches than a solid background
 ex. 29 with solid, 32 without. same distances
  */
 @Config
-@Disabled
 @TeleOp(name = "Ultrasonic Distance", group = "Test")
 public class ultrasonicDistance extends LinearOpMode {
 
     private AnalogInput sensorRange;
- //   private DistanceSensor sensorRange;
+    private DistanceSensor distanceSensor;
     public static int FILTERSIZE = 20;
 
     private double sum = 0;
@@ -73,7 +72,7 @@ public class ultrasonicDistance extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         // you can use this as a regular DistanceSensor.
         sensorRange = hardwareMap.get(AnalogInput.class, "sonar");
-        //sensorRange = hardwareMap.get(DistanceSensor.class, "distance");
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "detectorOfTheScaryYellowJunctions");
 
         // you can also cast this to a Rev2mDistanceSensor if you want to use added
         // methods associated with the Rev2mDistanceSensor class.
@@ -97,8 +96,9 @@ public class ultrasonicDistance extends LinearOpMode {
             avgInches = sum/getCurrentReading();
 
             telemetry.addData("Inches", inches);
-            telemetry.addData("avgInches", avgInches);
-            telemetry.addData("Loop", loopTracker);
+            //telemetry.addData("avgInches", avgInches);
+            //telemetry.addData("Loop", loopTracker);
+            telemetry.addData("rev 2m", distanceSensor.getDistance(DistanceUnit.INCH));
             telemetry.update();
             handleloopTracker();
         }

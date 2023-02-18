@@ -38,25 +38,13 @@ public class MM_Auto_Test extends MM_OpMode {
         robot.drivetrain.initializeGyroAndEncoders();
         waitForStart();
 
+        startingPosition = LEFT;
         alliance = RED;
 
         totalTime.reset();
-        robot.setLastScored(MM_Robot.LOW);
-        //start collection code
-        robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.MEDIUM);
-        robot.lift.turner.changePosition(MM_Turner.SIDE);
-        sleep(1000);
-        robot.lift.turner.changePosition(MM_Turner.FRONT);
-        robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 28, -9, 3, 0,5,false, true);
-        robot.drivetrain.followTapeToStack();
-        robot.lift.autoStackCollect(5);
-
-        while (opModeIsActive()){
-            telemetry.addData("Distance", robot.drivetrain.getFrontDistance());
-            telemetry.addData("Left Blueness", robot.drivetrain.tempGetLeftBlue());
-            telemetry.addData("Right Blueness", robot.drivetrain.tempGetRightBlue());
-            telemetry.update();
-        }
+        //robot.drivetrain.autoScore();
+        //robot.collectFromStack();
+        robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -24, 5, false, true);
     }
 
     private void initCamera() {
