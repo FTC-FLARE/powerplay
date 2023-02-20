@@ -20,8 +20,9 @@ public class MM_Robot {
 
     ElapsedTime runtime = new ElapsedTime();
     private boolean timedOut = false;
-    private int conesScored = 0;
+    public int conesScored = 0;
     private int lastScored = 0;
+    public int scoreTarget = 0;
 
     public MM_Robot(MM_OpMode opMode){
         this.opMode = opMode;
@@ -52,24 +53,21 @@ public class MM_Robot {
         lift.turner.changePosition(MM_Turner.FRONT);
         if (conesScored == 0) {
             if (opMode.startingPosition == MM_OpMode.LEFT) {
-                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 20, -40, MM_Drivetrain.DRIVE, 96,6, false, true);
-                drivetrain.followTapeToStack();
-                lift.autoStackCollect(5);
-                drivetrain.rotateToMicroscopicAngle(0);
+                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 12, -40, MM_Drivetrain.DRIVE, 96,6, false, true);
             }
             else {
             }
         } else {
             if (lastScored == LOW) {
-                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 10.2, -4, MM_Drivetrain.DRIVE, 40,5,false, true);
+                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 10.2, -2, MM_Drivetrain.DRIVE, 40,5,false, true);
             } else if (lastScored == MEDIUM) {
-                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 28, -9, 3, 0,5,false, true);
+                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 20, -4, 3, 0,5,false, true);
             } else {
                 runSlideandDiagonalDrive(lift.slide.stackTicks(5), 58.2, -6, 2, 0, 5, false, true);
             }
         }
         drivetrain.followTapeToStack();
-        drivetrain.rotateToMicroscopicAngle(90);
+        drivetrain.rotateToMicroscopicAngle(0);
         lift.autoStackCollect(5 - conesScored);
         drivetrain.resetEncoders();
 /*    if (!drivetrain.correctForCone()) { //TODO NEW METHOD THAT CHECKS DISTANCE FOR CONE FOR FAILSAFE
@@ -80,18 +78,18 @@ public class MM_Robot {
     }
 
     public void scoreOnJunction(int scoreTarget) {
+        this.scoreTarget = scoreTarget;
         if (scoreTarget == LOW) {
-
+            runSlideandDrive(MM_Slide.SlidePosition.LOW, -5, 5, false, true);
         } else if (scoreTarget == MEDIUM) {
-
+            runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, -30, 6, false, true);
         } else {
 
         }
-        if (drivetrain.alignedWithJunction()) {
-            lift.scoreCone();
-            lastScored = scoreTarget;
-        }
-
+        lift.scoreCone();
+        lastScored = scoreTarget;
+        conesScored+= 1;
+        drivetrain.resetEncoders();
     }
 
     public void parkFromStack(int maxColor) {

@@ -9,6 +9,7 @@
             <Servo name="rightOdometryLift" port="2"/>
             <Servo name="backOdometryLift" port="3"/>
             <RevColorSensorV3 name="slowerizer" port="0" bus="0" />
+            <REV_VL53L0X_RANGE_SENSOR name="detectorOfTheScaryYellowJunctions" port="0" bus="3" />
         </LynxModule>
         <LynxModule name="Control Hub" port="173">
             <goBILDA5202SeriesMotor name="FLMotor" port="0" />
@@ -16,16 +17,15 @@
             <goBILDA5202SeriesMotor name="BLMotor" port="2" />
             <goBILDA5202SeriesMotor name="BRMotor" port="3" />
             <Servo name="right" port="3"/>
-
             <LynxEmbeddedIMU name="imu" port="0" bus="0" />
             <Servo name="floppyServo" port="1"/>
-            <REV_VL53L0X_RANGE_SENSOR name="coneSensor" port="0" bus="1" />
-            <REV_VL53L0X_RANGE_SENSOR name="detectorOfTheScaryYellowJunctions" port="0" bus="2" />
+            <REV_VL53L0X_RANGE_SENSOR name="coneSensor" port="0" bus="2" />
             <DigitalDevice name="topStop" port="0"/>
             <DigitalDevice name="bottomStop" port="3"/>
             <RevColorSensorV3 name="rightTapeSensor" port="0" bus="3"/>
-            <RevColorSensorV3 name="leftTapeSensor" port="0" bus="0"/>
-            <AnalogInput name="sonar" port="0"/>
+            <RevColorSensorV3 name="leftTapeSensor" port="0" bus="1"/>
+            <AnalogInput name="sonarLeft" port="0"/>
+            <AnalogInput name="sonarFront" port="2"/>
         </LynxModule>
     </LynxUsbDevice>
     <Webcam serialNumber="87BE527F" name="Webcam"/>

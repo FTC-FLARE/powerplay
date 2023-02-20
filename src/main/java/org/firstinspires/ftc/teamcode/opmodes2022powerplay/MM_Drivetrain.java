@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -39,9 +40,12 @@ public class MM_Drivetrain {
     private ColorSensor leftTapeSensor = null;
     private DistanceSensor distance = null;
     private DistanceSensor detectorOfTheScaryYellowJunctions = null;
+    private AnalogInput leftSonar = null;
+    private AnalogInput frontSonar = null;
 
 
     private final ElapsedTime runtime = new ElapsedTime();
+    private final ElapsedTime timer = new ElapsedTime();
 
     public static final double MIN_STRAFE_POWER = 0.4;
     private static final double SECONDS_PER_DEGREE = 0.025;//??
@@ -64,19 +68,29 @@ public class MM_Drivetrain {
     public static final int DRIVE = 0;
     public static final int STRAFE = 1;
 
-    private static final int TAPE_BLUE = 360;
+    private static final int TAPE_BLUE = 370;
     private static final int TAPE_RED = 245;  // Need correct value
     private final int ALLIANCE_TAPE_TARGET;  // Set in constructor
     private final int MIN_TAPE_TARGET;  // Set in constructor
-    private static final int TAPE_TOLERANCE_BLUE = 110;
+    private static final int TAPE_TOLERANCE_BLUE = 80;
     private static final int TAPE_TOLERANCE_RED = 70;
     private static final double MAX_TAPE_POWER = 0.45;
-    private static final double STACK_DISTANCE = 5.2;
-    private static final double STACK_DISTANCE_TOLERANCE = 0.2;
+    private static final double STACK_DISTANCE = 4.4; //5.2
+    private static final double STACK_DISTANCE_TOLERANCE = 0.4; ///0.2
+
 
     private int slowMode = SLOW;
     private int previousSlowMode = SLOW;
     private boolean backwardsMode = false;
+
+    public static int FILTERSIZE = 20;
+
+    private double sum = 0;
+    private double avgInches = 0;
+    private int loopTracker = 0;
+    private double lastTerms[] = new double[FILTERSIZE + 1];
+    private double lastTerm = 322;
+    private double timesDetected = 0;
 
     private double flPower = 0;
     private double frPower = 0;
@@ -101,6 +115,7 @@ public class MM_Drivetrain {
     private boolean colorKickOut = false;
     private boolean distanceKickOut = false;
     private boolean distanceKickedOut = false;
+    private boolean powerKickedOut = false;
     private boolean strafing = false;
     private boolean driving = false;
 
@@ -119,7 +134,6 @@ public class MM_Drivetrain {
             ALLIANCE_TAPE_TARGET = TAPE_BLUE;
             MIN_TAPE_TARGET = ALLIANCE_TAPE_TARGET - TAPE_TOLERANCE_BLUE;
         }
-
     }
 
     public void driveInches(double inches) {
@@ -175,6 +189,10 @@ public class MM_Drivetrain {
     public void prepareToDrive(double inches, boolean distanceKickOut) {
         this.distanceKickOut = distanceKickOut;
         distanceKickedOut = false;
+        powerKickedOut = false;
+        timesDetected = 0;
+        lastTerm = 322;
+
         int leftTargetTicks = leftPriorEncoderTarget + MM_Util.inchesToTicks(inches);
         int rightTargetTicks = rightPriorEncoderTarget + MM_Util.inchesToTicks(inches);
 
@@ -247,15 +265,18 @@ public class MM_Drivetrain {
             setStraightPower();
         }
 
-        if (distanceKickOut) {
-            if (withinJunctionRange() || distanceKickedOut) {
-                stop();
-                distanceKickedOut = true;
+        if (distanceKickOut && powerKickedOut) {
+            if (getJunctionDistance() < 15) {
+                alignedWithJunction();
                 return true;
             }
         }
 
-        if (opMode.pLeftDriveController.reachedTarget() || opMode.pRightDriveController.reachedTarget()) {
+        if ((opMode.pLeftDriveController.reachedTarget() || opMode.pRightDriveController.reachedTarget())) {
+            if (distanceKickOut) {
+                powerKickedOut = true;
+                return false;
+            }
             stop();
             return true;
         }
@@ -325,17 +346,22 @@ public class MM_Drivetrain {
     }
 
     private void setStraightPower() {
+
         leftCurrentTicks = leftEncoder.getCurrentPosition();
         rightCurrentTicks = rightEncoder.getCurrentPosition();
 
         leftDrivePower = opMode.pLeftDriveController.calculatePower(leftCurrentTicks);
         rightDrivePower = opMode.pRightDriveController.calculatePower(rightCurrentTicks);
 
-        setPowerVariables(leftDrivePower, rightDrivePower, leftDrivePower, rightDrivePower);
+        if (!distanceKickOut || leftDrivePower < 0) {
+            setPowerVariables(leftDrivePower, rightDrivePower, leftDrivePower, rightDrivePower);
 
-        angleStraighten(STRAIGHTEN_P, leftDrivePower, rightDrivePower);
-        normalize(1);
-        setMotorPower(flPower, frPower, blPower, brPower);
+            angleStraighten(STRAIGHTEN_P, leftDrivePower, rightDrivePower);
+            normalize(1);
+            setMotorPower(flPower, frPower, blPower, brPower);
+        } else {
+            drive(BACKWARD);
+        }
     }
 
     private void setMicroscopicStraightPower() {
@@ -422,7 +448,6 @@ public class MM_Drivetrain {
         double drive = -opMode.gamepad1.left_stick_y;
         double turn = opMode.gamepad1.right_stick_x;
         double strafe = opMode.gamepad1.left_stick_x;
-        opMode.telemetry.addData("dis", getFrontDistance());
         if(opMode.leftBumperPressed(opMode.GAMEPAD1)){
             backwardsMode = !backwardsMode;
         }
@@ -450,9 +475,6 @@ public class MM_Drivetrain {
         }else {
             setMotorPower(flPower, frPower, blPower, brPower);
         }
-
-        opMode.telemetry.addData("left color", leftTapeSensor.red());
-        opMode.telemetry.addData("right color", rightTapeSensor.red());
 
     }
 
@@ -616,11 +638,17 @@ public class MM_Drivetrain {
         if (leftTapeValue >= MIN_TAPE_TARGET && rightTapeValue >= MIN_TAPE_TARGET){
             bothWereOnTape = true;
         }
-
-        flPower += correctPower;
-        frPower -= correctPower;
-        blPower -= correctPower;
-        brPower += correctPower;
+        if (flPower < 0) {
+            flPower -= correctPower;
+            frPower += correctPower;
+            blPower += correctPower;
+            brPower -= correctPower;
+        } else {
+            flPower += correctPower;
+            frPower -= correctPower;
+            blPower -= correctPower;
+            brPower += correctPower;
+        }
 
         opMode.telemetry.addData("Left Blueness", leftTapeValue);
         opMode.telemetry.addData("Right Blueness", rightTapeValue);
@@ -636,7 +664,7 @@ public class MM_Drivetrain {
     }
 
     private boolean checkColors() {
-        if (opMode.alliance == MM_EOCVDetection.BLUE) {
+        if (opMode.alliance == MM_OpMode.BLUE) {
             return (leftTapeSensor.blue() > MIN_TAPE_TARGET || rightTapeSensor.blue() > MIN_TAPE_TARGET);
         } else {
             return (leftTapeSensor.red() > MIN_TAPE_TARGET || rightTapeSensor.red() > MIN_TAPE_TARGET);
@@ -670,26 +698,40 @@ public class MM_Drivetrain {
     }
 
     public boolean withinJunctionRange() {
-        return detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH) < 5;
+        return detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH) < 1;
     }
 
     public boolean alignedWithJunction() {
         if (!withinJunctionRange()) {
-            runtime.reset();
             double startingDistance = detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH);
             double currentDistance = startingDistance;
 
             leftPriorEncoderTarget = leftEncoder.getCurrentPosition();
             rightPriorEncoderTarget = rightEncoder.getCurrentPosition();
 
-            while (opMode.opModeIsActive() && currentDistance > 3) {
-                if(runtime.seconds() > 5){
+            double avgInchesTarget = 0;
+            if (opMode.robot.scoreTarget == MM_Robot.LOW) {
+                avgInchesTarget = 55.75;
+            } else if (opMode.robot.scoreTarget == MM_Robot.MEDIUM) {
+                avgInchesTarget = 26.5;
+            }
+            //currentDistance > 2.75 && currentDistance < 7
+            runtime.reset();
+            while (opMode.opModeIsActive() && (avgInches > avgInchesTarget|| runtime.seconds() < 0.25)) {
+                double inches = MM_Util.voltageToInches(leftSonar.getVoltage());
+                sum += inches;
+                sum -= lastTerms[loopTracker];
+                lastTerms[loopTracker] = inches;
+
+                avgInches = sum/getCurrentReading();
+
+                if(runtime.seconds() > 2){
                     stop();
                     return true;
                 }
                 strafe(LEFT);
 //                normalize(MIN_STRAFE_POWER);
-                currentDistance = detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH);
+                handleloopTracker();
             }
             stop();
             return false;
@@ -788,7 +830,7 @@ public class MM_Drivetrain {
     }
 
     public void drive(int direction) {
-        double power = 0.20 * direction;
+        double power = 0.16 * direction;
         setMotorPower(power, power, power, power);
     }
 
@@ -918,12 +960,6 @@ public class MM_Drivetrain {
 
         switchEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         switchEncoderMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        distance = opMode.hardwareMap.get(DistanceSensor.class, "coneSensor");
-        detectorOfTheScaryYellowJunctions = opMode.hardwareMap.get(DistanceSensor.class, "detectorOfTheScaryYellowJunctions");
-
-        rightTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "rightTapeSensor");
-        leftTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "leftTapeSensor");
     }
 
     private void initServos(){
@@ -937,9 +973,21 @@ public class MM_Drivetrain {
             rightOdomLift.setPosition(0);
             backOdomLift.setPosition(1);
             indicator.setPosition(0);
+            rightTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "rightTapeSensor");
+            leftTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "leftTapeSensor");
         } else {
+            rightTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "rightTapeSensor");
+            leftTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "leftTapeSensor");
+            leftSonar = opMode.hardwareMap.get(AnalogInput.class, "sonarLeft");
+            frontSonar = opMode.hardwareMap.get(AnalogInput.class, "sonarFront");
+
             scorer = opMode.hardwareMap.get(Servo.class, "floppyServo");
             scorer.setPosition(1);
+
+            distance = opMode.hardwareMap.get(DistanceSensor.class, "coneSensor");
+            detectorOfTheScaryYellowJunctions = opMode.hardwareMap.get(DistanceSensor.class, "detectorOfTheScaryYellowJunctions");
+
+
         }
     }
 
@@ -979,16 +1027,31 @@ public class MM_Drivetrain {
         return detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH);
     }
 
-    public boolean withinJunctionRange() {
-        return getJunctionDistance() < 9;
-    }
-
     public int tempGetLeftBlue() {
         return leftTapeSensor.red();
     }
 
     public int tempGetRightBlue() {
         return rightTapeSensor.red();
+    }
+
+    double getCurrentReading() {
+        if (lastTerms[FILTERSIZE] == 0) {
+            return loopTracker;
+        } else {
+            return FILTERSIZE;
+        }
+    }
+
+    void handleloopTracker() {
+        loopTracker += 1;
+        if (loopTracker == FILTERSIZE + 1) {
+            loopTracker = 1;
+        }
+    }
+
+    double getSonarDistance(AnalogInput analogInput) {
+        return MM_Util.voltageToInches(analogInput.getVoltage());
     }
 
 }

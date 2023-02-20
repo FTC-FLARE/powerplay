@@ -29,6 +29,9 @@ public class MM_Auto_Test extends MM_OpMode {
         telemetry.addData("Status", "Wait for initialization");
         telemetry.update();
         initCamera();
+        alliance = BLUE;
+        startingPosition = LEFT;
+
         robot.init();
         robot.drivetrain.initializeGyroAndEncoders();
         robot.lift.chomper.release();
@@ -38,13 +41,20 @@ public class MM_Auto_Test extends MM_OpMode {
         robot.drivetrain.initializeGyroAndEncoders();
         waitForStart();
 
-        startingPosition = LEFT;
-        alliance = RED;
-
         totalTime.reset();
-        //robot.drivetrain.autoScore();
-        //robot.collectFromStack();
-        robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -24, 5, false, true);
+        camera.stopStreaming();
+        camera.closeCameraDevice();
+        robot.drivetrain.autoScore();
+        robot.collectFromStack();
+        robot.scoreOnJunction(MM_Robot.LOW);
+        robot.collectFromStack();
+        robot.scoreOnJunction(MM_Robot.LOW);
+        robot.collectFromStack();
+        robot.scoreOnJunction(MM_Robot.MEDIUM);
+        robot.collectFromStack();
+        robot.scoreOnJunction(MM_Robot.MEDIUM);
+
+
     }
 
     private void initCamera() {
