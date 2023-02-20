@@ -34,7 +34,7 @@ public class MM_Drivetrain {
     private Servo backOdomLift = null;
     private Servo indicator = null;
     private Servo scorer = null;
-    private Servo distanceServo = null;
+    private Servo conePusher = null;
 
     private ColorSensor rightTapeSensor = null;
     private ColorSensor leftTapeSensor = null;
@@ -134,6 +134,7 @@ public class MM_Drivetrain {
             ALLIANCE_TAPE_TARGET = TAPE_BLUE;
             MIN_TAPE_TARGET = ALLIANCE_TAPE_TARGET - TAPE_TOLERANCE_BLUE;
         }
+
     }
 
     public void driveInches(double inches) {
@@ -346,7 +347,6 @@ public class MM_Drivetrain {
     }
 
     private void setStraightPower() {
-
         leftCurrentTicks = leftEncoder.getCurrentPosition();
         rightCurrentTicks = rightEncoder.getCurrentPosition();
 
@@ -448,6 +448,13 @@ public class MM_Drivetrain {
         double drive = -opMode.gamepad1.left_stick_y;
         double turn = opMode.gamepad1.right_stick_x;
         double strafe = opMode.gamepad1.left_stick_x;
+
+        if (opMode.dpadUpPressed(opMode.GAMEPAD2)){
+            conePusher.setPosition(0);
+        }else if (opMode.dpadDownPressed(opMode.GAMEPAD2)){
+            conePusher.setPosition(1);
+        }
+
         if(opMode.leftBumperPressed(opMode.GAMEPAD1)){
             backwardsMode = !backwardsMode;
         }
@@ -703,6 +710,7 @@ public class MM_Drivetrain {
 
     public boolean alignedWithJunction() {
         if (!withinJunctionRange()) {
+            runtime.reset();
             double startingDistance = detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH);
             double currentDistance = startingDistance;
 
@@ -731,7 +739,7 @@ public class MM_Drivetrain {
                 }
                 strafe(LEFT);
 //                normalize(MIN_STRAFE_POWER);
-                handleloopTracker();
+                currentDistance = detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH);
             }
             stop();
             return false;
@@ -968,6 +976,7 @@ public class MM_Drivetrain {
             leftOdomLift = opMode.hardwareMap.get(Servo.class,"leftOdometryLift");
             rightOdomLift = opMode.hardwareMap.get(Servo.class,"rightOdometryLift");
             backOdomLift = opMode.hardwareMap.get(Servo.class,"backOdometryLift");
+            conePusher = opMode.hardwareMap.get(Servo.class,"theUltimateConePusher");
 
             leftOdomLift.setPosition(1);
             rightOdomLift.setPosition(0);
@@ -975,6 +984,8 @@ public class MM_Drivetrain {
             indicator.setPosition(0);
             rightTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "rightTapeSensor");
             leftTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "leftTapeSensor");
+            conePusher.setPosition(0);
+
         } else {
             rightTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "rightTapeSensor");
             leftTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "leftTapeSensor");
