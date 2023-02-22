@@ -13,7 +13,6 @@ public class MM_Chomper {
 
     public MM_Chomper(HardwareMap hardwareMap) {
         chomper = hardwareMap.get(Servo.class, "Chokerizer");
-        changePosition(CHOKE);
     }
 
     public double getPosition() {

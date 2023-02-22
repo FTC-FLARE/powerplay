@@ -27,7 +27,6 @@ public class MM_Lift {
         chomper.release();
         opMode.waitSeconds(0.3);
         turner.changePosition(MM_Turner.FRONT);
-        opMode.waitSeconds(0.1);
     }
 
     public boolean reachedPositionTurner() {

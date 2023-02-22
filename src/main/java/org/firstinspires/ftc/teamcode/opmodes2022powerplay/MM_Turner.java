@@ -8,7 +8,7 @@ public class MM_Turner{
     private final MM_OpMode opMode;
     private Servo turner = null;
 
-    static final double FRONT = 0.845;
+    static final double FRONT = 0.805;
     static final double SIDE = 0.475;
     static final double BACK = 0;
     static final double FRONT_TURN_INCREMENT = 0.031;

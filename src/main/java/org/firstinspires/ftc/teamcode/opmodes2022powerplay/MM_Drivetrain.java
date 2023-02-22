@@ -149,7 +149,7 @@ public class MM_Drivetrain {
     public void microscopicDriveInches(double inches) {
         prepareToDrive(inches,false);
         runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 1.5 && !reachedPositionMicroscopicDrive()) {
+        while (opMode.opModeIsActive() && runtime.seconds() < 5 && !reachedPositionMicroscopicDrive()) {
             opMode.telemetry.addData("inches target", inches);
             opMode.telemetry.update();
         }
@@ -199,6 +199,8 @@ public class MM_Drivetrain {
 
         opMode.pLeftDriveController.setup(leftPriorEncoderTarget, leftTargetTicks);
         opMode.pRightDriveController.setup(rightPriorEncoderTarget, rightTargetTicks);
+        opMode.pFastLeftDriveController.setup(leftPriorEncoderTarget, leftTargetTicks);
+        opMode.pFastRightDriveController.setup(rightPriorEncoderTarget, rightTargetTicks);
         leftPriorEncoderTarget = leftTargetTicks;
         rightPriorEncoderTarget = rightTargetTicks;
     }
@@ -273,7 +275,7 @@ public class MM_Drivetrain {
             }
         }
 
-        if ((opMode.pLeftDriveController.reachedTarget() || opMode.pRightDriveController.reachedTarget())) {
+        if (opMode.pLeftDriveController.reachedTarget() || opMode.pRightDriveController.reachedTarget()) {
             if (distanceKickOut) {
                 powerKickedOut = true;
                 return false;
@@ -286,7 +288,7 @@ public class MM_Drivetrain {
 
     public boolean reachedPositionMicroscopicDrive() {
         setMicroscopicStraightPower();
-        if (Math.abs(leftEncoder.getCurrentPosition() - leftPriorEncoderTarget) < 210 || Math.abs(rightEncoder.getCurrentPosition() - rightPriorEncoderTarget) < 210) {
+        if (opMode.pFastLeftDriveController.reachedTarget() || opMode.pFastLeftDriveController.reachedTarget()) {
             stop();
             return true;
         }
@@ -368,14 +370,11 @@ public class MM_Drivetrain {
         leftCurrentTicks = leftEncoder.getCurrentPosition();
         rightCurrentTicks = rightEncoder.getCurrentPosition();
 
-        if (leftCurrentTicks > leftPriorEncoderTarget) {
-            setPowerVariables(-MIN_DRIVE_POWER, -MIN_DRIVE_POWER, -MIN_DRIVE_POWER, -MIN_DRIVE_POWER);
-        } else {
-            setPowerVariables(MIN_DRIVE_POWER, MIN_DRIVE_POWER, MIN_DRIVE_POWER, MIN_DRIVE_POWER);
-        }
+        leftDrivePower = opMode.pFastLeftDriveController.calculatePower(leftCurrentTicks);
+        rightDrivePower = opMode.pFastRightDriveController.calculatePower(rightCurrentTicks);
 
-        opMode.telemetry.addData("leftPriorEncoder", leftPriorEncoderTarget);
-        angleStraighten(STRAIGHTEN_P, flPower, frPower);
+        setPowerVariables(leftDrivePower, rightDrivePower, leftDrivePower, rightDrivePower);
+        angleStraighten(STRAIGHTEN_P, leftDrivePower, rightDrivePower);
         normalize(1);
         setMotorPower(flPower, frPower, blPower, brPower);
     }
@@ -450,9 +449,9 @@ public class MM_Drivetrain {
         double strafe = opMode.gamepad1.left_stick_x;
 
         if (opMode.dpadUpPressed(opMode.GAMEPAD2)){
-            conePusher.setPosition(0);
+
         }else if (opMode.dpadDownPressed(opMode.GAMEPAD2)){
-            conePusher.setPosition(1);
+
         }
 
         if(opMode.leftBumperPressed(opMode.GAMEPAD1)){
@@ -728,7 +727,7 @@ public class MM_Drivetrain {
             }
             //currentDistance > 2.75 && currentDistance < 7
             runtime.reset();
-            while (opMode.opModeIsActive() && (avgInches > avgInchesTarget|| runtime.seconds() < 0.25)) {
+            while (opMode.opModeIsActive() && (avgInches > avgInchesTarget|| runtime.seconds() < 0.27)) {
                 double inches = MM_Util.voltageToInches(leftSonar.getVoltage());
                 sum += inches;
                 sum -= lastTerms[loopTracker];
@@ -994,7 +993,7 @@ public class MM_Drivetrain {
             frontSonar = opMode.hardwareMap.get(AnalogInput.class, "sonarFront");
 
             scorer = opMode.hardwareMap.get(Servo.class, "floppyServo");
-            scorer.setPosition(1);
+            scorer.setPosition(0.32);
 
             distance = opMode.hardwareMap.get(DistanceSensor.class, "coneSensor");
             detectorOfTheScaryYellowJunctions = opMode.hardwareMap.get(DistanceSensor.class, "detectorOfTheScaryYellowJunctions");
@@ -1014,17 +1013,10 @@ public class MM_Drivetrain {
     }
 
     public void autoScore() {
-        scorer.setPosition(0.5);
-        strafeInches(-11.3);
-        scorer.setPosition(0.45);
-        opMode.waitSeconds(0.25);
-        scorer.setPosition(0.22);
-        opMode.waitSeconds(0.65);
-        scorer.setPosition(0.35);
-        opMode.waitSeconds(0.2);
-        scorer.setPosition(0.6);
-        opMode.waitSeconds(0.2);
-        scorer.setPosition(0);
+        strafeInches(-14.9);
+        scorer.setPosition(0.43);
+        opMode.waitSeconds(0.3);
+        scorer.setPosition(0.15);
     }
 
     public void getScorerOutOfTheWay() {
@@ -1119,4 +1111,14 @@ public class MM_Drivetrain {
         return getSonarDistance(leftSonar);
     }
 
+    public void returnSensorReadings() {
+        opMode.telemetry.addData("left tape red", leftTapeSensor.red());
+        opMode.telemetry.addData("right tape red", rightTapeSensor.red());
+        opMode.telemetry.addData("left tape blue", leftTapeSensor.blue());
+        opMode.telemetry.addData("right tape blue", rightTapeSensor.blue());
+        opMode.telemetry.addData("front sonar", getSonarDistance(frontSonar));
+        opMode.telemetry.addData("left sonar", getSonarDistance(leftSonar));
+        opMode.telemetry.addData("cone detector", getFrontDistance());
+        opMode.telemetry.addData("scary yellow junction detector", getJunctionDistance());
+    }
 }

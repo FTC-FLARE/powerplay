@@ -31,17 +31,22 @@ public class MM_Auto_Test extends MM_OpMode {
         initCamera();
         alliance = RED;
         startingPosition = LEFT;
-        parkingColor = MM_EOCVDetection.RED;
+        parkingColor = MM_EOCVDetection.BLUE;
+        signalDanger = true;
 
         robot.init();
         robot.drivetrain.initializeGyroAndEncoders();
-        robot.lift.chomper.release();
+
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         robot.drivetrain.initializeGyroAndEncoders();
-        waitForStart();
+        while (!isStarted() && !isStopRequested()) {
+            robot.drivetrain.returnSensorReadings();
+            telemetry.update();
+        }
 
+        robot.lift.chomper.release();
         totalTime.reset();
         camera.stopStreaming();
         camera.closeCameraDevice();
@@ -51,9 +56,9 @@ public class MM_Auto_Test extends MM_OpMode {
         robot.collectFromStack();
         robot.scoreOnJunction(MM_Robot.LOW);
         robot.collectFromStack();
-        robot.scoreOnJunction(MM_Robot.MEDIUM);
+        robot.scoreOnJunction(MM_Robot.LOW);
         robot.collectFromStack();
-        robot.scoreOnJunction(MM_Robot.MEDIUM);
+        robot.scoreOnJunction(MM_Robot.LOW);
         robot.park();
     }
 
