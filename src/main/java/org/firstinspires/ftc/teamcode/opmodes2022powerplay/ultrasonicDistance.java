@@ -60,6 +60,7 @@ public class ultrasonicDistance extends LinearOpMode {
 
     private AnalogInput sensorRange;
     private DistanceSensor distanceSensor;
+    private AnalogInput secondSonar;
     public static int FILTERSIZE = 20;
 
     private double sum = 0;
@@ -67,11 +68,16 @@ public class ultrasonicDistance extends LinearOpMode {
     private int loopTracker = 0;
     private double lastTerms[] = new double[FILTERSIZE + 1];
 
+    private double sum2 = 0;
+    private double avgInches2 = 0;
+    private double lastTerms2[] = new double[FILTERSIZE + 1];
+
     @Override
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         // you can use this as a regular DistanceSensor.
-        sensorRange = hardwareMap.get(AnalogInput.class, "sonarFront");
+        sensorRange = hardwareMap.get(AnalogInput.class, "sonarLeft");
+        secondSonar = hardwareMap.get(AnalogInput.class, "sonarFront");
         distanceSensor = hardwareMap.get(DistanceSensor.class, "coneSensor");
 
         // you can also cast this to a Rev2mDistanceSensor if you want to use added
@@ -80,6 +86,7 @@ public class ultrasonicDistance extends LinearOpMode {
         //change to constant
         while (loopTracker < FILTERSIZE+1) {
             lastTerms[loopTracker] = 0;
+            lastTerms2[loopTracker] = 0;
             loopTracker += 1;
         }
         loopTracker = 1;
@@ -95,8 +102,18 @@ public class ultrasonicDistance extends LinearOpMode {
 
             avgInches = sum/getCurrentReading();
 
-            telemetry.addData("Inches", inches);
-            telemetry.addData("avgInches", avgInches);
+            double inches2 = MM_Util.voltageToInches(secondSonar.getVoltage());
+
+            sum2 += inches2;
+            sum2 -= lastTerms2[loopTracker];
+            lastTerms2[loopTracker] = inches2;
+
+            avgInches2 = sum2/getCurrentReading();
+
+            telemetry.addData("Left Inches", inches);
+            telemetry.addData("Left avgInches", avgInches);
+            telemetry.addData("Front Inches", inches2);
+            telemetry.addData("Front avgInches", avgInches2);
             telemetry.addData("Loop", loopTracker);
             telemetry.addData("rev 2m", distanceSensor.getDistance(DistanceUnit.INCH));
             telemetry.update();

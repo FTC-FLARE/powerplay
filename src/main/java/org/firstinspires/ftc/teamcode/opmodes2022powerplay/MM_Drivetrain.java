@@ -75,7 +75,7 @@ public class MM_Drivetrain {
     private static final int TAPE_TOLERANCE_BLUE = 80;
     private static final int TAPE_TOLERANCE_RED = 70;
     private static final double MAX_TAPE_POWER = 0.45;
-    private static final double STACK_DISTANCE = 4.4; //5.2
+    private static final double STACK_DISTANCE = 4.6; //5.2
     private static final double STACK_DISTANCE_TOLERANCE = 0.4; ///0.2
 
 
@@ -719,12 +719,12 @@ public class MM_Drivetrain {
             rightPriorEncoderTarget = rightEncoder.getCurrentPosition();
 
             double avgInchesTarget = 0;
-            if (opMode.robot.scoreTarget == MM_Robot.LOW) {
-                avgInchesTarget = 55.75;
-            } else if (opMode.robot.scoreTarget == MM_Robot.MEDIUM) {
+            if (opMode.robot.scoreTarget == MM_Robot.MEDIUM) {
+                avgInchesTarget = 26.5;
+            } else if (opMode.robot.scoreTarget == MM_Robot.NEARSIDE_HIGH) {
                 avgInchesTarget = 26.5;
             } else {
-                avgInchesTarget = 26.5;
+                avgInchesTarget = 55.0;
             }
             //currentDistance > 2.75 && currentDistance < 7
             runtime.reset();
@@ -736,13 +736,13 @@ public class MM_Drivetrain {
 
                 avgInches = sum/getCurrentReading();
 
-                if(runtime.seconds() > 2){
+                if(runtime.seconds() > 0.5){
                     stop();
                     return true;
                 }
                 strafe(LEFT);
 //                normalize(MIN_STRAFE_POWER);
-                currentDistance = detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH);
+                handleloopTracker();
             }
             stop();
             return false;
@@ -1014,7 +1014,7 @@ public class MM_Drivetrain {
     }
 
     public void autoScore() {
-        scorer.setPosition(0.6);
+        scorer.setPosition(0.5);
         strafeInches(-11.3);
         scorer.setPosition(0.45);
         opMode.waitSeconds(0.25);
@@ -1067,10 +1067,55 @@ public class MM_Drivetrain {
     }
 
     public double getFrontSonar() {
+        loopTracker = 1;
+        while (loopTracker < FILTERSIZE+1) {
+            lastTerms[loopTracker] = 0;
+            loopTracker += 1;
+        }
+        loopTracker = 1;
+        sum = 0;
+        avgInches = 0;
+
+        while (opMode.opModeIsActive() && lastTerms[FILTERSIZE] == 0) {
+            double inches = getSonarDistance(frontSonar);
+            sum += inches;
+            sum -= lastTerms[loopTracker];
+            lastTerms[loopTracker] = inches;
+
+            avgInches = sum/getCurrentReading();
+            handleloopTracker();
+        }
+        return avgInches;
+    }
+
+    public double getFrontSonarRaw() {
         return getSonarDistance(frontSonar);
     }
 
     public double getLeftSonar() {
+        loopTracker = 1;
+        while (loopTracker < FILTERSIZE+1) {
+            lastTerms[loopTracker] = 0;
+            loopTracker += 1;
+        }
+        loopTracker = 1;
+        sum = 0;
+        avgInches = 0;
+
+        while (opMode.opModeIsActive() && lastTerms[FILTERSIZE] == 0) {
+            double inches = getSonarDistance(leftSonar);
+            sum += inches;
+            sum -= lastTerms[loopTracker];
+            lastTerms[loopTracker] = inches;
+
+            avgInches = sum/getCurrentReading();
+            handleloopTracker();
+        }
+        opMode.telemetry.update();
+        return avgInches;
+    }
+
+    public double getLeftSonarRaw() {
         return getSonarDistance(leftSonar);
     }
 

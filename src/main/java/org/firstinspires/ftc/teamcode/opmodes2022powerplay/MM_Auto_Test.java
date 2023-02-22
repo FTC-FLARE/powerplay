@@ -29,8 +29,9 @@ public class MM_Auto_Test extends MM_OpMode {
         telemetry.addData("Status", "Wait for initialization");
         telemetry.update();
         initCamera();
-        alliance = BLUE;
+        alliance = RED;
         startingPosition = LEFT;
+        parkingColor = MM_EOCVDetection.RED;
 
         robot.init();
         robot.drivetrain.initializeGyroAndEncoders();
@@ -53,8 +54,7 @@ public class MM_Auto_Test extends MM_OpMode {
         robot.scoreOnJunction(MM_Robot.MEDIUM);
         robot.collectFromStack();
         robot.scoreOnJunction(MM_Robot.MEDIUM);
-
-
+        robot.park();
     }
 
     private void initCamera() {

@@ -25,7 +25,7 @@ public class MM_Lift {
 
     public void scoreCone() {
         chomper.release();
-        opMode.waitSeconds(0.2);
+        opMode.waitSeconds(0.3);
         turner.changePosition(MM_Turner.FRONT);
         opMode.waitSeconds(0.1);
     }
