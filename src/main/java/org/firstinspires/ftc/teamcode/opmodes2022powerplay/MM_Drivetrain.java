@@ -482,7 +482,8 @@ public class MM_Drivetrain {
         }else {
             setMotorPower(flPower, frPower, blPower, brPower);
         }
-
+        opMode.telemetry.addData("left", leftTapeSensor.red());
+        opMode.telemetry.addData("RIGHT", rightTapeSensor.red());
     }
 
     public void rotateToAngle(double targetAngle){
@@ -721,6 +722,8 @@ public class MM_Drivetrain {
             if (opMode.robot.scoreTarget == MM_Robot.LOW) {
                 avgInchesTarget = 55.75;
             } else if (opMode.robot.scoreTarget == MM_Robot.MEDIUM) {
+                avgInchesTarget = 26.5;
+            } else {
                 avgInchesTarget = 26.5;
             }
             //currentDistance > 2.75 && currentDistance < 7
@@ -976,7 +979,6 @@ public class MM_Drivetrain {
             leftOdomLift = opMode.hardwareMap.get(Servo.class,"leftOdometryLift");
             rightOdomLift = opMode.hardwareMap.get(Servo.class,"rightOdometryLift");
             backOdomLift = opMode.hardwareMap.get(Servo.class,"backOdometryLift");
-            conePusher = opMode.hardwareMap.get(Servo.class,"theUltimateConePusher");
 
             leftOdomLift.setPosition(1);
             rightOdomLift.setPosition(0);
@@ -984,7 +986,6 @@ public class MM_Drivetrain {
             indicator.setPosition(0);
             rightTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "rightTapeSensor");
             leftTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "leftTapeSensor");
-            conePusher.setPosition(0);
 
         } else {
             rightTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "rightTapeSensor");
@@ -1046,7 +1047,7 @@ public class MM_Drivetrain {
         return rightTapeSensor.red();
     }
 
-    double getCurrentReading() {
+    private double getCurrentReading() {
         if (lastTerms[FILTERSIZE] == 0) {
             return loopTracker;
         } else {
@@ -1054,15 +1055,23 @@ public class MM_Drivetrain {
         }
     }
 
-    void handleloopTracker() {
+    private void handleloopTracker() {
         loopTracker += 1;
         if (loopTracker == FILTERSIZE + 1) {
             loopTracker = 1;
         }
     }
 
-    double getSonarDistance(AnalogInput analogInput) {
+    private double getSonarDistance(AnalogInput analogInput) {
         return MM_Util.voltageToInches(analogInput.getVoltage());
+    }
+
+    public double getFrontSonar() {
+        return getSonarDistance(frontSonar);
+    }
+
+    public double getLeftSonar() {
+        return getSonarDistance(leftSonar);
     }
 
 }

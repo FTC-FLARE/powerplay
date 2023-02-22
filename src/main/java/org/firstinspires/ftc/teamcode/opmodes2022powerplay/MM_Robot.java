@@ -14,7 +14,10 @@ public class MM_Robot {
     static final double MIN_ROTATE_POWER = 0.24;
     static final double MAX_ROTATE_POWER = 0.6;
 
-    static final int HIGH = 2;
+    static final int START = 5;
+    static final int STACK = 4;
+    static final int NEARSIDE_HIGH = 3;
+    static final int FRONT_HIGH = 2;
     static final int MEDIUM = 1;
     static final int LOW = 0;
 
@@ -22,31 +25,117 @@ public class MM_Robot {
     private boolean timedOut = false;
     public int conesScored = 0;
     private int lastScored = 0;
+    private int currentPosition = START;
     public int scoreTarget = 0;
 
     public MM_Robot(MM_OpMode opMode){
         this.opMode = opMode;
     }
 
-    public void parkFromJunction(int maxColor, boolean left) {
-        if (left) {
-            if (maxColor == MM_EOCVDetection.RED) {
-                runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, 35, -1, 2, 0,5,false, false);
-            } else if (maxColor == MM_EOCVDetection.BLUE) {
-                runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, 9, -1, 2, 0,5,false, false);
+    public void park() {
+        if (currentPosition == STACK) {
+            if (opMode.parkingColor == MM_EOCVDetection.RED) {
+                if (opMode.startingPosition == MM_OpMode.LEFT) {
+
+                } else {
+
+                }
+            } else if (opMode.parkingColor == MM_EOCVDetection.BLUE) {
+                if (opMode.startingPosition == MM_OpMode.LEFT) {
+
+                } else {
+
+                }
             } else {
-                runSlideandDiagonalDrive(MM_Slide.SlidePosition.COLLECT.ticks, -16, -1, 2, 0,5,false, false);
+                if (opMode.startingPosition == MM_OpMode.LEFT) {
+
+                } else {
+
+                }
+            }
+        } else if (currentPosition == LOW) {
+            if (opMode.parkingColor == MM_EOCVDetection.RED) {
+                if (opMode.startingPosition == MM_OpMode.LEFT) {
+
+                } else {
+
+                }
+            } else if (opMode.parkingColor == MM_EOCVDetection.BLUE) {
+                if (opMode.startingPosition == MM_OpMode.LEFT) {
+
+                } else {
+
+                }
+            } else {
+                if (opMode.startingPosition == MM_OpMode.LEFT) {
+
+                } else {
+
+                }
+            }
+        } else if (currentPosition == MEDIUM) {
+            if (opMode.parkingColor == MM_EOCVDetection.RED) {
+                if (opMode.startingPosition == MM_OpMode.LEFT) {
+
+                } else {
+
+                }
+            } else if (opMode.parkingColor == MM_EOCVDetection.BLUE) {
+                if (opMode.startingPosition == MM_OpMode.LEFT) {
+
+                } else {
+
+                }
+            } else {
+                if (opMode.startingPosition == MM_OpMode.LEFT) {
+
+                } else {
+
+                }
+            }
+        } else if (currentPosition == FRONT_HIGH) {
+            if (opMode.parkingColor == MM_EOCVDetection.RED) {
+                if (opMode.startingPosition == MM_OpMode.LEFT) {
+
+                } else {
+
+                }
+            } else if (opMode.parkingColor == MM_EOCVDetection.BLUE) {
+                if (opMode.startingPosition == MM_OpMode.LEFT) {
+
+                } else {
+
+                }
+            } else {
+                if (opMode.startingPosition == MM_OpMode.LEFT) {
+
+                } else {
+
+                }
+            }
+        } else if (currentPosition == NEARSIDE_HIGH) {
+            if (opMode.parkingColor == MM_EOCVDetection.RED) {
+                if (opMode.startingPosition == MM_OpMode.LEFT) {
+
+                } else {
+
+                }
+            } else if (opMode.parkingColor == MM_EOCVDetection.BLUE) {
+                if (opMode.startingPosition == MM_OpMode.LEFT) {
+
+                } else {
+
+                }
+            } else {
+                if (opMode.startingPosition == MM_OpMode.LEFT) {
+
+                } else {
+
+                }
             }
         } else {
-            if (maxColor == MM_EOCVDetection.YELLOW) {
-                runSlideandDrive(MM_Slide.SlidePosition.COLLECT, 24, 3, false, false);
-            } else if (maxColor == MM_EOCVDetection.BLUE) {
-                lift.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT.ticks);
-            } else {
-                runSlideandDrive(MM_Slide.SlidePosition.COLLECT, -24, 3, false, false);
-            }
+
         }
-        lift.chomper.choke();
     }
 
     public void collectFromStack() {
@@ -63,13 +152,14 @@ public class MM_Robot {
             } else if (lastScored == MEDIUM) {
                 runSlideandDiagonalDrive(lift.slide.stackTicks(5), 20, -4, 3, 0,5,false, true);
             } else {
-                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 58.2, -6, 2, 0, 5, false, true);
+                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 44, -4, 3, 0, 6, false, true);
             }
         }
         drivetrain.followTapeToStack();
         drivetrain.rotateToMicroscopicAngle(0);
         lift.autoStackCollect(5 - conesScored);
         drivetrain.resetEncoders();
+        currentPosition = STACK;
 /*    if (!drivetrain.correctForCone()) { //TODO NEW METHOD THAT CHECKS DISTANCE FOR CONE FOR FAILSAFE
 
     } else {
@@ -81,8 +171,13 @@ public class MM_Robot {
         this.scoreTarget = scoreTarget;
         if (scoreTarget == LOW) {
             runSlideandDrive(MM_Slide.SlidePosition.LOW, -5, 5, false, true);
+            currentPosition = LOW;
         } else if (scoreTarget == MEDIUM) {
             runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, -30, 6, false, true);
+            currentPosition = MEDIUM;
+        } else if (scoreTarget == FRONT_HIGH){
+            runSlideandDrive(MM_Slide.SlidePosition.HIGH, -54, 8, false, true);
+            currentPosition = FRONT_HIGH;
         } else {
 
         }
@@ -90,43 +185,6 @@ public class MM_Robot {
         lastScored = scoreTarget;
         conesScored+= 1;
         drivetrain.resetEncoders();
-    }
-
-    public void parkFromStack(int maxColor) {
-        drivetrain.resetEncoders();
-        lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_POSITION);
-        if (opMode.startingPosition == MM_OpMode.LEFT) {
-            if (maxColor == MM_EOCVDetection.BLUE) {
-                drivetrain.microscopicStrafeInches(1);
-                drivetrain.driveInches(-20);
-            } else if (maxColor == MM_EOCVDetection.YELLOW) {
-                drivetrain.microscopicStrafeInches(1);
-                drivetrain.driveInches(-48);
-                if (drivetrain.stuckOnCone()) {
-                    drivetrain.strafe(1);
-                    drivetrain.diagonalDriveInches(0, 0, MM_Drivetrain.STRAFE, 50, false);
-                }
-            } else {
-                drivetrain.microscopicStrafeInches(-1);
-                drivetrain.driveInches(-5);
-            }
-        } else {
-            if (maxColor == MM_EOCVDetection.BLUE) {
-                drivetrain.microscopicStrafeInches(1);
-                drivetrain.driveInches(-20);
-            } else if (maxColor == MM_EOCVDetection.RED) {
-                drivetrain.microscopicStrafeInches(1);
-                drivetrain.driveInches(-48);
-                if (drivetrain.stuckOnCone()) {
-                    drivetrain.strafe(1);
-                    drivetrain.diagonalDriveInches(0, 0, MM_Drivetrain.STRAFE, 50, false);
-                }
-            } else {
-                drivetrain.microscopicStrafeInches(-1);
-                drivetrain.driveInches(-5);
-            }
-        }
-        lift.chomper.choke();
     }
 
     public boolean timeToScore(double totalTime, int maxColor) {

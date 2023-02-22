@@ -33,6 +33,7 @@ public abstract class MM_OpMode extends LinearOpMode {
 
     public int alliance = RED;
     public int startingPosition = LEFT;
+    public int parkingColor = MM_EOCVDetection.YELLOW;
 
     private final ElapsedTime runtime = new ElapsedTime();
 

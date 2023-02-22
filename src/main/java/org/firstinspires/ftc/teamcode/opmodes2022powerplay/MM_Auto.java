@@ -63,7 +63,6 @@ public class MM_Auto extends MM_OpMode {
             robot.drivetrain.rotateToMicroscopicAngle(90);
             robot.drivetrain.correctForTape();
             if (!robot.drivetrain.correctForCone()) {
-                robot.parkFromStack(sleeveColor);
             } else {
                 robot.drivetrain.resetEncoders();
                 robot.lift.autoStackCollect(5);
@@ -75,7 +74,7 @@ public class MM_Auto extends MM_OpMode {
                 robot.drivetrain.rotateToMicroscopicAngle(90);
                 robot.drivetrain.correctForTape();
                 if (!robot.drivetrain.correctForCone()) {
-                    robot.parkFromStack(sleeveColor);
+
                 } else {
                     robot.lift.autoStackCollect(4);
                     robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -10.2,4, false, false);
@@ -87,12 +86,12 @@ public class MM_Auto extends MM_OpMode {
                     robot.drivetrain.rotateToMicroscopicAngle(90);
                     robot.drivetrain.correctForTape();
                     if (!robot.drivetrain.correctForCone()) { //add another parameter to check for time because being parked is more worth
-                        robot.parkFromStack(sleeveColor);
+
                     } else {
                         robot.lift.autoStackCollect(3);
                         robot.drivetrain.resetEncoders();
                         if (!robot.timeToScore(totalTime.seconds(), sleeveColor)) {
-                            robot.parkFromStack(sleeveColor);
+
                         } else {
                             robot.drivetrain.microscopicStrafeInches(0.9);
                             robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, -34.2, 5, false, false);
@@ -106,7 +105,7 @@ public class MM_Auto extends MM_OpMode {
                                 robot.lift.scoreCone();
                                 robot.drivetrain.resetEncoders();
                             }
-                            robot.parkFromJunction(sleeveColor, true);
+                            robot.park();
                         }
                     }
                 }
@@ -135,7 +134,7 @@ public class MM_Auto extends MM_OpMode {
             robot.drivetrain.resetEncoders();
             robot.drivetrain.correctForTape();
             if (!robot.drivetrain.correctForCone()) {
-                robot.parkFromStack(sleeveColor);
+
             } else {
                 robot.lift.autoStackCollect(5);
                 robot.drivetrain.resetEncoders();
@@ -145,7 +144,6 @@ public class MM_Auto extends MM_OpMode {
                 robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 23, 14, 2, 0, 7, false, false);
                 robot.drivetrain.correctForTape();
                 if (!robot.drivetrain.correctForCone()) {
-                    robot.parkFromStack(sleeveColor);
                 } else {
                     robot.lift.autoStackCollect(4);
                     robot.lift.turner.changePosition(MM_Turner.BACK);
@@ -153,7 +151,7 @@ public class MM_Auto extends MM_OpMode {
                     robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -25, -12.2, MM_Drivetrain.STRAFE, 90, 7, false, false);
                     robot.lift.scoreCone();
                     robot.drivetrain.strafeInches(13);
-                    robot.parkFromJunction(sleeveColor, false);
+                    robot.park();
                 }
             }
 

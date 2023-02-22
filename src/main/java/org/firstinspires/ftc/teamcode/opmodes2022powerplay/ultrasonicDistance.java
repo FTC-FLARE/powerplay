@@ -71,8 +71,8 @@ public class ultrasonicDistance extends LinearOpMode {
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         // you can use this as a regular DistanceSensor.
-        sensorRange = hardwareMap.get(AnalogInput.class, "sonarLeft");
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "detectorOfTheScaryYellowJunctions");
+        sensorRange = hardwareMap.get(AnalogInput.class, "sonarFront");
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "coneSensor");
 
         // you can also cast this to a Rev2mDistanceSensor if you want to use added
         // methods associated with the Rev2mDistanceSensor class.
