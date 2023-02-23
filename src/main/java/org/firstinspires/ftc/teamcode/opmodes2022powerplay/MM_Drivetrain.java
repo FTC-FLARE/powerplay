@@ -592,10 +592,14 @@ public class MM_Drivetrain {
         runtime.reset();
         while (opMode.opModeIsActive() && !reachedPositionTapeDrive()) {
             opMode.telemetry.update();
-            if (runtime.seconds() > 5) return false;
+            if (runtime.seconds() > 4) {
+                stop();
+            }
         }
-
-        return true;
+        if (getSonarDistance(frontSonar) < 8) {
+            return reachedPositionTapeDrive() && checkColors(); //it finished and at least one sensor is on tape, may add better check for colors at the end
+        }
+        return false;
     }
 
     public boolean reachedPositionTapeDrive() {
@@ -709,7 +713,7 @@ public class MM_Drivetrain {
     }
 
     public boolean alignedWithJunction() {
-        if (!withinJunctionRange()) {
+        if (!withinJunctionRange() && opMode.startingPosition == MM_OpMode.LEFT) {
             runtime.reset();
             double startingDistance = detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH);
             double currentDistance = startingDistance;
@@ -745,6 +749,12 @@ public class MM_Drivetrain {
             }
             stop();
             return false;
+        } else {
+            runtime.reset();
+            while (opMode.opModeIsActive() && runtime.seconds() < 0.27) {
+                strafe(LEFT);
+            }
+            stop();
         }
         return true;
     }
@@ -1013,7 +1023,11 @@ public class MM_Drivetrain {
     }
 
     public void autoScore() {
-        strafeInches(-14.9);
+        double inches = -14.9;
+        if (opMode.startingPosition == LEFT) {
+            inches -= 24;
+        }
+        strafeInches(inches);
         scorer.setPosition(0.43);
         opMode.waitSeconds(0.3);
         scorer.setPosition(0.15);
@@ -1109,6 +1123,10 @@ public class MM_Drivetrain {
 
     public double getLeftSonarRaw() {
         return getSonarDistance(leftSonar);
+    }
+
+    public boolean isTilted() {
+        return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).secondAngle > 3; //figure out the number
     }
 
     public void returnSensorReadings() {

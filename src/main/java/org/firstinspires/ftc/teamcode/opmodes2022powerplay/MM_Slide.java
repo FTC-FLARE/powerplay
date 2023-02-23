@@ -103,13 +103,14 @@ public class MM_Slide {
         }
     }
 
-    public void waitToReachPosition(int ticks) {
+    public boolean waitToReachPosition(int ticks) {
         moveTowardTarget(ticks);
 
-        while (opMode.opModeIsActive() && !reachedPosition()) {
+        while (opMode.opModeIsActive() && !reachedPosition() && !opMode.robot.drivetrain.isTilted()) {
             opMode.telemetry.addData("Waiting for Slide", "Current: %d  Target: %d", slide.getCurrentPosition(), getSlideTarget());
             opMode.telemetry.update();
         }
+        return !opMode.robot.drivetrain.isTilted();
     }
 
 

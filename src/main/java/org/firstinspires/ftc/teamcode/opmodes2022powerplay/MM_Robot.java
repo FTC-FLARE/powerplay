@@ -160,23 +160,27 @@ public class MM_Robot {
                 }
             }
         } else if (currentPosition == NEARSIDE_HIGH) {
+            drivetrain.resetEncoders();
+            double frontDistance = drivetrain.getFrontSonar();
+            double leftDistance = drivetrain.getLeftSonar();
+
+            runtime.reset();
+            //front 14.8
+            //left 50.5
             if (opMode.parkingColor == MM_EOCVDetection.RED) {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
-
                 } else {
-
+                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -53.5 + frontDistance, 5, false, false);
                 }
             } else if (opMode.parkingColor == MM_EOCVDetection.BLUE) {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
-
                 } else {
-
+                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -29.5 + frontDistance, 4,false, false);
                 }
             } else {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
-
                 } else {
-
+                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -4.5 + frontDistance, 4, false, false);
                 }
             }
         } else {
@@ -192,30 +196,47 @@ public class MM_Robot {
                 runSlideandDiagonalDrive(lift.slide.stackTicks(5), 21, -37.5, MM_Drivetrain.DRIVE, 96,6, false, true);
             }
             else {
+                drivetrain.strafeInches(-18);
+                drivetrain.strafeInches(6);
+                drivetrain.rotateToAngle(179.9);
+                //may have to add a drive, not sure
             }
         } else {
             if (lastScored == LOW) {
                 runSlideandDiagonalDrive(lift.slide.stackTicks(5), 10.2, -2, MM_Drivetrain.DRIVE, 40,5,false, true);
-            } else if (lastScored == MEDIUM) {
+            } else if (lastScored == MEDIUM || lastScored == NEARSIDE_HIGH) {
+                //only works for left and nearside on the right
                 runSlideandDiagonalDrive(lift.slide.stackTicks(5), 20, -4, 3, 0,5,false, true);
-            } else {
+            } else if (lastScored == FRONT_HIGH) {
                 runSlideandDiagonalDrive(lift.slide.stackTicks(5), 44, -4, 3, 0, 6, false, true);
             }
         }
-        drivetrain.followTapeToStack();
-        drivetrain.rotateToMicroscopicAngle(0);
-        lift.autoStackCollect(5 - conesScored);
-        drivetrain.resetEncoders();
-        currentPosition = STACK;
-/*    if (!drivetrain.correctForCone()) { //TODO NEW METHOD THAT CHECKS DISTANCE FOR CONE FOR FAILSAFE
-
-    } else {
-
-    }*/
+        double retryCounter = 0;
+        while (!drivetrain.followTapeToStack() && retryCounter < 2) {
+            drivetrain.driveInches(-12);
+            retryCounter += 1;
+        }
+        if (retryCounter < 2) {
+            double angle = 0;
+            if (opMode.startingPosition == MM_OpMode.RIGHT) {
+                angle = 179.9;
+            }
+            drivetrain.rotateToMicroscopicAngle(angle);
+            while (!lift.autoStackCollect(5 - conesScored)) { //in case robot lifts itself up
+                drivetrain.resetEncoders();
+                drivetrain.driveInches(-6);
+                drivetrain.followTapeToStack();
+            }
+            drivetrain.resetEncoders();
+            currentPosition = STACK;
+        } else {
+            //prob a blind park
+        }
     }
 
     public void scoreOnJunction(int scoreTarget) {
         this.scoreTarget = scoreTarget;
+        lift.turner.autoFlip();
         if (scoreTarget == LOW) {
             runSlideandDrive(MM_Slide.SlidePosition.LOW, -5, 5, false, true);
             currentPosition = LOW;
@@ -226,7 +247,8 @@ public class MM_Robot {
             runSlideandDrive(MM_Slide.SlidePosition.HIGH, -54, 8, false, true);
             currentPosition = FRONT_HIGH;
         } else {
-
+            runSlideandDrive(MM_Slide.SlidePosition.HIGH, -30, 6, false, true);
+            currentPosition = NEARSIDE_HIGH;
         }
         lift.scoreCone();
         lastScored = scoreTarget;
