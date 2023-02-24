@@ -86,7 +86,7 @@ public class MM_Robot {
                 //left 50.5
                 if (opMode.parkingColor == MM_EOCVDetection.RED) {
                     if (opMode.startingPosition == MM_OpMode.LEFT) {
-                        runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -4.5 + frontDistance, 4, false, false);
+                        runSlideandDrive(MM_Slide.SlidePosition.DETECT, -2.5 + frontDistance, 4, false, false);
                     } else {
 
                     }
@@ -98,7 +98,7 @@ public class MM_Robot {
                     }
                 } else {
                     if (opMode.startingPosition == MM_OpMode.LEFT) {
-                        runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -53.3 + frontDistance, 5, false, false);
+                        runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -51.0 + frontDistance, 5, false, false);
                     } else {
 
                     }
@@ -114,7 +114,7 @@ public class MM_Robot {
             //left 50.5
             if (opMode.parkingColor == MM_EOCVDetection.RED) {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
-                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -4.5 + frontDistance, 4, false, false);
+                    runSlideandDrive(MM_Slide.SlidePosition.DETECT, -2.5 + frontDistance, 4, false, false);
                 } else {
 
                 }
@@ -126,7 +126,7 @@ public class MM_Robot {
                 }
             } else {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
-                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -53.5 + frontDistance, 5, false, false);
+                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -51.0 + frontDistance, 5, false, false);
                 } else {
 
                 }
@@ -142,7 +142,7 @@ public class MM_Robot {
             //left 50.5
             if (opMode.parkingColor == MM_EOCVDetection.RED) {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
-                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -4.5 + frontDistance, 4, false, false);
+                    runSlideandDrive(MM_Slide.SlidePosition.DETECT, -2.5 + frontDistance, 4, false, false);
                 } else {
 
                 }
@@ -154,7 +154,7 @@ public class MM_Robot {
                 }
             } else {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
-                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -53.3 + frontDistance, 5, false, false);
+                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -51.0 + frontDistance, 5, false, false);
                 } else {
 
                 }
@@ -170,7 +170,7 @@ public class MM_Robot {
             if (opMode.parkingColor == MM_EOCVDetection.RED) {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
                 } else {
-                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -53.5 + frontDistance, 5, false, false);
+                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -51.0 + frontDistance, 5, false, false);
                 }
             } else if (opMode.parkingColor == MM_EOCVDetection.BLUE) {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
@@ -180,20 +180,26 @@ public class MM_Robot {
             } else {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
                 } else {
-                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -4.5 + frontDistance, 4, false, false);
+                    runSlideandDrive(MM_Slide.SlidePosition.DETECT, -4.5 + frontDistance, 4, false, false);
                 }
             }
         } else {
 //blind park
         }
+        if (opMode.startingPosition == MM_OpMode.LEFT && !(opMode.parkingColor == MM_EOCVDetection.RED)) {
+            drivetrain.setSignalProtectorPosition(0.25);
+            drivetrain.rotateToAngle(90);
+        }
 
     }
 
     public void collectFromStack() {
-        lift.turner.changePosition(MM_Turner.FRONT);
+        lift.turner.autoFrontFlip();
+        int signalProtectorPosition = 0;
         if (conesScored == 0) {
             if (opMode.startingPosition == MM_OpMode.LEFT) {
                 runSlideandDiagonalDrive(lift.slide.stackTicks(5), 21, -37.5, MM_Drivetrain.DRIVE, 96,6, false, true);
+                signalProtectorPosition = 1;
             }
             else {
                 drivetrain.strafeInches(-18);
@@ -218,6 +224,9 @@ public class MM_Robot {
             retryCounter += 1;
         }
         if (retryCounter < 2) {
+            if (conesScored == 0) {
+                drivetrain.setSignalProtectorPosition(signalProtectorPosition);
+            }
             double angle = 0;
             if (opMode.startingPosition == MM_OpMode.RIGHT) {
                 angle = 179.9;

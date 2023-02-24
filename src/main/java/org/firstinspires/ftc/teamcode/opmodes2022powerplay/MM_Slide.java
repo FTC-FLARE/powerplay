@@ -35,7 +35,7 @@ public class MM_Slide {
         COLLECT(0),
         HOVER_FLOOR(525),
         DETECT(700),
-        END_POSITION(900),
+        END_POSITION(1700),
         PIVOT_AUTO(1235),
         PIVOT_POSITION(1333),
         LOW(1800),

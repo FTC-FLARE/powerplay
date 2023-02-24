@@ -116,6 +116,7 @@ public class MM_Drivetrain {
     private boolean colorKickOut = false;
     private boolean distanceKickOut = false;
     private boolean powerKickedOut = false;
+    private boolean alignedWithJunction = false;
     private boolean strafing = false;
     private boolean driving = false;
 
@@ -190,6 +191,7 @@ public class MM_Drivetrain {
     public void prepareToDrive(double inches, boolean distanceKickOut) {
         this.distanceKickOut = distanceKickOut;
         powerKickedOut = false;
+        alignedWithJunction = false;
         timesDetected = 0;
         lastTerm = 322;
 
@@ -263,8 +265,10 @@ public class MM_Drivetrain {
     }
 
     public boolean reachedPositionDrive() { //this also sets the motor power
-        if (!powerKickedOut) {
+        if (!alignedWithJunction) {
             setStraightPower();
+        } else {
+            return true;
         }
 
         if (distanceKickOut && powerKickedOut) {
@@ -272,6 +276,7 @@ public class MM_Drivetrain {
                 opMode.telemetry.addLine("aligning with junction");
                 opMode.telemetry.update();
                 alignedWithJunction();
+                alignedWithJunction = true;
                 return true;
             }
         }
@@ -365,6 +370,14 @@ public class MM_Drivetrain {
         } else {
             drive(BACKWARD);
         }
+    }
+
+    private void setDriftPower() {
+        setPowerVariables(leftDrivePower, rightDrivePower, leftDrivePower, rightDrivePower);
+
+        angleStraighten(STRAIGHTEN_P, leftDrivePower, rightDrivePower);
+        normalize(1);
+        setMotorPower(flPower, frPower, blPower, brPower);
     }
 
     private void setMicroscopicStraightPower() {
@@ -971,6 +984,7 @@ public class MM_Drivetrain {
 
     private void initServos(){
         signalProtector = opMode.hardwareMap.get(Servo.class, "signalProtector");
+        signalProtector.setPosition(0.25);
         if(opMode.getClass() == MM_TeleOp.class){
             indicator = opMode.hardwareMap.get(Servo.class, "floppyServo");
             leftOdomLift = opMode.hardwareMap.get(Servo.class,"leftOdometryLift");
@@ -981,7 +995,6 @@ public class MM_Drivetrain {
             rightOdomLift.setPosition(0);
             backOdomLift.setPosition(1);
             indicator.setPosition(0);
-            signalProtector.setPosition(0.25);
             rightTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "rightTapeSensor");
             leftTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "leftTapeSensor");
 
@@ -993,12 +1006,6 @@ public class MM_Drivetrain {
 
             scorer = opMode.hardwareMap.get(Servo.class, "floppyServo");
             scorer.setPosition(0.32);
-
-            if (opMode.startingPosition == MM_OpMode.LEFT) {
-                signalProtector.setPosition(1);
-            } else {
-                signalProtector.setPosition(0);
-            }
 
             distance = opMode.hardwareMap.get(DistanceSensor.class, "coneSensor");
             detectorOfTheScaryYellowJunctions = opMode.hardwareMap.get(DistanceSensor.class, "detectorOfTheScaryYellowJunctions");
@@ -1019,7 +1026,7 @@ public class MM_Drivetrain {
 
     public void autoScore() {
         double inches = -14.9;
-        if (opMode.startingPosition == LEFT) {
+        if (opMode.startingPosition == MM_OpMode.RIGHT) {
             inches -= 24;
         }
         strafeInches(inches);
@@ -1136,5 +1143,9 @@ public class MM_Drivetrain {
         opMode.telemetry.addData("left sonar", getSonarDistance(leftSonar));
         opMode.telemetry.addData("cone detector", getConeDistance());
         opMode.telemetry.addData("scary yellow junction detector", getJunctionDistance());
+    }
+
+    public void setSignalProtectorPosition(double position) {
+        signalProtector.setPosition(position);
     }
 }

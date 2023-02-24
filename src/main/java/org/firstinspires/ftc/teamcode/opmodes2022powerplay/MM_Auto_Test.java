@@ -31,7 +31,7 @@ public class MM_Auto_Test extends MM_OpMode {
         initCamera();
         alliance = RED;
         startingPosition = LEFT;
-        parkingColor = MM_EOCVDetection.BLUE;
+        parkingColor = MM_EOCVDetection.YELLOW;
         signalDanger = true;
 
         robot.init();

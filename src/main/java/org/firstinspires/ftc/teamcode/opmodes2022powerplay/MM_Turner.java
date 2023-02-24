@@ -8,7 +8,7 @@ public class MM_Turner{
     private final MM_OpMode opMode;
     private Servo turner = null;
 
-    static final double FRONT = 0.815;
+    static final double FRONT = 0.835;
     static final double SIDE = 0.475;
     static final double BACK = 0;
     static final double FRONT_TURN_INCREMENT = 0.031;
@@ -19,6 +19,7 @@ public class MM_Turner{
     private final ElapsedTime timer = new ElapsedTime();
     private boolean isMoving = false;
     private double timerGoal = 0;
+    private double conesCollected = -1;
     private double currentPosition = FRONT;
     private double targetPosition = FRONT;
     private double turnIncrement = BACK_TURN_INCREMENT;
@@ -38,6 +39,11 @@ public class MM_Turner{
     public void startMoving(double increment) {
         turnIncrement = increment;
         isMoving = true;
+    }
+
+    public void autoFrontFlip() {
+        conesCollected += 1;
+        turner.setPosition(FRONT - (0.01 * conesCollected));
     }
 
     public void checkIfDoneMoving() {
