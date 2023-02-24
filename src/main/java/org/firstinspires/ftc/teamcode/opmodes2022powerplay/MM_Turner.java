@@ -8,7 +8,7 @@ public class MM_Turner{
     private final MM_OpMode opMode;
     private Servo turner = null;
 
-    static final double FRONT = 0.805;
+    static final double FRONT = 0.815;
     static final double SIDE = 0.475;
     static final double BACK = 0;
     static final double FRONT_TURN_INCREMENT = 0.031;
@@ -30,7 +30,7 @@ public class MM_Turner{
     }
 
     public void autoFlip() {
-        if ((opMode.startingPosition != MM_OpMode.RIGHT && opMode.robot.scoreTarget != MM_Robot.NEARSIDE_HIGH) || (opMode.startingPosition == MM_OpMode.RIGHT && opMode.robot.scoreTarget == MM_Robot.NEARSIDE_HIGH)){
+        if ((opMode.startingPosition == MM_OpMode.LEFT && opMode.robot.scoreTarget != MM_Robot.NEARSIDE_HIGH) || (opMode.startingPosition == MM_OpMode.RIGHT && opMode.robot.scoreTarget == MM_Robot.NEARSIDE_HIGH)){
             changePosition(MM_Turner.SIDE);
         }
     }

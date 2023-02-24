@@ -65,7 +65,7 @@ public class MM_Auto extends MM_OpMode {
             if (!robot.drivetrain.correctForCone()) {
             } else {
                 robot.drivetrain.resetEncoders();
-                robot.lift.autoStackCollect(5);
+                robot.autoStackCollect(5);
                 robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -10.5,4, false, false);
                 robot.drivetrain.rotateToMicroscopicAngle(90);
                 robot.drivetrain.microscopicStrafeInches(2.5);
@@ -76,7 +76,7 @@ public class MM_Auto extends MM_OpMode {
                 if (!robot.drivetrain.correctForCone()) {
 
                 } else {
-                    robot.lift.autoStackCollect(4);
+                    robot.autoStackCollect(4);
                     robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -10.2,4, false, false);
                     robot.drivetrain.rotateToMicroscopicAngle(90);
                     robot.drivetrain.microscopicStrafeInches(2.5);
@@ -88,7 +88,7 @@ public class MM_Auto extends MM_OpMode {
                     if (!robot.drivetrain.correctForCone()) { //add another parameter to check for time because being parked is more worth
 
                     } else {
-                        robot.lift.autoStackCollect(3);
+                        robot.autoStackCollect(3);
                         robot.drivetrain.resetEncoders();
                         if (!robot.timeToScore(totalTime.seconds(), sleeveColor)) {
 
@@ -136,7 +136,7 @@ public class MM_Auto extends MM_OpMode {
             if (!robot.drivetrain.correctForCone()) {
 
             } else {
-                robot.lift.autoStackCollect(5);
+                robot.autoStackCollect(5);
                 robot.drivetrain.resetEncoders();
                 robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.LOW.ticks, -21, -12, MM_Drivetrain.STRAFE, 90, 7, false, false);
                 robot.lift.scoreCone();
@@ -145,7 +145,7 @@ public class MM_Auto extends MM_OpMode {
                 robot.drivetrain.correctForTape();
                 if (!robot.drivetrain.correctForCone()) {
                 } else {
-                    robot.lift.autoStackCollect(4);
+                    robot.autoStackCollect(4);
                     robot.lift.turner.changePosition(MM_Turner.BACK);
                     robot.drivetrain.resetEncoders();
                     robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -25, -12.2, MM_Drivetrain.STRAFE, 90, 7, false, false);

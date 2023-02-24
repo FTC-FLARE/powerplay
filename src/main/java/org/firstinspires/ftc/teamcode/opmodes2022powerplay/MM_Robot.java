@@ -92,7 +92,7 @@ public class MM_Robot {
                     }
                 } else if (opMode.parkingColor == MM_EOCVDetection.BLUE) {
                     if (opMode.startingPosition == MM_OpMode.LEFT) {
-                        runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -29.3 + frontDistance, 4,false, false);
+                        runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -28.3 + frontDistance, 4,false, false);
                     } else {
 
                     }
@@ -120,7 +120,7 @@ public class MM_Robot {
                 }
             } else if (opMode.parkingColor == MM_EOCVDetection.BLUE) {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
-                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -29.5 + frontDistance, 4,false, false);
+                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -28.5 + frontDistance, 4,false, false);
                 } else {
 
                 }
@@ -148,7 +148,7 @@ public class MM_Robot {
                 }
             } else if (opMode.parkingColor == MM_EOCVDetection.BLUE) {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
-                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -29.3 + frontDistance, 4,false, false);
+                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -28.3 + frontDistance, 4,false, false);
                 } else {
 
                 }
@@ -184,7 +184,7 @@ public class MM_Robot {
                 }
             }
         } else {
-
+//blind park
         }
 
     }
@@ -212,7 +212,8 @@ public class MM_Robot {
             }
         }
         double retryCounter = 0;
-        while (!drivetrain.followTapeToStack() && retryCounter < 2) {
+        while (opMode.opModeIsActive() && !drivetrain.followTapeToStack() && retryCounter < 2) {
+            drivetrain.resetEncoders();
             drivetrain.driveInches(-12);
             retryCounter += 1;
         }
@@ -222,7 +223,7 @@ public class MM_Robot {
                 angle = 179.9;
             }
             drivetrain.rotateToMicroscopicAngle(angle);
-            while (!lift.autoStackCollect(5 - conesScored)) { //in case robot lifts itself up
+            while (opMode.opModeIsActive() && !autoStackCollect(5 - conesScored)) { //in case robot lifts itself up
                 drivetrain.resetEncoders();
                 drivetrain.driveInches(-6);
                 drivetrain.followTapeToStack();
@@ -238,19 +239,16 @@ public class MM_Robot {
         this.scoreTarget = scoreTarget;
         lift.turner.autoFlip();
         if (scoreTarget == LOW) {
-            runSlideandDrive(MM_Slide.SlidePosition.LOW, -5, 5, false, true);
-            currentPosition = LOW;
+            runSlideandDrive(MM_Slide.SlidePosition.LOW, -5, 3, false, true);
         } else if (scoreTarget == MEDIUM) {
-            runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, -30, 6, false, true);
-            currentPosition = MEDIUM;
+            runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, -30, 4, false, true);
         } else if (scoreTarget == FRONT_HIGH){
-            runSlideandDrive(MM_Slide.SlidePosition.HIGH, -54, 8, false, true);
-            currentPosition = FRONT_HIGH;
-        } else {
-            runSlideandDrive(MM_Slide.SlidePosition.HIGH, -30, 6, false, true);
-            currentPosition = NEARSIDE_HIGH;
+            runSlideandDrive(MM_Slide.SlidePosition.HIGH, -54, 5, false, true);
+        } else { //Nearside high
+            runSlideandDrive(MM_Slide.SlidePosition.HIGH, -30, 5, false, true);
         }
         lift.scoreCone();
+        currentPosition = scoreTarget;
         lastScored = scoreTarget;
         conesScored+= 1;
         drivetrain.resetEncoders();
@@ -374,5 +372,25 @@ public class MM_Robot {
     public void setLastScored(int score) {
         lastScored = score;
         conesScored = 1;
+    }
+
+    public boolean autoStackCollect(int stackLevel){
+        lift.slide.moveTowardTarget(lift.slide.lowerStackTicks(stackLevel));
+
+        boolean slideReached = false;
+        while (opMode.opModeIsActive() && !slideReached && !drivetrain.isTilted()) {
+            slideReached = lift.slide.reachedPosition();
+            opMode.telemetry.addLine("Waiting for Slide");
+            opMode.telemetry.update();
+        }
+
+        if (slideReached) {
+            lift.chomper.choke();
+            opMode.waitSeconds(0.25);
+            lift.slide.waitToReachPosition(MM_Slide.SlidePosition.PIVOT_AUTO);
+            return true;
+        }
+        lift.slide.waitToReachPosition(lift.slide.stackTicks(5));
+        return false;
     }
 }

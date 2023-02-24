@@ -8,6 +8,7 @@
             <Servo name="leftOdometryLift" port="4"/>
             <Servo name="rightOdometryLift" port="2"/>
             <Servo name="backOdometryLift" port="3"/>
+            <Servo name="signalProtector" port="5"/>
             <RevColorSensorV3 name="slowerizer" port="0" bus="0" />
             <REV_VL53L0X_RANGE_SENSOR name="detectorOfTheScaryYellowJunctions" port="0" bus="3" />
         </LynxModule>

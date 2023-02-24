@@ -36,11 +36,8 @@ public class MM_Auto_Test extends MM_OpMode {
 
         robot.init();
         robot.drivetrain.initializeGyroAndEncoders();
-
-
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-        robot.drivetrain.initializeGyroAndEncoders();
         while (!isStarted() && !isStopRequested()) {
             robot.drivetrain.returnSensorReadings();
             telemetry.update();
@@ -56,10 +53,12 @@ public class MM_Auto_Test extends MM_OpMode {
         robot.collectFromStack();
         robot.scoreOnJunction(MM_Robot.LOW);
         robot.collectFromStack();
-        robot.scoreOnJunction(MM_Robot.LOW);
+        robot.scoreOnJunction(MM_Robot.MEDIUM);
         robot.collectFromStack();
-        robot.scoreOnJunction(MM_Robot.LOW);
+        robot.scoreOnJunction(MM_Robot.MEDIUM);
         robot.park();
+
+        //make algorithm to decide if time is left for actions
     }
 
     private void initCamera() {

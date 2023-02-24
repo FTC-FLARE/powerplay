@@ -55,6 +55,7 @@ public class MM_Slide {
     }
 
     public void driverControl() {
+        //tape to stop hover
         if (opMode.gamepad2.right_trigger > 0.1 && !atTop()) {
             setSlideTarget(slide.getCurrentPosition() + MANUAL_INCREMENT);
             stackLevel = 1;
@@ -106,11 +107,11 @@ public class MM_Slide {
     public boolean waitToReachPosition(int ticks) {
         moveTowardTarget(ticks);
 
-        while (opMode.opModeIsActive() && !reachedPosition() && !opMode.robot.drivetrain.isTilted()) {
+        while (opMode.opModeIsActive() && !reachedPosition()) {
             opMode.telemetry.addData("Waiting for Slide", "Current: %d  Target: %d", slide.getCurrentPosition(), getSlideTarget());
             opMode.telemetry.update();
         }
-        return !opMode.robot.drivetrain.isTilted();
+        return reachedPosition();
     }
 
 
