@@ -588,7 +588,6 @@ public class MM_Drivetrain {
 
     public boolean followTapeToStack() {
         bothWereOnTape = false;
-
         runtime.reset();
         while (opMode.opModeIsActive() && !reachedPositionTapeDrive()) {
             opMode.telemetry.update();
@@ -617,25 +616,15 @@ public class MM_Drivetrain {
     }
 
     private void setTapePower(double distanceError) {
-/*        if (bothWereOnTape) {  // set base power according to distance from stack
-            double power = Math.max(MIN_DRIVE_POWER, distanceError * DISTANCE_P_COEFFICIENT);
-            if (distanceError < 0) {
-                opMode.telemetry.addLine("*** Too close to stack");
-                power *= -1;
-            }
-            setPowerVariables(power, power, power, power);
-        } else {  // set base power according to P-Controllers & encoder targets
-            leftDrivePower = (opMode.pLeftDriveController.calculatePower(leftEncoder.getCurrentPosition()))/1.3;
-            rightDrivePower = (opMode.pRightDriveController.calculatePower(rightEncoder.getCurrentPosition()))/1.3;
-            setPowerVariables(leftDrivePower, rightDrivePower, leftDrivePower, rightDrivePower);
-        }*/
-        double power = Math.max(MIN_DRIVE_POWER, distanceError * DISTANCE_P_COEFFICIENT);
+        double power = Math.max(MIN_DRIVE_POWER, Math.abs(distanceError * DISTANCE_P_COEFFICIENT));
         if (distanceError < 0) {
             opMode.telemetry.addLine("*** Too close to stack");
             power *= -1;
         }
         setPowerVariables(power, power, power, power);
-        tapeCorrect();
+        if (power > 0) {
+            tapeCorrect();
+        }
         angleStraighten(STRAIGHTEN_P, flPower, frPower);
         normalize(MAX_TAPE_POWER);
         setMotorPower(flPower, frPower, blPower, brPower);
@@ -649,17 +638,11 @@ public class MM_Drivetrain {
         if (leftTapeValue >= MIN_TAPE_TARGET && rightTapeValue >= MIN_TAPE_TARGET){
             bothWereOnTape = true;
         }
-        if (flPower < 0) {
-            flPower -= correctPower;
-            frPower += correctPower;
-            blPower += correctPower;
-            brPower -= correctPower;
-        } else {
-            flPower += correctPower;
-            frPower -= correctPower;
-            blPower -= correctPower;
-            brPower += correctPower;
-        }
+
+        flPower += correctPower;
+        frPower -= correctPower;
+        blPower -= correctPower;
+        brPower += correctPower;
 
         opMode.telemetry.addData("Left Blueness", leftTapeValue);
         opMode.telemetry.addData("Right Blueness", rightTapeValue);
