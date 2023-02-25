@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class MM_Robot {
@@ -28,6 +29,7 @@ public class MM_Robot {
     public int currentPosition = START;
     public int scoreTarget = 0;
     private int offset = 0;
+    private double straightAngle = 0;
 
     public MM_Robot(MM_OpMode opMode){
         this.opMode = opMode;
@@ -45,7 +47,11 @@ public class MM_Robot {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
                     //do nothing
                 } else {
-
+                    if (opMode.signalDanger) {
+                        drivetrain.microscopicDriveInches(-43.5 + frontDistance);
+                    } else {
+                        runSlideandDiagonalDrive(MM_Slide.SlidePosition.PIVOT_AUTO.ticks, -54.3 + frontDistance, leftDistance - 51.5 + offset,3, 0,5, false, false);
+                    }
                 }
             } else if (opMode.parkingColor == MM_EOCVDetection.BLUE) {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
@@ -55,8 +61,13 @@ public class MM_Robot {
                         runSlideandDiagonalDrive(MM_Slide.SlidePosition.PIVOT_AUTO.ticks, -30.3 + frontDistance, leftDistance - 51.5 + offset,3, 0,5, false, false);
                     }
                 } else {
-
+                    if (opMode.signalDanger) {
+                        drivetrain.microscopicDriveInches(-24.3 + frontDistance);
+                    } else {
+                        runSlideandDiagonalDrive(MM_Slide.SlidePosition.PIVOT_AUTO.ticks, -30.3 + frontDistance, leftDistance - 51.5 + offset,3, 0,5, false, false);
+                    }
                 }
+                drivetrain.engageConePusher();
             } else {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
                     if (opMode.signalDanger) {
@@ -70,12 +81,28 @@ public class MM_Robot {
             }
         } else if (currentPosition == LOW) {
             if (opMode.signalDanger) {
-                drivetrain.driveInches(9);
-                drivetrain.strafeInches(24);
+                lift.chomper.release();
+                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 10.2, -2, MM_Drivetrain.DRIVE, 40,5,false, true);
+                lift.slide.moveTowardTarget(lift.slide.lowerStackTicks(1));
+
+                boolean slideReached = false;
+                while (opMode.opModeIsActive() && !slideReached && !drivetrain.isTilted()) {
+                    slideReached = lift.slide.reachedPosition();
+                    opMode.telemetry.addLine("Waiting for Slide");
+                    opMode.telemetry.update();
+                }
+
+                if (slideReached) {
+                    lift.chomper.choke();
+                    opMode.waitSeconds(0.25);
+                    lift.slide.waitToReachPosition(lift.slide.lowerStackTicks(2));
+                }
                 currentPosition = STACK;
-                offset = 24;
+                //offset = 24;
+                //drivetrain.strafeInches(26);
                 park();
             } else {
+                drivetrain.engageConePusher();
                 drivetrain.strafeInches(-3.25);
                 drivetrain.resetEncoders();
                 double frontDistance = drivetrain.getFrontSonar();
@@ -86,25 +113,26 @@ public class MM_Robot {
                 //left 50.5
                 if (opMode.parkingColor == MM_EOCVDetection.RED) {
                     if (opMode.startingPosition == MM_OpMode.LEFT) {
-                        runSlideandDrive(MM_Slide.SlidePosition.DETECT, -2.5 + frontDistance, 4, false, false);
+                        runSlideandDrive(MM_Slide.SlidePosition.DETECT.ticks, -2.5 + frontDistance, 4, false, false);
                     } else {
-
+                        runSlideandDrive(MM_Slide.SlidePosition.END_POSITION.ticks, -51.0 + frontDistance, 5, false, false);
                     }
                 } else if (opMode.parkingColor == MM_EOCVDetection.BLUE) {
                     if (opMode.startingPosition == MM_OpMode.LEFT) {
-                        runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -28.3 + frontDistance, 4,false, false);
+                        runSlideandDrive(MM_Slide.SlidePosition.END_POSITION.ticks, -28.3 + frontDistance, 4,false, false);
                     } else {
-
+                        runSlideandDrive(MM_Slide.SlidePosition.END_POSITION.ticks, -28.3 + frontDistance, 4,false, false);
                     }
                 } else {
                     if (opMode.startingPosition == MM_OpMode.LEFT) {
-                        runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -51.0 + frontDistance, 5, false, false);
+                        runSlideandDrive(MM_Slide.SlidePosition.END_POSITION.ticks, -51.0 + frontDistance, 5, false, false);
                     } else {
-
+                        runSlideandDrive(MM_Slide.SlidePosition.DETECT.ticks, -2.5 + frontDistance, 4, false, false);
                     }
                 }
             }
         } else if (currentPosition == MEDIUM) {
+            drivetrain.engageConePusher();
             drivetrain.resetEncoders();
             double frontDistance = drivetrain.getFrontSonar();
             double leftDistance = drivetrain.getLeftSonar();
@@ -114,24 +142,25 @@ public class MM_Robot {
             //left 50.5
             if (opMode.parkingColor == MM_EOCVDetection.RED) {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
-                    runSlideandDrive(MM_Slide.SlidePosition.DETECT, -2.5 + frontDistance, 4, false, false);
+                    runSlideandDrive(MM_Slide.SlidePosition.DETECT.ticks, -2.5 + frontDistance, 4, false, false);
                 } else {
-
+                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION.ticks, -51.0 + frontDistance, 5, false, false);
                 }
             } else if (opMode.parkingColor == MM_EOCVDetection.BLUE) {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
-                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -28.5 + frontDistance, 4,false, false);
+                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION.ticks, -27.5 + frontDistance, 4,false, false);
                 } else {
-
+                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION.ticks, -27.5 + frontDistance, 4,false, false);
                 }
             } else {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
-                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -51.0 + frontDistance, 5, false, false);
+                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION.ticks, -51.0 + frontDistance, 5, false, false);
                 } else {
-
+                    runSlideandDrive(MM_Slide.SlidePosition.DETECT.ticks, -2.5 + frontDistance, 4, false, false);
                 }
             }
         } else if (currentPosition == FRONT_HIGH) {
+            drivetrain.engageConePusher();
             drivetrain.strafeInches(-3.25);
             drivetrain.resetEncoders();
             double frontDistance = drivetrain.getFrontSonar() + 44.5;
@@ -142,24 +171,25 @@ public class MM_Robot {
             //left 50.5
             if (opMode.parkingColor == MM_EOCVDetection.RED) {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
-                    runSlideandDrive(MM_Slide.SlidePosition.DETECT, -2.5 + frontDistance, 4, false, false);
+                    runSlideandDrive(MM_Slide.SlidePosition.DETECT.ticks, -2.5 + frontDistance, 4, false, false);
                 } else {
-
+                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION.ticks, -51.0 + frontDistance, 5, false, false);
                 }
             } else if (opMode.parkingColor == MM_EOCVDetection.BLUE) {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
-                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -28.3 + frontDistance, 4,false, false);
+                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION.ticks, -28.3 + frontDistance, 4,false, false);
                 } else {
-
+                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION.ticks, -28.3 + frontDistance, 4,false, false);
                 }
             } else {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
-                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -51.0 + frontDistance, 5, false, false);
+                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION.ticks, -51.0 + frontDistance, 5, false, false);
                 } else {
-
+                    runSlideandDrive(MM_Slide.SlidePosition.DETECT.ticks, -2.5 + frontDistance, 4, false, false);
                 }
             }
         } else if (currentPosition == NEARSIDE_HIGH) {
+            drivetrain.engageConePusher();
             drivetrain.resetEncoders();
             double frontDistance = drivetrain.getFrontSonar();
             double leftDistance = drivetrain.getLeftSonar();
@@ -170,27 +200,31 @@ public class MM_Robot {
             if (opMode.parkingColor == MM_EOCVDetection.RED) {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
                 } else {
-                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -51.0 + frontDistance, 5, false, false);
+                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION.ticks, -14, 5, false, false);
                 }
             } else if (opMode.parkingColor == MM_EOCVDetection.BLUE) {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
                 } else {
-                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION, -29.5 + frontDistance, 4,false, false);
+                    runSlideandDrive(MM_Slide.SlidePosition.END_POSITION.ticks,  10.5, 4,false, false);
                 }
             } else {
                 if (opMode.startingPosition == MM_OpMode.LEFT) {
                 } else {
-                    runSlideandDrive(MM_Slide.SlidePosition.DETECT, -4.5 + frontDistance, 4, false, false);
+                    runSlideandDrive(MM_Slide.SlidePosition.DETECT.ticks, 36, 4, false, false);
                 }
             }
         } else {
 //blind park
         }
+        drivetrain.setSignalProtectorPosition(0.5);
         if (opMode.startingPosition == MM_OpMode.LEFT && !(opMode.parkingColor == MM_EOCVDetection.RED)) {
-            drivetrain.setSignalProtectorPosition(0.25);
             drivetrain.rotateToAngle(90);
+        } else if (opMode.startingPosition == MM_OpMode.RIGHT && !(opMode.parkingColor == MM_EOCVDetection.YELLOW)) {
+            drivetrain.rotateToAngle(drivetrain.get90Angle());
         }
-
+        while (opMode.opModeIsActive()) {
+            drivetrain.wag();
+        }
     }
 
     public void collectFromStack() {
@@ -203,41 +237,39 @@ public class MM_Robot {
             }
             else {
                 runSlideandStrafe(lift.slide.stackTicks(5), -18, 3, false);
-                drivetrain.strafeInches(4.5);
-                drivetrain.rotateToAngle(90);
-                drivetrain.rotateToMicroscopicAngle(90);
-                drivetrain.initializeGyroAndEncoders();
-                drivetrain.rotateToAngle(90);
+                drivetrain.strafeInches(2);
+                straightAngle = drivetrain.get180Angle();
+                drivetrain.rotateToAngle(straightAngle);
+                drivetrain.followTapeToStack();
                 //may have to add a drive, not sure
             }
         } else {
             if (lastScored == LOW) {
-                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 10.2, -2, MM_Drivetrain.DRIVE, 40,5,false, true);
-            } else if (lastScored == MEDIUM || lastScored == NEARSIDE_HIGH) {
+                runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 10.2, -2, MM_Drivetrain.DRIVE, 40,5,false, true);
+            } else if (lastScored == MEDIUM) {
                 //only works for left and nearside on the right
-                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 20, -4, 3, 0,5,false, true);
+                runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 20, -6, 3, 0,5,false, true);
             } else if (lastScored == FRONT_HIGH) {
-                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 44, -4, 3, 0, 6, false, true);
+                runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 44, -4, 3, 0, 6, false, true);
+            } else if (lastScored == NEARSIDE_HIGH) {
+                runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 20, -2, 3, 0,5,false, true);
             }
         }
         double retryCounter = 0;
-        while (opMode.opModeIsActive() && !drivetrain.followTapeToStack() && retryCounter < 2) {
-            drivetrain.resetEncoders();
-            drivetrain.driveInches(-12);
-            retryCounter += 1;
-        }
+
         if (retryCounter < 2) {
             if (conesScored == 0) {
                 drivetrain.setSignalProtectorPosition(signalProtectorPosition);
             }
             double angle = 0;
             if (opMode.startingPosition == MM_OpMode.RIGHT) {
-                angle = 90;
+                angle = straightAngle;
             }
             drivetrain.rotateToMicroscopicAngle(angle);
-            while (opMode.opModeIsActive() && !autoStackCollect(5 - conesScored)) { //in case robot lifts itself up
+            while (opMode.opModeIsActive() && (!autoStackCollect(5 - conesScored) || !drivetrain.coneCollected())) { //in case robot lifts itself up
+                lift.chomper.release();
                 drivetrain.resetEncoders();
-                drivetrain.driveInches(-6);
+                drivetrain.driveInches(-12);
                 drivetrain.followTapeToStack();
             }
             drivetrain.resetEncoders();
@@ -249,15 +281,19 @@ public class MM_Robot {
 
     public void scoreOnJunction(int scoreTarget) {
         this.scoreTarget = scoreTarget;
+        runtime.reset();
+        while (opMode.startingPosition == MM_OpMode.RIGHT && opMode.opModeIsActive() && runtime.seconds() < 0.2) {
+            drivetrain.strafe(1);
+        }
         lift.turner.autoFlip();
         if (scoreTarget == LOW) {
-            runSlideandDrive(MM_Slide.SlidePosition.LOW, -5, 3, false, true);
+            runSlideandDrive(MM_Slide.SlidePosition.LOW.ticks, -5, 3, false, true);
         } else if (scoreTarget == MEDIUM) {
-            runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, -30, 4, false, true);
+            runSlideandDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -30, 4, false, true);
         } else if (scoreTarget == FRONT_HIGH){
-            runSlideandDrive(MM_Slide.SlidePosition.HIGH, -54, 5, false, true);
+            runSlideandDrive(MM_Slide.SlidePosition.HIGH.ticks, -54, 5, false, true);
         } else { //Nearside high
-            runSlideandDrive(MM_Slide.SlidePosition.HIGH, -30, 5, false, true);
+            runSlideandDrive(MM_Slide.SlidePosition.HIGH.ticks, -30, 5, false, true);
         }
         lift.scoreCone();
         currentPosition = scoreTarget;
@@ -275,7 +311,7 @@ public class MM_Robot {
         return !(totalTime > 26); //blue
     }
 
-    public void runSlideandDrive(MM_Slide.SlidePosition slidePosition, double inches, double timeoutTime, boolean flipTurner, boolean distanceKickOut) {
+    public void runSlideandDrive(int slidePosition, double inches, double timeoutTime, boolean flipTurner, boolean distanceKickOut) {
         drivetrain.prepareToDrive(inches, distanceKickOut);
         lift.slide.moveTowardTarget(slidePosition);
 
@@ -340,7 +376,7 @@ public class MM_Robot {
         while (opMode.opModeIsActive() && (!driveDone || !slideDone || !tapeDone) && runtime.seconds() < timeoutTime) {
             if (!tapeDone && driveDone) {
                 tapeDone = drivetrain.reachedPositionTapeDrive();
-            } else {
+            } else if (!driveDone) {
                 driveDone = drivetrain.reachedPositionDiagonalDrive();
             }
 

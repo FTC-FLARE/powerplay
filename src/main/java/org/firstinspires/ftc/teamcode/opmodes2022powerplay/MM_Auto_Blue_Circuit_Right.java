@@ -80,9 +80,9 @@ public class MM_Auto_Blue_Circuit_Right extends MM_OpMode {
                 robot.lift.scoreCone();
                 robot.drivetrain.strafeInches(13);
                 if (sleeveColor == MM_EOCVDetection.YELLOW) {
-                    robot.runSlideandDrive(MM_Slide.SlidePosition.COLLECT, 45, 4, false, false);
+                    robot.runSlideandDrive(MM_Slide.SlidePosition.COLLECT.ticks, 45, 4, false, false);
                 } else if (sleeveColor == MM_EOCVDetection.BLUE) {
-                    robot.runSlideandDrive(MM_Slide.SlidePosition.COLLECT, 23, 4, false, false);
+                    robot.runSlideandDrive(MM_Slide.SlidePosition.COLLECT.ticks, 23, 4, false, false);
                 }
             }
         }

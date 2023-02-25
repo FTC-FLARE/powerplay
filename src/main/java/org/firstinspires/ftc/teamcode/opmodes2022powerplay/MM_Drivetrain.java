@@ -39,7 +39,8 @@ public class MM_Drivetrain {
 
     private ColorSensor rightTapeSensor = null;
     private ColorSensor leftTapeSensor = null;
-    private DistanceSensor distance = null;
+    private DistanceSensor coneDetector = null;
+    private DistanceSensor stackDetector = null;
     private DistanceSensor detectorOfTheScaryYellowJunctions = null;
     private AnalogInput leftSonar = null;
     private AnalogInput frontSonar = null;
@@ -76,11 +77,11 @@ public class MM_Drivetrain {
     private static final int TAPE_TOLERANCE_BLUE = 80;
     private static final int TAPE_TOLERANCE_RED = 70;
     private static final double MAX_TAPE_POWER = 0.45;
-    private static final double STACK_DISTANCE = 4.6; //5.2
-    private static final double STACK_DISTANCE_TOLERANCE = 0.4; ///0.2
+    private static final double STACK_DISTANCE = 4.9; //5.2
+    private static final double STACK_DISTANCE_TOLERANCE = 0.3; ///0.2
     private static final double LEFT_WAG = 0.25;
-    private static final double RIGHT_WAG = 0.75;
-    private static final double TAIL_TIME_INCREMENT= 0.15;
+    private static final double RIGHT_WAG = 0.53;
+    private static final double TAIL_TIME_INCREMENT= 0.22;
 
 
     private int slowMode = SLOW;
@@ -331,7 +332,7 @@ public class MM_Drivetrain {
 
         if (driving) {
             if (colorKickOut) {
-                return checkColors();
+                return checkColors() || getSonarDistance(frontSonar) < 16;
             }
         }
         if (!driving && !strafing) {
@@ -477,6 +478,11 @@ public class MM_Drivetrain {
             strafe = -strafe;
         }
 
+        if (opMode.dpadDownPressed(MM_OpMode.GAMEPAD1)) {
+            conePusher = opMode.hardwareMap.get(Servo.class, "conePusher");
+            conePusher.setPosition(0);
+        }
+
         flPower = (drive + turn + strafe);
         frPower = (drive - turn - strafe);
         blPower = (drive + turn - strafe);
@@ -495,6 +501,7 @@ public class MM_Drivetrain {
         }else {
             setMotorPower(flPower, frPower, blPower, brPower);
         }
+        wagTail();
     }
 
     public void rotateToAngle(double targetAngle){
@@ -622,7 +629,7 @@ public class MM_Drivetrain {
     }
 
     public boolean reachedPositionTapeDrive() {
-        double frontDistance = getConeDistance();
+        double frontDistance = getStackDistance();
         double distanceError = frontDistance - STACK_DISTANCE;
         opMode.telemetry.addData("Distance", frontDistance);
 
@@ -713,15 +720,18 @@ public class MM_Drivetrain {
 
     public boolean withinJunctionRange() {
         if (opMode.startingPosition == MM_OpMode.LEFT) {
-            return getJunctionDistance() < 15;
+            if (opMode.robot.scoreTarget == MM_Robot.LOW) {
+                return getJunctionDistance() < 15;
+            } else {
+                return getJunctionDistance() < 10;
+            }
         } else {
             return getJunctionDistance() < 6;
         }
-
     }
 
     public boolean alignedWithJunction() {
-        if (!withinJunctionRange() && opMode.startingPosition == MM_OpMode.LEFT) {
+        if (opMode.startingPosition == MM_OpMode.LEFT) {
             runtime.reset();
             double startingDistance = detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH);
             double currentDistance = startingDistance;
@@ -730,8 +740,10 @@ public class MM_Drivetrain {
             rightPriorEncoderTarget = rightEncoder.getCurrentPosition();
 
             double avgInchesTarget = 0;
+            double timeout = 0.30;
             if (opMode.robot.scoreTarget == MM_Robot.MEDIUM) {
                 avgInchesTarget = 26.5;
+                timeout = 0.35;
             } else if (opMode.robot.scoreTarget == MM_Robot.NEARSIDE_HIGH) {
                 avgInchesTarget = 26.5;
             } else {
@@ -739,7 +751,7 @@ public class MM_Drivetrain {
             }
             //currentDistance > 2.75 && currentDistance < 7
             runtime.reset();
-            while (opMode.opModeIsActive() && (avgInches > avgInchesTarget|| runtime.seconds() < 0.27)) {
+            while (opMode.opModeIsActive() && (avgInches > avgInchesTarget|| runtime.seconds() < timeout)) {
                 double inches = MM_Util.voltageToInches(leftSonar.getVoltage());
                 sum += inches;
                 sum -= lastTerms[loopTracker];
@@ -759,10 +771,8 @@ public class MM_Drivetrain {
             return true;
         } else {
             runtime.reset();
-            while (opMode.opModeIsActive() && runtime.seconds() < 0.15) {
-                strafe(LEFT);
-            }
             stop();
+            opMode.waitSeconds(0.15);
         }
         return true;
     }
@@ -770,17 +780,17 @@ public class MM_Drivetrain {
         leftCurrentTicks = leftEncoder.getCurrentPosition();
         rightCurrentTicks = rightEncoder.getCurrentPosition();
         boolean corrected = true;
-        if (getConeDistance() > 4.2) {
+        if (getStackDistance() > 4.2) {
             drive(FORWARD);
             corrected = false;
-        } else if (getConeDistance() < 3.2) {
+        } else if (getStackDistance() < 3.2) {
             drive(BACKWARD);
             corrected = false;
         }
 
         runtime.reset();
         while (opMode.opModeIsActive() && !corrected && runtime.seconds() < 3) {
-            double distance = getConeDistance();
+            double distance = getStackDistance();
             corrected = (distance < 4.2 && distance > 2.8);
         }
         leftPriorEncoderTarget = leftPriorEncoderTarget + (leftEncoder.getCurrentPosition() - leftCurrentTicks);
@@ -1003,8 +1013,6 @@ public class MM_Drivetrain {
             rightOdomLift.setPosition(0);
             backOdomLift.setPosition(1);
             indicator.setPosition(0);
-            rightTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "rightTapeSensor");
-            leftTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "leftTapeSensor");
 
         } else {
             rightTapeSensor = opMode.hardwareMap.get(ColorSensor.class, "rightTapeSensor");
@@ -1014,8 +1022,11 @@ public class MM_Drivetrain {
 
             scorer = opMode.hardwareMap.get(Servo.class, "floppyServo");
             scorer.setPosition(0.32);
+            conePusher = opMode.hardwareMap.get(Servo.class, "conePusher");
+            conePusher.setPosition(1);
 
-            distance = opMode.hardwareMap.get(DistanceSensor.class, "coneSensor");
+            coneDetector = opMode.hardwareMap.get(DistanceSensor.class, "coneDetector");
+            stackDetector = opMode.hardwareMap.get(DistanceSensor.class, "stackSensor");
             detectorOfTheScaryYellowJunctions = opMode.hardwareMap.get(DistanceSensor.class, "detectorOfTheScaryYellowJunctions");
 
 
@@ -1035,6 +1046,7 @@ public class MM_Drivetrain {
     public void autoScore() {
         double inches = -14.9;
         if (opMode.startingPosition == MM_OpMode.RIGHT) {
+            priorAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
             inches -= 24;
         }
         strafeInches(inches);
@@ -1043,12 +1055,19 @@ public class MM_Drivetrain {
         scorer.setPosition(0.15);
     }
 
+    public double get180Angle() {
+        return correctedAngle(priorAngle + 180);
+    }
+
+    public double get90Angle() {return correctedAngle(priorAngle - 90); }
+
+
     public void getScorerOutOfTheWay() {
         scorer.setPosition(0);
     }
 
-    public double getConeDistance() {
-        return distance.getDistance(DistanceUnit.INCH);
+    public double getStackDistance() {
+        return stackDetector.getDistance(DistanceUnit.INCH);
     }
 
     public double getJunctionDistance() {
@@ -1142,6 +1161,7 @@ public class MM_Drivetrain {
 
     public void returnSensorReadings() {
         opMode.telemetry.addData("istilted", isTilted());
+        opMode.telemetry.addData("first angle", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
         opMode.telemetry.addData("third angle", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).thirdAngle);
         opMode.telemetry.addData("left tape red", leftTapeSensor.red());
         opMode.telemetry.addData("right tape red", rightTapeSensor.red());
@@ -1149,8 +1169,9 @@ public class MM_Drivetrain {
         opMode.telemetry.addData("right tape blue", rightTapeSensor.blue());
         opMode.telemetry.addData("front sonar", getSonarDistance(frontSonar));
         opMode.telemetry.addData("left sonar", getSonarDistance(leftSonar));
-        opMode.telemetry.addData("cone detector", getConeDistance());
+        opMode.telemetry.addData("cone stack", getStackDistance());
         opMode.telemetry.addData("scary yellow junction detector", getJunctionDistance());
+        opMode.telemetry.addData("cone detector", coneDetector.getDistance(DistanceUnit.INCH));
     }
 
     public void setSignalProtectorPosition(double position) {
@@ -1161,6 +1182,7 @@ public class MM_Drivetrain {
         if (opMode.rightBumperPressed(MM_OpMode.GAMEPAD2)) {
             if (!tailWagged) {
                 runtime.reset();
+                tailWagged = true;
             } else {
                 tailWagged = false;
             }
@@ -1181,5 +1203,24 @@ public class MM_Drivetrain {
         } else if (tailLoop) {
             runtime.reset();
         }
+    }
+
+    public boolean coneCollected() {
+        return coneDetector.getDistance(DistanceUnit.INCH) < 5;
+    }
+
+    public void engageConePusher() {
+        conePusher.setPosition(0);
+    }
+
+    public void wag() {
+        tail.setPosition(RIGHT_WAG);
+        opMode.waitSeconds(TAIL_TIME_INCREMENT);
+        tail.setPosition(LEFT_WAG);
+        opMode.waitSeconds(TAIL_TIME_INCREMENT);
+        tail.setPosition(RIGHT_WAG);
+        opMode.waitSeconds(TAIL_TIME_INCREMENT);
+        tail.setPosition(LEFT_WAG);
+        opMode.waitSeconds(TAIL_TIME_INCREMENT);
     }
 }

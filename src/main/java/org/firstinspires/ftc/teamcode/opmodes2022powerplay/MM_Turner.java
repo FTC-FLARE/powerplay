@@ -31,7 +31,11 @@ public class MM_Turner{
     }
 
     public void autoFlip() {
-        changePosition(MM_Turner.SIDE);
+        if (opMode.startingPosition == MM_OpMode.RIGHT) {
+            changePosition(SIDE - 0.0365);
+        } else {
+            changePosition(MM_Turner.SIDE);
+        }
     }
 
     public void startMoving(double increment) {
@@ -40,8 +44,13 @@ public class MM_Turner{
     }
 
     public void autoFrontFlip() {
-        conesCollected += 1;
-        turner.setPosition(FRONT - (0.01 * conesCollected));
+        if (opMode.startingPosition == MM_OpMode.LEFT) {
+            conesCollected += 1;
+            turner.setPosition(FRONT - (0.01 * conesCollected));
+        } else {
+            turner.setPosition(FRONT - 0.04);
+        }
+
     }
 
     public void checkIfDoneMoving() {

@@ -37,10 +37,10 @@ public class MM_Slide {
         DETECT(700),
         END_POSITION(1700),
         PIVOT_AUTO(1235),
-        PIVOT_POSITION(1333),
+        PIVOT_POSITION(2200),
         LOW(1800),
         MEDIUM(2975),
-        HIGH(4100);
+        HIGH(4150);
 
         public final int ticks;
 
@@ -147,6 +147,10 @@ public class MM_Slide {
 
     public int stackTicks(int stackLevel) {
         return STACK_LEVEL_INCREMENT * (stackLevel - 1) + SlidePosition.HOVER_FLOOR.ticks;
+    }
+
+    public int autoScoreLevel(MM_Slide.SlidePosition slidePosition) {
+        return slidePosition.ticks + 300; //gain in autos
     }
 
     public int lowerStackTicks(int stackLevel) {

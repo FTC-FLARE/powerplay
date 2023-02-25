@@ -30,8 +30,8 @@ public class MM_Auto_Test extends MM_OpMode {
         telemetry.update();
         initCamera();
         alliance = RED;
-        startingPosition = RIGHT;
-        parkingColor = MM_EOCVDetection.YELLOW;
+        startingPosition = LEFT;
+        parkingColor = MM_EOCVDetection.BLUE;
         signalDanger = false;
 
         robot.init();
@@ -43,14 +43,21 @@ public class MM_Auto_Test extends MM_OpMode {
             telemetry.update();
         }
 
+        robot.drivetrain.resetEncoders();
         robot.lift.chomper.release();
         totalTime.reset();
         camera.stopStreaming();
         camera.closeCameraDevice();
         robot.drivetrain.autoScore();
         robot.collectFromStack();
-        robot.scoreOnJunction(MM_Robot.NEARSIDE_HIGH);
-
+        robot.scoreOnJunction(MM_Robot.LOW);
+        robot.collectFromStack();
+        robot.scoreOnJunction(MM_Robot.LOW);
+        robot.collectFromStack();
+        robot.scoreOnJunction(MM_Robot.MEDIUM);
+        robot.collectFromStack();
+        robot.scoreOnJunction(MM_Robot.FRONT_HIGH);
+        robot.park();
 
         //make algorithm to decide if time is left for actions
     }

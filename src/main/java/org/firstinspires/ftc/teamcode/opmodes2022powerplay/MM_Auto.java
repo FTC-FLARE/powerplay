@@ -66,7 +66,7 @@ public class MM_Auto extends MM_OpMode {
             } else {
                 robot.drivetrain.resetEncoders();
                 robot.autoStackCollect(5);
-                robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -10.5,4, false, false);
+                robot.runSlideandDrive(MM_Slide.SlidePosition.LOW.ticks, -10.5,4, false, false);
                 robot.drivetrain.rotateToMicroscopicAngle(90);
                 robot.drivetrain.microscopicStrafeInches(2.5);
                 robot.lift.scoreCone();
@@ -77,7 +77,7 @@ public class MM_Auto extends MM_OpMode {
 
                 } else {
                     robot.autoStackCollect(4);
-                    robot.runSlideandDrive(MM_Slide.SlidePosition.LOW, -10.2,4, false, false);
+                    robot.runSlideandDrive(MM_Slide.SlidePosition.LOW.ticks, -10.2,4, false, false);
                     robot.drivetrain.rotateToMicroscopicAngle(90);
                     robot.drivetrain.microscopicStrafeInches(2.5);
                     robot.lift.scoreCone();
@@ -94,7 +94,7 @@ public class MM_Auto extends MM_OpMode {
 
                         } else {
                             robot.drivetrain.microscopicStrafeInches(0.9);
-                            robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM, -34.2, 5, false, false);
+                            robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -34.2, 5, false, false);
                             if (robot.timedOut() && robot.drivetrain.stuckOnCone()) {
                                 robot.drivetrain.strafe(1); //left
                                 runtime.reset();
