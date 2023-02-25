@@ -33,7 +33,7 @@ public class MM_Slide {
         RESET(-50),
         UNUSED(0),
         COLLECT(0),
-        HOVER_FLOOR(525),
+        HOVER_FLOOR(385),
         DETECT(700),
         END_POSITION(1700),
         PIVOT_AUTO(1235),
@@ -41,6 +41,9 @@ public class MM_Slide {
         LOW(1800),
         MEDIUM(2975),
         HIGH(4100);
+//                LOW(1540),
+//        MEDIUM(2680),
+//        HIGH(3800);
 
         public final int ticks;
 

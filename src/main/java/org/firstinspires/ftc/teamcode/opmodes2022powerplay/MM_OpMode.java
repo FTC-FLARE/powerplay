@@ -38,6 +38,11 @@ public abstract class MM_OpMode extends LinearOpMode {
     public int startingPosition = LEFT;
     public int parkingColor = MM_EOCVDetection.YELLOW;
     public boolean signalDanger = false;
+    public int autoConeConfiguration = 1;
+    public int lowCones = 2;
+    public int mediumCones = 2;
+    public int frontHighCones = 0;
+    public int leftHighCones = 0;
 
 
     private final ElapsedTime runtime = new ElapsedTime();

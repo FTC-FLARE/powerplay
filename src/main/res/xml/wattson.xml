@@ -20,6 +20,7 @@
             <Servo name="right" port="3"/>
             <Servo name="theUltimateConePusher" port="1"/>
             <LynxEmbeddedIMU name="imu" port="0" bus="0" />
+            <Servo name="theUltimateConePusher" port="0"/>
             <Servo name="floppyServo" port="1"/>
             <REV_VL53L0X_RANGE_SENSOR name="coneSensor" port="0" bus="2" />
             <DigitalDevice name="topStop" port="0"/>
