@@ -41,8 +41,7 @@ public class MM_EOCVDetection extends OpenCvPipeline {
             while(loopCount <= 2) {
                 Mat thresh = new Mat();
                 Core.inRange(mat, lowerBoundColorSleeve(loopCount), upperBoundColorSleeve(loopCount), thresh);
-
-                cropped = new Mat(thresh, new Range(85, 145), new Range(135, 185));
+                cropped = new Mat(thresh, new Range(70, 135), new Range(75, 125));
                 mean[loopCount] = Core.mean(cropped).val[0];
                 if (loopCount == RED) {
                     max = cropped;

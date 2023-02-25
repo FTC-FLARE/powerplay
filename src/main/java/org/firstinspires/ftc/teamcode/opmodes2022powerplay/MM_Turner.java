@@ -31,9 +31,7 @@ public class MM_Turner{
     }
 
     public void autoFlip() {
-        if ((opMode.startingPosition == MM_OpMode.LEFT && opMode.robot.scoreTarget != MM_Robot.NEARSIDE_HIGH) || (opMode.startingPosition == MM_OpMode.RIGHT && opMode.robot.scoreTarget == MM_Robot.NEARSIDE_HIGH)){
-            changePosition(MM_Turner.SIDE);
-        }
+        changePosition(MM_Turner.SIDE);
     }
 
     public void startMoving(double increment) {

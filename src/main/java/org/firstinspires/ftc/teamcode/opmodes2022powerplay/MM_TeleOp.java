@@ -10,6 +10,7 @@ public class MM_TeleOp extends MM_OpMode {
         telemetry.addLine("Please wait for Initialization");
         telemetry.update();
         robot.init();
+        robot.lift.chomper.choke();
         telemetry.addLine("Initialized");
         telemetry.update();
 

@@ -202,9 +202,12 @@ public class MM_Robot {
                 signalProtectorPosition = 1;
             }
             else {
-                drivetrain.strafeInches(-18);
-                drivetrain.strafeInches(6);
-                drivetrain.rotateToAngle(179.9);
+                runSlideandStrafe(lift.slide.stackTicks(5), -18, 3, false);
+                drivetrain.strafeInches(4.5);
+                drivetrain.rotateToAngle(90);
+                drivetrain.rotateToMicroscopicAngle(90);
+                drivetrain.initializeGyroAndEncoders();
+                drivetrain.rotateToAngle(90);
                 //may have to add a drive, not sure
             }
         } else {
@@ -229,7 +232,7 @@ public class MM_Robot {
             }
             double angle = 0;
             if (opMode.startingPosition == MM_OpMode.RIGHT) {
-                angle = 179.9;
+                angle = 90;
             }
             drivetrain.rotateToMicroscopicAngle(angle);
             while (opMode.opModeIsActive() && !autoStackCollect(5 - conesScored)) { //in case robot lifts itself up

@@ -35,7 +35,7 @@ public class MM_Drivetrain {
     private Servo indicator = null;
     private Servo scorer = null;
     private Servo conePusher = null;
-    private Servo signalProtector = null;
+    private Servo tail = null;
 
     private ColorSensor rightTapeSensor = null;
     private ColorSensor leftTapeSensor = null;
@@ -78,6 +78,9 @@ public class MM_Drivetrain {
     private static final double MAX_TAPE_POWER = 0.45;
     private static final double STACK_DISTANCE = 4.6; //5.2
     private static final double STACK_DISTANCE_TOLERANCE = 0.4; ///0.2
+    private static final double LEFT_WAG = 0.25;
+    private static final double RIGHT_WAG = 0.75;
+    private static final double TAIL_TIME_INCREMENT= 0.15;
 
 
     private int slowMode = SLOW;
@@ -89,6 +92,8 @@ public class MM_Drivetrain {
     private double sum = 0;
     private double avgInches = 0;
     private int loopTracker = 0;
+    private boolean tailWagged = false;
+    private boolean tailLoop = false;
     private double lastTerms[] = new double[FILTERSIZE + 1];
     private double lastTerm = 322;
     private double timesDetected = 0;
@@ -272,7 +277,7 @@ public class MM_Drivetrain {
         }
 
         if (distanceKickOut && powerKickedOut) {
-            if (getJunctionDistance() < 15) {
+            if (withinJunctionRange()) {
                 opMode.telemetry.addLine("aligning with junction");
                 opMode.telemetry.update();
                 alignedWithJunction();
@@ -300,6 +305,7 @@ public class MM_Drivetrain {
         }
         return false;
     }
+
 
     public boolean reachedPositionDiagonalDrive() {
         setDiagonalPower();
@@ -462,13 +468,7 @@ public class MM_Drivetrain {
         double turn = opMode.gamepad1.right_stick_x;
         double strafe = opMode.gamepad1.left_stick_x;
 
-        if (opMode.dpadUpPressed(opMode.GAMEPAD2)){
-
-        }else if (opMode.dpadDownPressed(opMode.GAMEPAD2)){
-
-        }
-
-        if(opMode.leftBumperPressed(opMode.GAMEPAD1)){
+        if(opMode.leftBumperPressed(MM_OpMode.GAMEPAD1)){
             backwardsMode = !backwardsMode;
         }
 
@@ -495,8 +495,6 @@ public class MM_Drivetrain {
         }else {
             setMotorPower(flPower, frPower, blPower, brPower);
         }
-        opMode.telemetry.addData("left", leftTapeSensor.red());
-        opMode.telemetry.addData("RIGHT", rightTapeSensor.red());
     }
 
     public void rotateToAngle(double targetAngle){
@@ -509,9 +507,11 @@ public class MM_Drivetrain {
         opMode.pTurnController.setInputRange(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle, targetAngle);
         opMode.pTurnController.setSetpoint(targetAngle);
         runtime.reset();
+        double prevAngle = priorAngle;
 
         do {
-            double turnPower = Math.abs(opMode.pTurnController.calculatePower(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle));
+            double currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+            double turnPower = Math.abs(opMode.pTurnController.calculatePower(currentAngle));
 
             if(correctedAngle(opMode.pTurnController.getCurrentError()) > 0){
                 setMotorPower(-turnPower, turnPower, -turnPower, turnPower);
@@ -521,7 +521,10 @@ public class MM_Drivetrain {
             opMode.telemetry.addData("target reached", opMode.pTurnController.reachedTarget());
             opMode.telemetry.update();
 
-        } while (opMode.opModeIsActive() && !opMode.pTurnController.reachedTarget() && runtime.seconds() < timeOut);
+
+            prevAngle = currentAngle;
+
+        } while (opMode.opModeIsActive() && (!opMode.pTurnController.reachedTarget()) && runtime.seconds() < timeOut);
 
         stop();
         priorAngle = targetAngle;
@@ -709,7 +712,12 @@ public class MM_Drivetrain {
     }
 
     public boolean withinJunctionRange() {
-        return detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH) < 1;
+        if (opMode.startingPosition == MM_OpMode.LEFT) {
+            return getJunctionDistance() < 15;
+        } else {
+            return getJunctionDistance() < 6;
+        }
+
     }
 
     public boolean alignedWithJunction() {
@@ -751,7 +759,7 @@ public class MM_Drivetrain {
             return true;
         } else {
             runtime.reset();
-            while (opMode.opModeIsActive() && runtime.seconds() < 0.27) {
+            while (opMode.opModeIsActive() && runtime.seconds() < 0.15) {
                 strafe(LEFT);
             }
             stop();
@@ -983,8 +991,8 @@ public class MM_Drivetrain {
     }
 
     private void initServos(){
-        signalProtector = opMode.hardwareMap.get(Servo.class, "signalProtector");
-        signalProtector.setPosition(0.25);
+        tail = opMode.hardwareMap.get(Servo.class, "signalProtector");
+        tail.setPosition(0.25);
         if(opMode.getClass() == MM_TeleOp.class){
             indicator = opMode.hardwareMap.get(Servo.class, "floppyServo");
             leftOdomLift = opMode.hardwareMap.get(Servo.class,"leftOdometryLift");
@@ -1146,6 +1154,32 @@ public class MM_Drivetrain {
     }
 
     public void setSignalProtectorPosition(double position) {
-        signalProtector.setPosition(position);
+        tail.setPosition(position);
+    }
+
+    public void wagTail() {
+        if (opMode.rightBumperPressed(MM_OpMode.GAMEPAD2)) {
+            if (!tailWagged) {
+                runtime.reset();
+            } else {
+                tailWagged = false;
+            }
+        } else if (opMode.dpadUpPressed(MM_OpMode.GAMEPAD1)) {
+            tailLoop = !tailLoop;
+        }
+        double seconds = runtime.seconds();
+        if (seconds < 5 * TAIL_TIME_INCREMENT) {
+            if (seconds < TAIL_TIME_INCREMENT) {
+                tail.setPosition(RIGHT_WAG);
+            } else if (seconds < 2 * TAIL_TIME_INCREMENT) {
+                tail.setPosition(LEFT_WAG);
+            } else if (seconds < 3 * TAIL_TIME_INCREMENT) {
+                tail.setPosition(RIGHT_WAG);
+            } else {
+                tail.setPosition(LEFT_WAG);
+            }
+        } else if (tailLoop) {
+            runtime.reset();
+        }
     }
 }
