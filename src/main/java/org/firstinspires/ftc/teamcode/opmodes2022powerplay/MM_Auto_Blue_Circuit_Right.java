@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
+/*package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -113,7 +113,7 @@ public class MM_Auto_Blue_Circuit_Right extends MM_OpMode {
         FtcDashboard.getInstance().startCameraStream(camera, 0);
 
     }
-}
+}*/
 //*/
 //    private void firstInitCamera() {
 //        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());

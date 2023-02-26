@@ -744,7 +744,7 @@ public class MM_Drivetrain {
             if (opMode.robot.scoreTarget == MM_Robot.MEDIUM) {
                 avgInchesTarget = 26.5;
                 timeout = 0.35;
-            } else if (opMode.robot.scoreTarget == MM_Robot.NEARSIDE_HIGH) {
+            } else if (opMode.robot.scoreTarget == MM_Robot.RIGHT_HIGH) {
                 avgInchesTarget = 26.5;
             } else {
                 avgInchesTarget = 55.0;

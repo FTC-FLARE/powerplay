@@ -45,7 +45,7 @@ public class MM_Auto extends MM_OpMode {
 
             if (autoConeConfiguration == 1) {
                 lowCones = 2;
-                mediumCones = 1;
+                mediumCones = 2;
                 frontHighCones = 0;
                 signalDanger = false;
             }else if (autoConeConfiguration == 2){
@@ -79,15 +79,23 @@ public class MM_Auto extends MM_OpMode {
 //            code that will always be the same
 
         totalTime.reset();
-        int sleeveColor = detector.getMaxColor();
+        robot.startTimer();
+        parkingColor = detector.getMaxColor();
+        if (lowCones == 4) {
+            lastCone = MM_Robot.LOW;
+        } else if (startingPosition == MM_OpMode.RIGHT) {
+            lastCone = MM_Robot.RIGHT_HIGH;
+        } else if (parkingColor == MM_EOCVDetection.YELLOW) {
+            lastCone = MM_Robot.FRONT_HIGH;
+        } else {
+            lastCone = MM_Robot.MEDIUM;
+        }
         robot.lift.chomper.release();
         totalTime.reset();
         camera.stopStreaming();
         camera.closeCameraDevice();
         robot.drivetrain.autoScore();
         robot.collectFromStack();
-
-
 
         if (startingPosition == LEFT) {
             robot.scoreOnJunction(MM_Robot.LOW);
@@ -98,23 +106,20 @@ public class MM_Auto extends MM_OpMode {
                 robot.scoreOnJunction(MM_Robot.LOW);
                 robot.collectFromStack();
                 robot.scoreOnJunction(MM_Robot.LOW);
-                robot.park();
             }else {
                 robot.scoreOnJunction(MM_Robot.MEDIUM);
                 robot.collectFromStack();
-                if (sleeveColor == RED){
-                    robot.scoreOnJunction(MM_Robot.LOW);
-                }else if (sleeveColor == BLUE){
-                    robot.scoreOnJunction(MM_Robot.MEDIUM);
-                }else{
-                    robot.scoreOnJunction(MM_Robot.FRONT_HIGH);
-                }
-                robot.park();
+                robot.scoreOnJunction(lastCone);
+
             }
-
         }else if (startingPosition == RIGHT){
-
+            robot.scoreOnJunction(MM_Robot.RIGHT_HIGH);
+            robot.collectFromStack();
+            robot.scoreOnJunction(MM_Robot.RIGHT_HIGH);
+            robot.collectFromStack();
+            robot.scoreOnJunction(MM_Robot.RIGHT_HIGH);
         }
+        robot.park();
     }
 
     private void initializeOpmode() {
@@ -148,5 +153,44 @@ public class MM_Auto extends MM_OpMode {
         });
 
         FtcDashboard.getInstance().startCameraStream(camera, 0);
+    }
+
+    public enum MoveTimes {
+        SCORE_LOW(1.9),
+        SCORE_MEDIUM(3),
+        SCORE_FRONT_HIGH(3.6),
+        SCORE_RIGHT_HIGH(3.3),
+        CORRECT_TIME(3.7),
+        COLLECT_TIME(1.7), //longest possible on 2 cones left
+        COLLECT_LOW(3),
+        COLLECT_MEDIUM(4.1),
+        COLLECT_RIGHT_HIGH(4.2),
+        PARK_LEFT_RED_STACK(0),
+        PARK_LEFT_BLUE_STACK(1.8),
+        PARK_LEFT_YELLOW_STACK(2.2),
+        PARK_RED_LOW_COLLECT(3),
+        PARK_BLUE_LOW_COLLECT(4.8),
+        PARK_YELLOW_LOW_COLLECT(5.1),
+        PARK_RED_LOW(1.9),
+        PARK_BLUE_LOW(2.4),
+        PARK_YELLOW_LOW(2.6),
+        PARK_RED_MEDIUM(2.3),
+        PARK_BLUE_MEDIUM(2.2),
+        PARK_YELLOW_MEDIUM(2.9),
+        PARK_YELLOW_HIGH(1.8),
+        PARK_RIGHT_RED_STACK(2.2),
+        PARK_RIGHT_BLUE_STACK(1.8),
+        PARK_RIGHT_YELLOW_STACK(0),
+        PARK_RED_RIGHT_HIGH(2.5),
+        PARK_BLUE_RIGHT_HIGH(2.2),
+        PARK_YELLOW_RIGHT_HIGH(2.1);
+
+
+
+        public final double seconds;
+
+        MoveTimes(double seconds) {
+            this.seconds = seconds;
+        }
     }
 }
