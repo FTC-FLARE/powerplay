@@ -21,6 +21,11 @@ public class MM_Auto extends MM_OpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private ElapsedTime totalTime = new ElapsedTime();
 
+    private int firstCone = MM_Robot.NO_CONE;
+    private int secondCone = MM_Robot.NO_CONE;
+    private int thirdCone = MM_Robot.NO_CONE;
+    private int fourthCone = MM_Robot.NO_CONE;
+
     @Override
     public void runOpMode() {
         initializeOpmode();
@@ -82,13 +87,24 @@ public class MM_Auto extends MM_OpMode {
         robot.startTimer();
         parkingColor = detector.getMaxColor();
         if (lowCones == 4) {
-            lastCone = MM_Robot.LOW;
+            firstCone = MM_Robot.LOW;
+            secondCone = MM_Robot.LOW;
+            thirdCone = MM_Robot.LOW;
+            fourthCone = MM_Robot.LOW;
         } else if (startingPosition == MM_OpMode.RIGHT) {
-            lastCone = MM_Robot.RIGHT_HIGH;
+            firstCone = MM_Robot.RIGHT_HIGH;
+            secondCone = MM_Robot.RIGHT_HIGH;
+            thirdCone = MM_Robot.RIGHT_HIGH;
         } else if (parkingColor == MM_EOCVDetection.YELLOW) {
-            lastCone = MM_Robot.FRONT_HIGH;
+            firstCone = MM_Robot.LOW;
+            secondCone = MM_Robot.LOW;
+            thirdCone = MM_Robot.MEDIUM;
+            fourthCone = MM_Robot.FRONT_HIGH;
         } else {
-            lastCone = MM_Robot.MEDIUM;
+            firstCone = MM_Robot.LOW;
+            secondCone = MM_Robot.LOW;
+            thirdCone = MM_Robot.MEDIUM;
+            fourthCone = MM_Robot.MEDIUM;
         }
         robot.lift.chomper.release();
         totalTime.reset();
@@ -96,30 +112,113 @@ public class MM_Auto extends MM_OpMode {
         camera.closeCameraDevice();
         robot.drivetrain.autoScore();
         robot.collectFromStack();
+        robot.scoreOnJunction(firstCone);
+        robot.collectFromStack();
+        robot.scoreOnJunction(secondCone);
 
-        if (startingPosition == LEFT) {
-            robot.scoreOnJunction(MM_Robot.LOW);
+        if (fourthCone != MM_Robot.NO_CONE) {
             robot.collectFromStack();
-            robot.scoreOnJunction(MM_Robot.LOW);
+            handleThirdCone();
+            robot.scoreOnJunction(thirdCone);
             robot.collectFromStack();
-            if (autoConeConfiguration == 2){
-                robot.scoreOnJunction(MM_Robot.LOW);
-                robot.collectFromStack();
-                robot.scoreOnJunction(MM_Robot.LOW);
-            }else {
-                robot.scoreOnJunction(MM_Robot.MEDIUM);
-                robot.collectFromStack();
-                robot.scoreOnJunction(lastCone);
-
-            }
-        }else if (startingPosition == RIGHT){
-            robot.scoreOnJunction(MM_Robot.RIGHT_HIGH);
+            handleLastCone();
+            robot.scoreOnJunction(fourthCone);
+        } else {
             robot.collectFromStack();
-            robot.scoreOnJunction(MM_Robot.RIGHT_HIGH);
-            robot.collectFromStack();
-            robot.scoreOnJunction(MM_Robot.RIGHT_HIGH);
+            handleLastCone();
+            robot.scoreOnJunction(thirdCone);
         }
         robot.park();
+    }
+
+    private void handleThirdCone() {
+        if (thirdCone != MM_Robot.LOW) { //if you are already not doing the shortest score moves
+            double targetTimeLeft = robot.getScoreTime(thirdCone) + robot.getCollectTime(thirdCone) + robot.getScoreTime(fourthCone) + robot.getParkTime(fourthCone);
+            double actualTimeLeft = totalTime.seconds();
+            if (actualTimeLeft < targetTimeLeft) {
+                if (actualTimeLeft > robot.getScoreTime(MM_Robot.MEDIUM) + robot.getCollectTime(MM_Robot.MEDIUM) + robot.getScoreTime(MM_Robot.MEDIUM) + robot.getParkTime(MM_Robot.MEDIUM)) {
+                    thirdCone = MM_Robot.MEDIUM;
+                } else if (actualTimeLeft > robot.getScoreTime(MM_Robot.LOW) + robot.getCollectTime(MM_Robot.LOW) + robot.getScoreTime(fourthCone) + robot.getParkTime(fourthCone)) {
+                    thirdCone = MM_Robot.LOW;
+                } else if (actualTimeLeft > robot.getScoreTime(MM_Robot.LOW) + robot.getCollectTime(MM_Robot.LOW) + robot.getScoreTime(MM_Robot.MEDIUM) + robot.getParkTime(MM_Robot.MEDIUM)) {
+                    thirdCone = MM_Robot.LOW;
+                } else if (actualTimeLeft > robot.getScoreTime(fourthCone) + robot.getParkTime(fourthCone)) {
+                    thirdCone = fourthCone;
+                } else if (actualTimeLeft > robot.getScoreTime(MM_Robot.MEDIUM) + robot.getParkTime(MM_Robot.MEDIUM)) {
+                    thirdCone = MM_Robot.MEDIUM;
+                } else if (actualTimeLeft > robot.getScoreTime(MM_Robot.LOW) + robot.getParkTime(MM_Robot.LOW)) {
+                    thirdCone = MM_Robot.LOW;
+                } else {
+                    thirdCone = MM_Robot.NO_CONE;
+                }
+            }
+        }
+    }
+
+    private void handleLastCone() {
+        int scoreTarget = fourthCone;
+        if (startingPosition == MM_OpMode.RIGHT) {
+            scoreTarget = thirdCone;
+        }
+        double parkTime = robot.getParkTime(scoreTarget);
+        double junctionScoreTime = robot.getScoreTime(scoreTarget);
+        if (scoreTarget == MM_Robot.LOW) {
+            parkTime = robot.getLowCollectandParkTime();
+        }
+        double timeLeft = totalTime.seconds();
+
+        if (timeLeft < parkTime + junctionScoreTime) {
+            if (startingPosition == MM_OpMode.LEFT) {
+                if (timeLeft > robot.getParkTime(MM_Robot.MEDIUM) + robot.getScoreTime(MM_Robot.MEDIUM)) {
+                    fourthCone = MM_Robot.MEDIUM;
+                } else if (timeLeft > robot.getParkTime(MM_Robot.LOW) + robot.getScoreTime(MM_Robot.LOW)) {
+                    fourthCone = MM_Robot.LOW;
+                } else {
+                    fourthCone = MM_Robot.NO_CONE;
+                }
+            } else {
+                thirdCone = MM_Robot.NO_CONE;
+            }
+        }
+    }
+
+    public enum MoveTimes {
+        SCORE_LOW(1.9),
+        SCORE_MEDIUM(3),
+        SCORE_FRONT_HIGH(3.6),
+        SCORE_RIGHT_HIGH(3.3),
+        CORRECT_TIME(3.7),
+        COLLECT_TIME(1.7), //longest possible on 2 cones left
+        COLLECT_LOW(3),
+        COLLECT_MEDIUM(4.1),
+        COLLECT_RIGHT_HIGH(4.2),
+        PARK_LEFT_RED_STACK(0),
+        PARK_LEFT_BLUE_STACK(1.8),
+        PARK_LEFT_YELLOW_STACK(2.2),
+        PARK_RED_LOW_COLLECT(3),
+        PARK_BLUE_LOW_COLLECT(4.8),
+        PARK_YELLOW_LOW_COLLECT(5.1),
+        PARK_RED_LOW(1.9),
+        PARK_BLUE_LOW(2.4),
+        PARK_YELLOW_LOW(2.6),
+        PARK_RED_MEDIUM(2.3),
+        PARK_BLUE_MEDIUM(2.2),
+        PARK_YELLOW_MEDIUM(2.9),
+        PARK_YELLOW_HIGH(1.8),
+        PARK_RIGHT_RED_STACK(2.2),
+        PARK_RIGHT_BLUE_STACK(1.8),
+        PARK_RIGHT_YELLOW_STACK(0),
+        PARK_RED_RIGHT_HIGH(2.5),
+        PARK_BLUE_RIGHT_HIGH(2.2),
+        PARK_YELLOW_RIGHT_HIGH(3.2);
+
+
+
+        public final double seconds;
+
+        MoveTimes(double seconds) {
+            this.seconds = seconds;
+        }
     }
 
     private void initializeOpmode() {
@@ -155,42 +254,4 @@ public class MM_Auto extends MM_OpMode {
         FtcDashboard.getInstance().startCameraStream(camera, 0);
     }
 
-    public enum MoveTimes {
-        SCORE_LOW(1.9),
-        SCORE_MEDIUM(3),
-        SCORE_FRONT_HIGH(3.6),
-        SCORE_RIGHT_HIGH(3.3),
-        CORRECT_TIME(3.7),
-        COLLECT_TIME(1.7), //longest possible on 2 cones left
-        COLLECT_LOW(3),
-        COLLECT_MEDIUM(4.1),
-        COLLECT_RIGHT_HIGH(4.2),
-        PARK_LEFT_RED_STACK(0),
-        PARK_LEFT_BLUE_STACK(1.8),
-        PARK_LEFT_YELLOW_STACK(2.2),
-        PARK_RED_LOW_COLLECT(3),
-        PARK_BLUE_LOW_COLLECT(4.8),
-        PARK_YELLOW_LOW_COLLECT(5.1),
-        PARK_RED_LOW(1.9),
-        PARK_BLUE_LOW(2.4),
-        PARK_YELLOW_LOW(2.6),
-        PARK_RED_MEDIUM(2.3),
-        PARK_BLUE_MEDIUM(2.2),
-        PARK_YELLOW_MEDIUM(2.9),
-        PARK_YELLOW_HIGH(1.8),
-        PARK_RIGHT_RED_STACK(2.2),
-        PARK_RIGHT_BLUE_STACK(1.8),
-        PARK_RIGHT_YELLOW_STACK(0),
-        PARK_RED_RIGHT_HIGH(2.5),
-        PARK_BLUE_RIGHT_HIGH(2.2),
-        PARK_YELLOW_RIGHT_HIGH(2.1);
-
-
-
-        public final double seconds;
-
-        MoveTimes(double seconds) {
-            this.seconds = seconds;
-        }
-    }
 }

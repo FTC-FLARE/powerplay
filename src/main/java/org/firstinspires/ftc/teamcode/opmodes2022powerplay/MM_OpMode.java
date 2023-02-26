@@ -43,7 +43,6 @@ public abstract class MM_OpMode extends LinearOpMode {
     public int mediumCones = 2;
     public int frontHighCones = 0;
     public int leftHighCones = 0;
-    public int lastCone = 0;
 
 
     private final ElapsedTime runtime = new ElapsedTime();

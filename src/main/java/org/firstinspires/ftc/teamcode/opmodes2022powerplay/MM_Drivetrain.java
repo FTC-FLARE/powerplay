@@ -1073,6 +1073,8 @@ public class MM_Drivetrain {
 
     public double get90Angle() {return correctedAngle(priorAngle - 90); }
 
+    public double get270Angle() {return correctedAngle(priorAngle + 90); }
+
 
     public void getScorerOutOfTheWay() {
         scorer.setPosition(0);
