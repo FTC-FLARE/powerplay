@@ -24,136 +24,95 @@ public class MM_Auto extends MM_OpMode {
     @Override
     public void runOpMode() {
         initializeOpmode();
+        robot.drivetrain.initializeGyroAndEncoders();
         while (!isStarted() && !isStopRequested()) {
             updateController();
             if (rightBumperPressed(GAMEPAD1)) {
                 alliance = BLUE;
             } else if (leftBumperPressed(GAMEPAD1)) {
                 alliance = RED;
-            } else if (aPressed(GAMEPAD1)) {
+            } else if (xPressed(GAMEPAD1)) {
                 if (startingPosition == LEFT) {
                     startingPosition = RIGHT;
                 } else {
                     startingPosition = LEFT;
                 }
+            }else if (dpadDownPressed(GAMEPAD1) && autoConeConfiguration < 4){
+                autoConeConfiguration = 1;
+            }else if (dpadUpPressed(GAMEPAD1) && autoConeConfiguration > 0){
+                autoConeConfiguration = 2;
             }
 
-            telemetry.addLine("Right or left bumper to change alliance");
-            telemetry.addLine("Press 'a' to change starting position");
-            telemetry.addData(alliance == RED ? "Red" : "Blue", startingPosition == LEFT ? "Left" : "Right");
+            if (autoConeConfiguration == 1) {
+                lowCones = 2;
+                mediumCones = 1;
+                frontHighCones = 0;
+                signalDanger = false;
+            }else if (autoConeConfiguration == 2){
+                lowCones = 4;
+                mediumCones = 0;
+                frontHighCones = 0;
+                signalDanger = true;
+            }
 
+//            robot.drivetrain.returnSensorReadings();
+             telemetry.addLine("Right or left bumper to change alliance");
+            telemetry.addLine("Press 'x' to change starting position");
+            telemetry.addData(alliance == RED ? "Red" : "Blue", startingPosition == LEFT ? "Left" : "Right");
+            if (startingPosition == LEFT){
+                telemetry.addLine("Use dpad up and down to adjust cone configuration");
+                telemetry.addLine("current cone configuration:");
+                telemetry.addData("low :", lowCones);
+                telemetry.addData("medium :", mediumCones);
+                telemetry.addData("high :", frontHighCones);
+                telemetry.addData("safety park :", signalDanger);
+
+            }else {
+                telemetry.addLine("**Only press when completely done with initialization**");
+                telemetry.addLine("press left stick to finalize initialization and reset encoders");
+            }
             telemetry.update();
         }
+//        robot.drivetrain.returnSensorReadings();
+        waitForStart();
         //*************************************** DRIVER HIT PLAY **************************************************
-        //robot.startTotalTime();
-        //scorePosition = ;
+//            code that will always be the same
 
         totalTime.reset();
+        int sleeveColor = detector.getMaxColor();
+        robot.lift.chomper.release();
+        totalTime.reset();
+        camera.stopStreaming();
+        camera.closeCameraDevice();
+        robot.drivetrain.autoScore();
+        robot.collectFromStack();
+
+
+
         if (startingPosition == LEFT) {
-            int sleeveColor = detector.getMaxColor();
-            robot.lift.chomper.release();
-            robot.drivetrain.microscopicDriveInches(1.40);
-            robot.drivetrain.strafeInches(-8);
-            robot.drivetrain.autoScore();
-            while (opModeIsActive() && runtime.seconds() < 0.3) {
-            }
-            robot.drivetrain.diagonalDriveInches(2, 8);
-            robot.drivetrain.rotateToAngle(90); //1/25 - -56.75 under this
-            robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 22, -57.5, MM_Drivetrain.DRIVE, 70, 8, false, true);
-            robot.drivetrain.rotateToMicroscopicAngle(90);
-            robot.drivetrain.correctForTape();
-            if (!robot.drivetrain.correctForCone()) {
-            } else {
-                robot.drivetrain.resetEncoders();
-                robot.autoStackCollect(5);
-                robot.runSlideandDrive(MM_Slide.SlidePosition.LOW.ticks, -10.5,4, false, false);
-                robot.drivetrain.rotateToMicroscopicAngle(90);
-                robot.drivetrain.microscopicStrafeInches(2.5);
-                robot.lift.scoreCone();
-                robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 10.2, -1, 2, 0,5,false, false);
-                robot.drivetrain.rotateToMicroscopicAngle(90);
-                robot.drivetrain.correctForTape();
-                if (!robot.drivetrain.correctForCone()) {
-
-                } else {
-                    robot.autoStackCollect(4);
-                    robot.runSlideandDrive(MM_Slide.SlidePosition.LOW.ticks, -10.2,4, false, false);
-                    robot.drivetrain.rotateToMicroscopicAngle(90);
-                    robot.drivetrain.microscopicStrafeInches(2.5);
-                    robot.lift.scoreCone();
-                    robot.drivetrain.resetEncoders();
-                    robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 9.2, -1, 2, 0,5,false, false);
-                    robot.drivetrain.rotateToMicroscopicAngle(90);
-                    robot.drivetrain.correctForTape();
-                    if (!robot.drivetrain.correctForCone()) { //add another parameter to check for time because being parked is more worth
-
-                    } else {
-                        robot.autoStackCollect(3);
-                        robot.drivetrain.resetEncoders();
-                        if (!robot.timeToScore(totalTime.seconds(), sleeveColor)) {
-
-                        } else {
-                            robot.drivetrain.microscopicStrafeInches(0.9);
-                            robot.runSlideandDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -34.2, 5, false, false);
-                            if (robot.timedOut() && robot.drivetrain.stuckOnCone()) {
-                                robot.drivetrain.strafe(1); //left
-                                runtime.reset();
-                                while (opModeIsActive() && runtime.seconds() < 2) {
-                                }
-                            } else {
-                                robot.drivetrain.rotateToMicroscopicAngle(90);
-                                robot.lift.scoreCone();
-                                robot.drivetrain.resetEncoders();
-                            }
-                            robot.park();
-                        }
-                    }
+            robot.scoreOnJunction(MM_Robot.LOW);
+            robot.collectFromStack();
+            robot.scoreOnJunction(MM_Robot.LOW);
+            robot.collectFromStack();
+            if (autoConeConfiguration == 2){
+                robot.scoreOnJunction(MM_Robot.LOW);
+                robot.collectFromStack();
+                robot.scoreOnJunction(MM_Robot.LOW);
+                robot.park();
+            }else {
+                robot.scoreOnJunction(MM_Robot.MEDIUM);
+                robot.collectFromStack();
+                if (sleeveColor == RED){
+                    robot.scoreOnJunction(MM_Robot.LOW);
+                }else if (sleeveColor == BLUE){
+                    robot.scoreOnJunction(MM_Robot.MEDIUM);
+                }else{
+                    robot.scoreOnJunction(MM_Robot.FRONT_HIGH);
                 }
+                robot.park();
             }
 
         }else if (startingPosition == RIGHT){
-            robot.drivetrain.getScorerOutOfTheWay();
-            robot.lift.slide.waitToReachPosition(robot.lift.slide.stackTicks(1));
-            robot.lift.chomper.release();
-            robot.drivetrain.microscopicDriveInches(2);
-            robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
-            robot.lift.chomper.choke();
-            runtime.reset();
-            while (opModeIsActive() && runtime.seconds() < 0.3) {
-            }
-            robot.lift.slide.waitToReachPosition(MM_Slide.SlidePosition.DETECT);
-            int sleeveColor = detector.getMaxColor();
-            //check to see if you can see color during init with a cone
-            robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.LOW.ticks, 15, 2, MM_Drivetrain.STRAFE, 70, 6, true, false); //test
-            robot.lift.scoreCone();
-            robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 41, -1.5, 2, 0,8, false, false );
-            robot.drivetrain.driveInches(-4);
-            robot.drivetrain.rotateToAngle(-90);
-            robot.drivetrain.driveInches(23);
-            robot.drivetrain.rotateToMicroscopicAngle(-90);
-            robot.drivetrain.resetEncoders();
-            robot.drivetrain.correctForTape();
-            if (!robot.drivetrain.correctForCone()) {
-
-            } else {
-                robot.autoStackCollect(5);
-                robot.drivetrain.resetEncoders();
-                robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.LOW.ticks, -21, -12, MM_Drivetrain.STRAFE, 90, 7, false, false);
-                robot.lift.scoreCone();
-                robot.drivetrain.driveInches(-8);
-                robot.runSlideandDiagonalDrive(robot.lift.slide.stackTicks(5), 23, 14, 2, 0, 7, false, false);
-                robot.drivetrain.correctForTape();
-                if (!robot.drivetrain.correctForCone()) {
-                } else {
-                    robot.autoStackCollect(4);
-                    robot.lift.turner.changePosition(MM_Turner.BACK);
-                    robot.drivetrain.resetEncoders();
-                    robot.runSlideandDiagonalDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -25, -12.2, MM_Drivetrain.STRAFE, 90, 7, false, false);
-                    robot.lift.scoreCone();
-                    robot.drivetrain.strafeInches(13);
-                    robot.park();
-                }
-            }
 
         }
     }
