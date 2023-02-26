@@ -305,23 +305,26 @@ public class MM_Robot {
             }
             lift.turner.autoFlip();
             if (scoreTarget == LOW) {
-                runSlideandDrive(MM_Slide.SlidePosition.LOW.ticks, -5, Math.min(3, totalTime.seconds() - getParkTime(LOW)), false, true);
+                runSlideandDrive(MM_Slide.SlidePosition.LOW.ticks, -5, Math.min(2.5, totalTime.seconds() - getParkTime(LOW)), false, true);
             } else if (scoreTarget == MEDIUM) {
-                runSlideandDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -30, Math.min(4, totalTime.seconds() - getParkTime(MEDIUM)), false, true);
+                runSlideandDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -30, Math.min(3.5, totalTime.seconds() - getParkTime(MEDIUM)), false, true);
             } else if (scoreTarget == FRONT_HIGH){
-                runSlideandDrive(MM_Slide.SlidePosition.HIGH.ticks, -54, Math.min(5, totalTime.seconds() - getParkTime(FRONT_HIGH)), false, true);
+                runSlideandDrive(MM_Slide.SlidePosition.HIGH.ticks, -54, Math.min(4.5, totalTime.seconds() - getParkTime(FRONT_HIGH)), false, true);
             } else { //Nearside high
-                runSlideandDrive(MM_Slide.SlidePosition.HIGH.ticks, -30, Math.min(5, totalTime.seconds() - getParkTime(RIGHT_HIGH)), false, true);
+                runSlideandDrive(MM_Slide.SlidePosition.HIGH.ticks, -30, Math.min(3.7, totalTime.seconds() - getParkTime(RIGHT_HIGH)), false, true);
             }
             currentPosition = scoreTarget;
             lastScored = scoreTarget;
-            if (totalTime.seconds() > getScoreTime(scoreTarget) + getParkTime(scoreTarget)) {
-                lift.scoreCone();
-                conesScored+= 1;
-                drivetrain.resetEncoders();
-            } else {
-                park();
+            if (!drivetrain.getAlignedWithJunction()) {
+                if (totalTime.seconds() > 0.85 + getParkTime(scoreTarget)) { //the while in drive time plus score time
+                    drivetrain.driveUntilJunction();
+                } else {
+                    park();
+                }
             }
+            lift.scoreCone();
+            conesScored+= 1;
+            drivetrain.resetEncoders();
         } else {
             park();
         }

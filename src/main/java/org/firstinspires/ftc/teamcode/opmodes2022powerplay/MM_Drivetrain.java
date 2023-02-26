@@ -776,6 +776,18 @@ public class MM_Drivetrain {
         }
         return true;
     }
+
+    public boolean getAlignedWithJunction() {
+        return alignedWithJunction;
+    }
+
+    public void driveUntilJunction() {
+        runtime.reset();
+        while (opMode.opModeIsActive() && !withinJunctionRange() && runtime.seconds() < 0.55) {
+            drive(FORWARD);
+        }
+    }
+
     public boolean correctForCone() {
         leftCurrentTicks = leftEncoder.getCurrentPosition();
         rightCurrentTicks = rightEncoder.getCurrentPosition();
