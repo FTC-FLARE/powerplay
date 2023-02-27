@@ -19,7 +19,6 @@ public class MM_Auto extends MM_OpMode {
     private boolean xIsPressed = false;
 
     private ElapsedTime runtime = new ElapsedTime();
-    private ElapsedTime totalTime = new ElapsedTime();
 
     private int firstCone = MM_Robot.NO_CONE;
     private int secondCone = MM_Robot.NO_CONE;
@@ -83,8 +82,7 @@ public class MM_Auto extends MM_OpMode {
         //*************************************** DRIVER HIT PLAY **************************************************
 //            code that will always be the same
 
-        totalTime.reset();
-        robot.startTimer();
+        startAutosTime();
         parkingColor = detector.getMaxColor();
         if (lowCones == 4) {
             firstCone = MM_Robot.LOW;
@@ -107,7 +105,7 @@ public class MM_Auto extends MM_OpMode {
             fourthCone = MM_Robot.MEDIUM;
         }
         robot.lift.chomper.release();
-        totalTime.reset();
+
         camera.stopStreaming();
         camera.closeCameraDevice();
         robot.drivetrain.autoScore();
@@ -134,7 +132,7 @@ public class MM_Auto extends MM_OpMode {
     private void handleThirdCone() {
         if (thirdCone != MM_Robot.LOW) { //if you are already not doing the shortest score moves
             double targetTimeLeft = robot.getScoreTime(thirdCone) + robot.getCollectTime(thirdCone) + robot.getScoreTime(fourthCone) + robot.getParkTime(fourthCone);
-            double actualTimeLeft = totalTime.seconds();
+            double actualTimeLeft = timeRemaining();
             if (actualTimeLeft < targetTimeLeft) {
                 if (actualTimeLeft > robot.getScoreTime(MM_Robot.MEDIUM) + robot.getCollectTime(MM_Robot.MEDIUM) + robot.getScoreTime(MM_Robot.MEDIUM) + robot.getParkTime(MM_Robot.MEDIUM)) {
                     thirdCone = MM_Robot.MEDIUM;
@@ -165,7 +163,7 @@ public class MM_Auto extends MM_OpMode {
         if (scoreTarget == MM_Robot.LOW) {
             parkTime = robot.getLowCollectandParkTime();
         }
-        double timeLeft = totalTime.seconds();
+        double timeLeft = timeRemaining();
 
         if (timeLeft < parkTime + junctionScoreTime) {
             if (startingPosition == MM_OpMode.LEFT) {

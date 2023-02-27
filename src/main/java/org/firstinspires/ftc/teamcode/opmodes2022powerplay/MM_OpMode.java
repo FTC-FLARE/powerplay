@@ -42,7 +42,8 @@ public abstract class MM_OpMode extends LinearOpMode {
     public int lowCones = 2;
     public int mediumCones = 2;
     public int frontHighCones = 0;
-    public int leftHighCones = 0;
+
+    public ElapsedTime autosTime = new ElapsedTime();
 
 
     private final ElapsedTime runtime = new ElapsedTime();
@@ -155,6 +156,14 @@ public abstract class MM_OpMode extends LinearOpMode {
         runtime.reset();
         while (opModeIsActive() && runtime.seconds() < seconds){
         }
+    }
+
+    public void startAutosTime() {
+        autosTime.reset();
+    }
+
+    public double timeRemaining() {
+        return 30 - autosTime.seconds();
     }
 
     public void updateController() {

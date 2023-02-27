@@ -23,7 +23,6 @@ public class MM_Robot {
     static final int NO_CONE = -1;
 
     ElapsedTime runtime = new ElapsedTime();
-    ElapsedTime totalTime = new ElapsedTime();
     private boolean timedOut = false;
     public int conesScored = 0;
     private int lastScored = 0;
@@ -59,14 +58,14 @@ public class MM_Robot {
             } else if (opMode.parkingColor == MM_EOCVDetection.BLUE) {
                 timeCheck = MM_Auto.MoveTimes.PARK_BLUE_LOW_COLLECT.seconds;
             }
-            if (totalTime.seconds() > timeCheck) {
+            if (opMode.timeRemaining() > timeCheck) {
                 lift.chomper.release();
                 runSlideandDiagonalDrive(lift.slide.stackTicks(5), 10.2, -2, MM_Drivetrain.DRIVE, 40,5,false, true);
                 currentPosition = STACK;
                 lift.slide.moveTowardTarget(lift.slide.lowerStackTicks(1));
 
                 boolean slideReached = false;
-                while (opMode.opModeIsActive() && !slideReached && !drivetrain.isTilted() && totalTime.seconds() > getParkTime(STACK)) {
+                while (opMode.opModeIsActive() && !slideReached && !drivetrain.isTilted() && opMode.timeRemaining() > getParkTime(STACK)) {
                     slideReached = lift.slide.reachedPosition();
                     opMode.telemetry.addLine("Waiting for Slide");
                     opMode.telemetry.update();
@@ -221,23 +220,23 @@ public class MM_Robot {
                 //may have to add a drive, not sure
             }
         } else {
-            if (totalTime.seconds() > getParkTime(STACK) + getCollectTime(lastScored)) {
+            if (opMode.timeRemaining() > getParkTime(STACK) + getCollectTime(lastScored)) {
                 if (lastScored == LOW) {
-                    runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 10.2, -2, MM_Drivetrain.DRIVE, 40,Math.min(5, totalTime.seconds() - getParkTime(STACK)),false, true);
+                    runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 10.2, -2, MM_Drivetrain.DRIVE, 40,Math.min(5, opMode.timeRemaining() - getParkTime(STACK)),false, true);
                 } else if (lastScored == MEDIUM) {
                     //only works for left and nearside on the right
-                    runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 20, -6, 3, 0,Math.min(5, totalTime.seconds() - getParkTime(STACK)),false, true);
+                    runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 20, -6, 3, 0,Math.min(5, opMode.timeRemaining() - getParkTime(STACK)),false, true);
                 } else if (lastScored == FRONT_HIGH) {
-                    runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 44, -4, 3, 0, Math.min(6, totalTime.seconds() - getParkTime(STACK)), false, true);
+                    runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 44, -4, 3, 0, Math.min(6, opMode.timeRemaining() - getParkTime(STACK)), false, true);
                 } else if (lastScored == RIGHT_HIGH) {
-                    runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 20, -2, 3, 0,Math.min(5, totalTime.seconds() - getParkTime(STACK)),false, true);
+                    runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 20, -2, 3, 0,Math.min(5, opMode.timeRemaining() - getParkTime(STACK)),false, true);
                 }
                 currentPosition = STACK;
             } else {
                 park();
             }
         }
-        if (totalTime.seconds() > MM_Auto.MoveTimes.COLLECT_TIME.seconds + getParkTime(STACK)) {
+        if (opMode.timeRemaining() > MM_Auto.MoveTimes.COLLECT_TIME.seconds + getParkTime(STACK)) {
             if (conesScored == 0) {
                 drivetrain.setSignalProtectorPosition(signalProtectorPosition);
             }
@@ -246,9 +245,9 @@ public class MM_Robot {
                 angle = straightAngle;
             }
             drivetrain.rotateToMicroscopicAngle(angle);
-            while (totalTime.seconds() > MM_Auto.MoveTimes.COLLECT_TIME.seconds + getParkTime(STACK) + 0.2 && opMode.opModeIsActive() && (!autoStackCollect(5 - conesScored) || !drivetrain.coneCollected())) {
+            while (opMode.timeRemaining() > MM_Auto.MoveTimes.COLLECT_TIME.seconds + getParkTime(STACK) + 0.2 && opMode.opModeIsActive() && (!autoStackCollect(5 - conesScored) || !drivetrain.coneCollected())) {
                 lift.chomper.release();
-                if (totalTime.seconds() < MM_Auto.MoveTimes.COLLECT_TIME.seconds + MM_Auto.MoveTimes.CORRECT_TIME.seconds + getParkTime(STACK) + 0.2) {
+                if (opMode.timeRemaining() < MM_Auto.MoveTimes.COLLECT_TIME.seconds + MM_Auto.MoveTimes.CORRECT_TIME.seconds + getParkTime(STACK) + 0.2) {
                     park();
                 } else {
                     drivetrain.resetEncoders();
@@ -283,10 +282,6 @@ public class MM_Robot {
         return false;
     }
 
-    public void startTimer() {
-        totalTime.reset();
-    }
-
     public double getCollectTime(int lastScored) {
         if (lastScored == LOW) {
             return MM_Auto.MoveTimes.COLLECT_LOW.seconds;
@@ -306,7 +301,7 @@ public class MM_Robot {
     }
 
     public void scoreOnJunction(int scoreTarget) {
-        if (totalTime.seconds() > getScoreTime(scoreTarget) + getParkTime(scoreTarget) && scoreTarget != NO_CONE) {
+        if (opMode.timeRemaining() > getScoreTime(scoreTarget) + getParkTime(scoreTarget) && scoreTarget != NO_CONE) {
             this.scoreTarget = scoreTarget;
             runtime.reset();
             while (opMode.startingPosition == MM_OpMode.RIGHT && opMode.opModeIsActive() && runtime.seconds() < 0.2) {
@@ -314,18 +309,18 @@ public class MM_Robot {
             }
             lift.turner.autoFlip();
             if (scoreTarget == LOW) {
-                runSlideandDrive(MM_Slide.SlidePosition.LOW.ticks, -5, Math.min(2.5, totalTime.seconds() - getParkTime(LOW)), false, true);
+                runSlideandDrive(MM_Slide.SlidePosition.LOW.ticks, -5, Math.min(2.5, opMode.timeRemaining() - getParkTime(LOW)), false, true);
             } else if (scoreTarget == MEDIUM) {
-                runSlideandDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -30, Math.min(3.5, totalTime.seconds() - getParkTime(MEDIUM)), false, true);
+                runSlideandDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -30, Math.min(3.5, opMode.timeRemaining() - getParkTime(MEDIUM)), false, true);
             } else if (scoreTarget == FRONT_HIGH){
-                runSlideandDrive(MM_Slide.SlidePosition.HIGH.ticks, -54, Math.min(4.5, totalTime.seconds() - getParkTime(FRONT_HIGH)), false, true);
+                runSlideandDrive(MM_Slide.SlidePosition.HIGH.ticks, -54, Math.min(4.5, opMode.timeRemaining() - getParkTime(FRONT_HIGH)), false, true);
             } else { //Nearside high
-                runSlideandDrive(MM_Slide.SlidePosition.HIGH.ticks, -30, Math.min(3.7, totalTime.seconds() - getParkTime(RIGHT_HIGH)), false, true);
+                runSlideandDrive(MM_Slide.SlidePosition.HIGH.ticks, -30, Math.min(3.7, opMode.timeRemaining() - getParkTime(RIGHT_HIGH)), false, true);
             }
             currentPosition = scoreTarget;
             lastScored = scoreTarget;
             if (!drivetrain.getAlignedWithJunction()) {
-                if (totalTime.seconds() > 0.85 + getParkTime(scoreTarget)) { //the while in drive time plus score time
+                if (opMode.timeRemaining() > 0.85 + getParkTime(scoreTarget)) { //the while in drive time plus score time
                     drivetrain.driveUntilJunction();
                 } else {
                     park();
