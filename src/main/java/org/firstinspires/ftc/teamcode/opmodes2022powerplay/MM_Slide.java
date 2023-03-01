@@ -33,17 +33,15 @@ public class MM_Slide {
         RESET(-50),
         UNUSED(0),
         COLLECT(0),
-        HOVER_FLOOR(525),//385
+        HOVER_FLOOR(440),//385 emma
         DETECT(700),
         END_POSITION(1700),
         PIVOT_AUTO(1235),
         PIVOT_POSITION(2200),
-        LOW(1800),
-        MEDIUM(2975),
-        HIGH(4150);
-//                LOW(1540),
-//        MEDIUM(2680),
-//        HIGH(3800);
+        LOW(1540),
+        MEDIUM(2680),
+        HIGH(3800);
+
 
         public final int ticks;
 
@@ -149,11 +147,18 @@ public class MM_Slide {
     }
 
     public int stackTicks(int stackLevel) {
-        return STACK_LEVEL_INCREMENT * (stackLevel - 1) + SlidePosition.HOVER_FLOOR.ticks;
+        return STACK_LEVEL_INCREMENT * (stackLevel - 1) + autoScoreLevel(SlidePosition.HOVER_FLOOR);
     }
 
     public int autoScoreLevel(MM_Slide.SlidePosition slidePosition) {
-        return slidePosition.ticks + 300; //gain in autos
+        if (slidePosition == SlidePosition.LOW) {
+            return 1800;
+        } else if (slidePosition == SlidePosition.MEDIUM) {
+            return 2975;
+        } else if (slidePosition == SlidePosition.HIGH) {
+            return 4150;
+        }
+        return 525;
     }
 
     public int lowerStackTicks(int stackLevel) {
