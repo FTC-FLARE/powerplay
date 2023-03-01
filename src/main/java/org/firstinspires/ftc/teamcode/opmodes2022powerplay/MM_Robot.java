@@ -310,13 +310,13 @@ public class MM_Robot {
             runtime.reset();
             lift.turner.autoFlip();
             if (scoreTarget == LOW) {
-                runSlideandDrive(MM_Slide.SlidePosition.LOW.ticks, -5, Math.min(2.5, opMode.timeRemaining() - getParkTime(LOW)), false, true);
+                runSlideandDrive(lift.slide.autoScoreLevel(MM_Slide.SlidePosition.LOW), -5, Math.min(2.5, opMode.timeRemaining() - getParkTime(LOW)), false, true);
             } else if (scoreTarget == MEDIUM) {
-                runSlideandDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -30, Math.min(3.5, opMode.timeRemaining() - getParkTime(MEDIUM)), false, true);
+                runSlideandDrive(lift.slide.autoScoreLevel(MM_Slide.SlidePosition.MEDIUM), -30, Math.min(3.5, opMode.timeRemaining() - getParkTime(MEDIUM)), false, true);
             } else if (scoreTarget == FRONT_HIGH){
-                runSlideandDrive(MM_Slide.SlidePosition.HIGH.ticks, -54, Math.min(4.5, opMode.timeRemaining() - getParkTime(FRONT_HIGH)), false, true);
+                runSlideandDrive(lift.slide.autoScoreLevel(MM_Slide.SlidePosition.HIGH), -54, Math.min(4.5, opMode.timeRemaining() - getParkTime(FRONT_HIGH)), false, true);
             } else { //Nearside high
-                runSlideandDrive(MM_Slide.SlidePosition.HIGH.ticks, -30, Math.min(3.7, opMode.timeRemaining() - getParkTime(RIGHT_HIGH)), false, true);
+                runSlideandDrive(lift.slide.autoScoreLevel(MM_Slide.SlidePosition.HIGH), -30, Math.min(3.7, opMode.timeRemaining() - getParkTime(RIGHT_HIGH)), false, true);
             }
             currentPosition = scoreTarget;
             lastScored = scoreTarget;
