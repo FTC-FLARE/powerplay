@@ -188,7 +188,7 @@ public class MM_Drivetrain {
     public void microscopicStrafeInches(double inches) {
         prepareToStrafe(inches);
         runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 0.7 && !reachedPositionMicroscopicStrafe()) {
+        while (opMode.opModeIsActive() && runtime.seconds() < 0.4 && !reachedPositionMicroscopicStrafe()) {
             opMode.telemetry.addData("inches target", inches);
             opMode.telemetry.update();
         }
@@ -723,7 +723,7 @@ public class MM_Drivetrain {
             if (opMode.robot.scoreTarget == MM_Robot.LOW) {
                 return getJunctionDistance() < 15;
             } else {
-                return getJunctionDistance() < 10;
+                return getJunctionDistance() < 7;
             }
         } else {
             return getJunctionDistance() < 6;
@@ -742,12 +742,16 @@ public class MM_Drivetrain {
             double avgInchesTarget = 0;
             double timeout = 0.30;
             if (opMode.robot.scoreTarget == MM_Robot.MEDIUM) {
-                avgInchesTarget = 26.5;
-                timeout = 0.35;
+                avgInchesTarget = 26;
+                timeout = 0.37;
             } else if (opMode.robot.scoreTarget == MM_Robot.RIGHT_HIGH) {
-                avgInchesTarget = 26.5;
+                avgInchesTarget = 26;
             } else {
                 avgInchesTarget = 55.0;
+                if (opMode.robot.scoreTarget == MM_Robot.FRONT_HIGH) {
+                    timeout = 0.13;
+                    avgInchesTarget = 53.5;
+                }
             }
             //currentDistance > 2.75 && currentDistance < 7
             runtime.reset();
@@ -770,7 +774,8 @@ public class MM_Drivetrain {
             stop();
             return true;
         } else {
-            runtime.reset();
+            stop();
+            microscopicStrafeInches(3);
             stop();
             opMode.waitSeconds(0.15);
         }
@@ -783,86 +788,16 @@ public class MM_Drivetrain {
 
     public void driveUntilJunction() {
         runtime.reset();
-        while (opMode.opModeIsActive() && !withinJunctionRange() && runtime.seconds() < 0.55) {
+        while (opMode.opModeIsActive() && !withinJunctionRange() && runtime.seconds() < 0.85) {
             drive(FORWARD);
         }
-    }
-
-    public boolean correctForCone() {
-        leftCurrentTicks = leftEncoder.getCurrentPosition();
-        rightCurrentTicks = rightEncoder.getCurrentPosition();
-        boolean corrected = true;
-        if (getStackDistance() > 4.2) {
-            drive(FORWARD);
-            corrected = false;
-        } else if (getStackDistance() < 3.2) {
-            drive(BACKWARD);
-            corrected = false;
-        }
-
         runtime.reset();
-        while (opMode.opModeIsActive() && !corrected && runtime.seconds() < 3) {
-            double distance = getStackDistance();
-            corrected = (distance < 4.2 && distance > 2.8);
+        while (opMode.opModeIsActive() && runtime.seconds() < 0.25) {
+            resetEncoders();
+            microscopicStrafeInches(2);
         }
-        leftPriorEncoderTarget = leftPriorEncoderTarget + (leftEncoder.getCurrentPosition() - leftCurrentTicks);
-        rightPriorEncoderTarget = rightPriorEncoderTarget + (rightEncoder.getCurrentPosition() - rightCurrentTicks);
         stop();
-        return corrected;
-    }
 
-    public void correctForTape() {
-        //if during the drive, strafe with a P coefficent maybe or just add powers somehow, you will have to change the prior encoders tho
-        backCurrentTicks = backEncoder.getCurrentPosition();
-        leftCurrentTicks = leftEncoder.getCurrentPosition();
-        rightCurrentTicks = rightEncoder.getCurrentPosition();
-
-        boolean corrected = true;
-        if (opMode.alliance == MM_OpMode.BLUE) {
-            int direction = 0;
-            if (leftTapeSensor.blue() < 300) {
-                strafe(RIGHT);
-                corrected = false;
-                direction = RIGHT;
-            } else if (rightTapeSensor.blue() < 320) {
-                strafe(LEFT);
-                corrected = false;
-                direction = LEFT;
-            }
-            runtime.reset();
-            while (opMode.opModeIsActive() && !corrected && runtime.seconds() < 2.5) {
-                corrected = (rightTapeSensor.blue() > 290 && leftTapeSensor.blue() > 310);
-                if (runtime.seconds() > 1.25) {
-                    strafe(-direction);
-                }
-            }
-        } else {
-            int direction = 0;
-            if (leftTapeSensor.red() < 280) { //albany 200
-                strafe(RIGHT);
-                corrected = false;
-                direction = RIGHT;
-            } else if (rightTapeSensor.red() < 300) { //albany 230
-                strafe(LEFT);
-                corrected = false;
-                direction = LEFT;
-            }
-            runtime.reset();
-            while (opMode.opModeIsActive() && !corrected && runtime.seconds() < 2.5) {
-                corrected = (rightTapeSensor.red() > 270 && leftTapeSensor.red() > 290); //albany 190, 220
-                opMode.telemetry.addData("left tape", leftTapeSensor.red());
-                opMode.telemetry.addData("right tape", rightTapeSensor.red());
-                opMode.telemetry.update();
-                if (runtime.seconds() > 1.25) {
-                    strafe(-direction);
-                }
-            }
-        }
-
-        backPriorEncoderTarget = backPriorEncoderTarget + (backEncoder.getCurrentPosition() - backCurrentTicks);
-        leftPriorEncoderTarget = leftPriorEncoderTarget + (leftEncoder.getCurrentPosition() - leftCurrentTicks);
-        rightPriorEncoderTarget = rightPriorEncoderTarget + (rightEncoder.getCurrentPosition() - rightCurrentTicks);
-        stop();
     }
 
     public void strafe(int direction) {
@@ -1035,7 +970,7 @@ public class MM_Drivetrain {
             scorer = opMode.hardwareMap.get(Servo.class, "floppyServo");
             scorer.setPosition(0.32);
             conePusher = opMode.hardwareMap.get(Servo.class, "conePusher");
-            conePusher.setPosition(1);
+            conePusher.setPosition(0.78);
 
             coneDetector = opMode.hardwareMap.get(DistanceSensor.class, "coneDetector");
             stackDetector = opMode.hardwareMap.get(DistanceSensor.class, "stackSensor");
@@ -1073,7 +1008,7 @@ public class MM_Drivetrain {
 
     public double get90Angle() {return correctedAngle(priorAngle - 90); }
 
-    public double get270Angle() {return correctedAngle(priorAngle + 90); }
+    public double get270Angle() {return correctedAngle(priorAngle - 90); }
 
 
     public void getScorerOutOfTheWay() {
@@ -1220,7 +1155,7 @@ public class MM_Drivetrain {
     }
 
     public boolean coneCollected() {
-        return coneDetector.getDistance(DistanceUnit.INCH) < 5;
+        return coneDetector.getDistance(DistanceUnit.INCH) < 7.5;
     }
 
     public void engageConePusher() {

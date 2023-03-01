@@ -31,7 +31,7 @@ public class MM_Auto_Test extends MM_OpMode {
         initCamera();
         alliance = RED;
         startingPosition = LEFT;
-        parkingColor = MM_EOCVDetection.BLUE;
+        parkingColor = MM_EOCVDetection.RED;
         signalDanger = false;
 
         robot.init();
@@ -54,9 +54,11 @@ public class MM_Auto_Test extends MM_OpMode {
         robot.collectFromStack();
         robot.scoreOnJunction(MM_Robot.LOW);
         robot.collectFromStack();
-        robot.scoreOnJunction(MM_Robot.MEDIUM);
+        robot.scoreOnJunction(MM_Robot.LOW);
         robot.collectFromStack();
-        robot.scoreOnJunction(MM_Robot.FRONT_HIGH);
+        robot.scoreOnJunction(MM_Robot.LOW);
+        robot.collectFromStack();
+        robot.scoreOnJunction(MM_Robot.LOW);
         robot.park();
 
         //make algorithm to decide if time is left for actions

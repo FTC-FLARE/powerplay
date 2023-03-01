@@ -59,6 +59,10 @@ public class MM_Auto extends MM_OpMode {
                 signalDanger = true;
             }
 
+            if (startingPosition == RIGHT) {
+
+            }
+
 //            robot.drivetrain.returnSensorReadings();
              telemetry.addLine("Right or left bumper to change alliance");
             telemetry.addLine("Press 'x' to change starting position");
@@ -70,10 +74,28 @@ public class MM_Auto extends MM_OpMode {
                 telemetry.addData("medium :", mediumCones);
                 telemetry.addData("high :", frontHighCones);
                 telemetry.addData("safety park :", signalDanger);
+                robot.drivetrain.returnSensorReadings();
 
             }else {
-                telemetry.addLine("**Only press when completely done with initialization**");
-                telemetry.addLine("press left stick to finalize initialization and reset encoders");
+                if (!signalDanger) {
+                    telemetry.addLine("**Only press when completely done with initialization**");
+                    telemetry.addLine("press left stick to finalize initialization and reset encoders");
+                    telemetry.addLine("*****************************************************");
+                    if (leftJoystickPressed(GAMEPAD1)) {
+                        robot.drivetrain.resetEncoders();
+                        signalDanger = true;
+                        frontHighCones = 3;
+                        lowCones = 1;
+                    }
+                } else {
+                    telemetry.addLine("current cone configuration:");
+                    telemetry.addData("low :", lowCones);
+                    telemetry.addData("medium :", mediumCones);
+                    telemetry.addData("high :", frontHighCones);
+                    telemetry.addData("safety park :", signalDanger);
+                    robot.drivetrain.returnSensorReadings();
+                }
+
             }
             telemetry.update();
         }
@@ -121,6 +143,10 @@ public class MM_Auto extends MM_OpMode {
             robot.collectFromStack();
             handleLastCone();
             robot.scoreOnJunction(fourthCone);
+            if (timeRemaining() > robot.getCollectTime(fourthCone) + robot.getScoreTime(MM_Robot.LOW) + robot.getParkTime(MM_Robot.LOW)) {
+                robot.collectFromStack();
+                robot.scoreOnJunction(MM_Robot.LOW);
+            }
         } else {
             robot.collectFromStack();
             handleLastCone();
@@ -184,7 +210,7 @@ public class MM_Auto extends MM_OpMode {
         SCORE_LOW(1.9),
         SCORE_MEDIUM(3),
         SCORE_FRONT_HIGH(3.6),
-        SCORE_RIGHT_HIGH(3.3),
+        SCORE_RIGHT_HIGH(3.4),
         CORRECT_TIME(3.7),
         COLLECT_TIME(1.7), //longest possible on 2 cones left
         COLLECT_LOW(3),
@@ -208,7 +234,7 @@ public class MM_Auto extends MM_OpMode {
         PARK_RIGHT_YELLOW_STACK(0),
         PARK_RED_RIGHT_HIGH(2.5),
         PARK_BLUE_RIGHT_HIGH(2.2),
-        PARK_YELLOW_RIGHT_HIGH(3.2);
+        PARK_YELLOW_RIGHT_HIGH(3.4);
 
 
 
