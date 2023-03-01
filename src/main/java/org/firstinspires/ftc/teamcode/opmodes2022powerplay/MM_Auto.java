@@ -29,7 +29,7 @@ public class MM_Auto extends MM_OpMode {
     public void runOpMode() {
         initializeOpmode();
         robot.drivetrain.initializeGyroAndEncoders();
-        while (!isStarted() && !isStopRequested()) {
+        while (!isStarted() && !isStopRequested() && !leftJoystickPressed(GAMEPAD1)) {
             updateController();
             if (rightBumperPressed(GAMEPAD1)) {
                 alliance = BLUE;
@@ -64,7 +64,7 @@ public class MM_Auto extends MM_OpMode {
             }
 
 //            robot.drivetrain.returnSensorReadings();
-             telemetry.addLine("Right or left bumper to change alliance");
+            telemetry.addLine("Right or left bumper to change alliance");
             telemetry.addLine("Press 'x' to change starting position");
             telemetry.addData(alliance == RED ? "Red" : "Blue", startingPosition == LEFT ? "Left" : "Right");
             if (startingPosition == LEFT){
@@ -77,28 +77,22 @@ public class MM_Auto extends MM_OpMode {
                 robot.drivetrain.returnSensorReadings();
 
             }else {
-                if (!signalDanger) {
-                    telemetry.addLine("**Only press when completely done with initialization**");
-                    telemetry.addLine("press left stick to finalize initialization and reset encoders");
-                    telemetry.addLine("*****************************************************");
-                    if (leftJoystickPressed(GAMEPAD1)) {
-                        robot.drivetrain.resetEncoders();
-                        signalDanger = true;
-                        frontHighCones = 3;
-                        lowCones = 1;
-                    }
-                } else {
-                    telemetry.addLine("current cone configuration:");
-                    telemetry.addData("low :", lowCones);
-                    telemetry.addData("medium :", mediumCones);
-                    telemetry.addData("high :", frontHighCones);
-                    telemetry.addData("safety park :", signalDanger);
-                    robot.drivetrain.returnSensorReadings();
-                }
+                telemetry.addLine("**Only press when completely done with initialization**");
+                telemetry.addLine("press left stick to finalize initialization and reset encoders");
+                telemetry.addLine("*****************************************************");
+                signalDanger = true;
+                frontHighCones = 3;
+                lowCones = 1;
 
             }
             telemetry.update();
         }
+
+        robot.drivetrain.resetEncoders();
+        telemetry.addLine("encoders reset, DO NOT MOVE ROBOT");
+        telemetry.update();
+
+
 //        robot.drivetrain.returnSensorReadings();
         waitForStart();
         //*************************************** DRIVER HIT PLAY **************************************************
