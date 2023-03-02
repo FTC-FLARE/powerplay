@@ -21,7 +21,7 @@ public class MM_EOCVTelemetry extends OpenCvPipeline {
         if (mat.empty()) {
             return frame;
         }
-        cropped = new Mat(mat, new Range(85, 145), new Range(135, 185));
+        cropped = new Mat(mat, new Range(90, 115), new Range(90, 110));
 
         return cropped;
     }

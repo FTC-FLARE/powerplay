@@ -74,7 +74,7 @@ public class MM_Drivetrain {
     private static final int TAPE_RED = 245;  // Need correct value
     private final int ALLIANCE_TAPE_TARGET;  // Set in constructor
     private final int MIN_TAPE_TARGET;  // Set in constructor
-    private static final int TAPE_TOLERANCE_BLUE = 80;
+    private static final int TAPE_TOLERANCE_BLUE = 100;
     private static final int TAPE_TOLERANCE_RED = 70;
     private static final double MAX_TAPE_POWER = 0.45;
     private static final double STACK_DISTANCE = 4.9; //5.2
@@ -188,7 +188,7 @@ public class MM_Drivetrain {
     public void microscopicStrafeInches(double inches) {
         prepareToStrafe(inches);
         runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 0.4 && !reachedPositionMicroscopicStrafe()) {
+        while (opMode.opModeIsActive() && runtime.seconds() < 0.7 && !reachedPositionMicroscopicStrafe()) {
             opMode.telemetry.addData("inches target", inches);
             opMode.telemetry.update();
         }
@@ -723,10 +723,10 @@ public class MM_Drivetrain {
             if (opMode.robot.scoreTarget == MM_Robot.LOW) {
                 return getJunctionDistance() < 15;
             } else {
-                return getJunctionDistance() < 7;
+                return getJunctionDistance() < 4.5;
             }
         } else {
-            return getJunctionDistance() < 6;
+            return getJunctionDistance() < 8;
         }
     }
 
@@ -743,7 +743,7 @@ public class MM_Drivetrain {
             double timeout = 0.30;
             if (opMode.robot.scoreTarget == MM_Robot.MEDIUM) {
                 avgInchesTarget = 26;
-                timeout = 0.37;
+                timeout = 0.42;
             } else if (opMode.robot.scoreTarget == MM_Robot.RIGHT_HIGH) {
                 avgInchesTarget = 26;
             } else {
@@ -788,11 +788,11 @@ public class MM_Drivetrain {
 
     public void driveUntilJunction() {
         runtime.reset();
-        while (opMode.opModeIsActive() && !withinJunctionRange() && runtime.seconds() < 0.85) {
+        while (opMode.opModeIsActive() && !withinJunctionRange() && runtime.seconds() < 2) {
             drive(FORWARD);
         }
         runtime.reset();
-        while (opMode.opModeIsActive() && runtime.seconds() < 0.25) {
+        while (opMode.opModeIsActive() && runtime.seconds() < 0.4) {
             resetEncoders();
             microscopicStrafeInches(2);
         }

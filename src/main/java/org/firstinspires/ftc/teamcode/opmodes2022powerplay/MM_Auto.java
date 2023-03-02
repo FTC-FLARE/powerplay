@@ -16,7 +16,7 @@ public class MM_Auto extends MM_OpMode {
     MM_EOCVDetection detector = new MM_EOCVDetection();
     OpenCvCamera camera;
 
-    private boolean xIsPressed = false;
+    private boolean initialized = false;
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -27,9 +27,7 @@ public class MM_Auto extends MM_OpMode {
 
     @Override
     public void runOpMode() {
-        initializeOpmode();
-        robot.drivetrain.initializeGyroAndEncoders();
-        while (!isStarted() && !isStopRequested() && !leftJoystickPressed(GAMEPAD1)) {
+        while (!isStarted() && !isStopRequested()) {
             updateController();
             if (rightBumperPressed(GAMEPAD1)) {
                 alliance = BLUE;
@@ -59,15 +57,21 @@ public class MM_Auto extends MM_OpMode {
                 signalDanger = true;
             }
 
-            if (startingPosition == RIGHT) {
+//            robot.drivetrain.returnSensorReadings();
 
+            if (aPressed(GAMEPAD1)) {
+                initialized = true;
+                initializeOpmode();
+                robot.drivetrain.initializeGyroAndEncoders();
             }
 
-//            robot.drivetrain.returnSensorReadings();
-            telemetry.addLine("Right or left bumper to change alliance");
-            telemetry.addLine("Press 'x' to change starting position");
-            telemetry.addData(alliance == RED ? "Red" : "Blue", startingPosition == LEFT ? "Left" : "Right");
-            if (startingPosition == LEFT){
+            if (!initialized) {
+                telemetry.addLine("Right or left bumper to change alliance");
+                telemetry.addLine("Press 'x' to change starting position");
+                telemetry.addData(alliance == RED ? "Red" : "Blue", startingPosition == LEFT ? "Left" : "Right");
+                telemetry.addLine("Press 'a' to confirm");
+            } else if (startingPosition == LEFT){
+                telemetry.addData(alliance == RED ? "Red" : "Blue", startingPosition == LEFT ? "Left" : "Right");
                 telemetry.addLine("Use dpad up and down to adjust cone configuration");
                 telemetry.addLine("current cone configuration:");
                 telemetry.addData("low :", lowCones);
@@ -77,6 +81,7 @@ public class MM_Auto extends MM_OpMode {
                 robot.drivetrain.returnSensorReadings();
 
             }else {
+                telemetry.addData(alliance == RED ? "Red" : "Blue", startingPosition == LEFT ? "Left" : "Right");
                 telemetry.addLine("**Only press when completely done with initialization**");
                 telemetry.addLine("press left stick to finalize initialization and reset encoders");
                 telemetry.addLine("*****************************************************");

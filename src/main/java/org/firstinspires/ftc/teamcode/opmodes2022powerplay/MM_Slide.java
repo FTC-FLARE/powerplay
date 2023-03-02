@@ -39,8 +39,8 @@ public class MM_Slide {
         PIVOT_AUTO(1235),
         PIVOT_POSITION(2200),
         LOW(1540),
-        MEDIUM(2680),
-        HIGH(3800);
+        MEDIUM(2780),
+        HIGH(3900);
 
 
         public final int ticks;
@@ -143,7 +143,7 @@ public class MM_Slide {
 
     public void changeStack(int change){
         stackLevel = Range.clip(stackLevel + change, 1, 5);
-        setSlideTarget(STACK_LEVEL_INCREMENT * (stackLevel - 1) + SlidePosition.HOVER_FLOOR.ticks);
+        setSlideTarget(STACK_LEVEL_INCREMENT * (stackLevel - 1) + SlidePosition.HOVER_FLOOR.ticks - 55);
     }
 
     public int stackTicks(int stackLevel) {

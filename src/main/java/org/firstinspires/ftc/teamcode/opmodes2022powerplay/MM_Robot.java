@@ -228,7 +228,6 @@ public class MM_Robot {
                 if (lastScored == LOW) {
                     runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 10.2, -2, MM_Drivetrain.DRIVE, 40,Math.min(5, opMode.timeRemaining() - getParkTime(STACK)),false, true);
                 } else if (lastScored == MEDIUM) {
-                    //only works for left and nearside on the right
                     runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 20, -6, 3, 0,Math.min(5, opMode.timeRemaining() - getParkTime(STACK)),false, true);
                 } else if (lastScored == FRONT_HIGH) {
                     runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 44, -4, 3, 0, Math.min(6, opMode.timeRemaining() - getParkTime(STACK)), false, true);
@@ -412,7 +411,7 @@ public class MM_Robot {
             if (!tapeDone && driveDone) {
                 tapeDone = drivetrain.reachedPositionTapeDrive();
             } else if (!driveDone) {
-                driveDone = drivetrain.reachedPositionDiagonalDrive();
+                driveDone = drivetrain.reachedPositionDiagonalDrive() || lastScored == MEDIUM;
             }
 
             if (flipTurner) {

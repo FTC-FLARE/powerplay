@@ -102,7 +102,7 @@ public class MM_EOCVDetection extends OpenCvPipeline {
 
     private Scalar upperBoundColorSleeve(int color) {
         if (color == RED) {
-            return new Scalar(210, 200, 240);
+            return new Scalar(210, 250, 250);
         } else if (color == BLUE) {
             return new Scalar(135, 255, 200);
         } else {
@@ -112,7 +112,7 @@ public class MM_EOCVDetection extends OpenCvPipeline {
 
     private Scalar lowerBoundColorSleeve(int color) {
         if (color == RED) {
-            return new Scalar(130, 110, 140);
+            return new Scalar(160, 180, 170);
         } else if (color == BLUE) {
             return new Scalar(75, 195, 100);
         } else {
