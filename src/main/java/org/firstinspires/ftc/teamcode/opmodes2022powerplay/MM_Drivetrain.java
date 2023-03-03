@@ -749,8 +749,8 @@ public class MM_Drivetrain {
             } else {
                 avgInchesTarget = 55.0;
                 if (opMode.robot.scoreTarget == MM_Robot.FRONT_HIGH) {
-                    timeout = 0.13;
-                    avgInchesTarget = 53.5;
+                    timeout = 0.08;
+                    avgInchesTarget = 55.0;
                 }
             }
             //currentDistance > 2.75 && currentDistance < 7

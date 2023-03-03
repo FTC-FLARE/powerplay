@@ -16,8 +16,7 @@ public class MM_Lift {
     public void scoreCone() {
         chomper.release();
         opMode.waitSeconds(0.305);
-        turner.changePosition(MM_Turner.FRONT);
-    }
+        turner.autoFrontFlip();    }
 
     public boolean reachedPositionTurner() {
         if (slide.getCurrentTicks() > 1100) {

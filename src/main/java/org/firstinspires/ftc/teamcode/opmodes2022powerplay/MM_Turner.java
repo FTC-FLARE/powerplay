@@ -50,6 +50,7 @@ public class MM_Turner{
         } else {
             turner.setPosition(FRONT - 0.04);
         }
+        opMode.waitSeconds(0.15);
 
     }
 
