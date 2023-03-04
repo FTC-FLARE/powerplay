@@ -27,7 +27,7 @@ public class MM_Auto extends MM_OpMode {
 
     @Override
     public void runOpMode() {
-        while (!isStarted() && !isStopRequested()) {
+        while (!isStarted() && !isStopRequested() && !leftJoystickPressed(GAMEPAD1)) {
             updateController();
             if (rightBumperPressed(GAMEPAD1)) {
                 alliance = BLUE;
