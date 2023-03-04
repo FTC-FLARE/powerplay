@@ -452,7 +452,7 @@ public class MM_Drivetrain {
 
     private void setMicroscopicStrafePower() {
         backCurrentTicks = -backEncoder.getCurrentPosition();
-        strafePower = 0.235;
+        strafePower = 0.27;
         if (backCurrentTicks > backPriorEncoderTarget) {
             strafePower *= -1;
         }
@@ -630,6 +630,9 @@ public class MM_Drivetrain {
 
     public boolean reachedPositionTapeDrive() {
         double frontDistance = getStackDistance();
+        if (frontDistance > 200) {
+            frontDistance = getSonarDistance(frontSonar) - 4;
+        }
         double distanceError = frontDistance - STACK_DISTANCE;
         opMode.telemetry.addData("Distance", frontDistance);
 
@@ -656,7 +659,6 @@ public class MM_Drivetrain {
         normalize(MAX_TAPE_POWER);
         setMotorPower(flPower, frPower, blPower, brPower);
     }
-
     private void tapeCorrect() {
         double leftTapeValue = tapeValue(leftTapeSensor);
         double rightTapeValue = tapeValue(rightTapeSensor);
@@ -664,6 +666,17 @@ public class MM_Drivetrain {
 
         if (leftTapeValue >= MIN_TAPE_TARGET && rightTapeValue >= MIN_TAPE_TARGET){
             bothWereOnTape = true;
+        }
+        if (getSonarDistance(frontSonar) < 28 && !bothWereOnTape) {
+            if (opMode.startingPosition == MM_OpMode.LEFT) {
+
+            } else {
+                double power = 0.15;
+                flPower += power;
+                frPower += -power;
+                blPower += -power;
+                brPower += power;
+            }
         }
 
         flPower += correctPower;
@@ -726,7 +739,7 @@ public class MM_Drivetrain {
                 return getJunctionDistance() < 4.5;
             }
         } else {
-            return getJunctionDistance() < 8;
+            return getJunctionDistance() < 11;
         }
     }
 
@@ -749,8 +762,8 @@ public class MM_Drivetrain {
             } else {
                 avgInchesTarget = 55.0;
                 if (opMode.robot.scoreTarget == MM_Robot.FRONT_HIGH) {
-                    timeout = 0.08;
-                    avgInchesTarget = 55.0;
+                    timeout = 0.05;
+                    avgInchesTarget = 56.75;
                 }
             }
             //currentDistance > 2.75 && currentDistance < 7
@@ -1139,7 +1152,7 @@ public class MM_Drivetrain {
             tailLoop = !tailLoop;
         }
         double seconds = runtime.seconds();
-        if (seconds < 5 * TAIL_TIME_INCREMENT) {
+        if (seconds < 4 * TAIL_TIME_INCREMENT) {
             if (seconds < TAIL_TIME_INCREMENT) {
                 tail.setPosition(RIGHT_WAG);
             } else if (seconds < 2 * TAIL_TIME_INCREMENT) {
@@ -1171,5 +1184,9 @@ public class MM_Drivetrain {
         opMode.waitSeconds(TAIL_TIME_INCREMENT);
         tail.setPosition(LEFT_WAG);
         opMode.waitSeconds(TAIL_TIME_INCREMENT);
+    }
+
+    public void setPrior(double angle) {
+        priorAngle = angle;
     }
 }

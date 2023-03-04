@@ -21,15 +21,15 @@ public class MM_Slide {
     private final static double SLIDE_SLOW_SPEED = 0.3;
     public final static int STACK_LEVEL_INCREMENT = 150;
 
-
     private int slideTarget = 0;
     private int stackLevel = 1;
     private double currentSlidePower = SLIDE_NORMAL_SPEED;
+    private boolean flipHandled = true;
 
     private int autoStacklevel = 5;
 
-
     public enum SlidePosition {
+        FRONT_LOWER(-95),
         RESET(-50),
         UNUSED(0),
         COLLECT(0),
@@ -39,9 +39,8 @@ public class MM_Slide {
         PIVOT_AUTO(1235),
         PIVOT_POSITION(2200),
         LOW(1540),
-        MEDIUM(2780),
+        MEDIUM(2740),
         HIGH(3900);
-
 
         public final int ticks;
 
@@ -86,6 +85,17 @@ public class MM_Slide {
             } else {
                 currentSlidePower = SLIDE_NORMAL_SPEED;
             }
+            if (opMode.robot.lift.turner.atFront() && flipHandled) {
+                if (getSlideTarget() == SlidePosition.MEDIUM.ticks || getSlideTarget() == SlidePosition.HIGH.ticks) {
+                    setSlideTarget(getSlideTarget() + SlidePosition.FRONT_LOWER.ticks);
+                    flipHandled = false;
+                }
+            } else if (!flipHandled && opMode.robot.lift.turner.getPosition() == MM_Turner.BACK) {
+                if (getSlideTarget() == SlidePosition.MEDIUM.ticks + SlidePosition.FRONT_LOWER.ticks || getSlideTarget() == SlidePosition.HIGH.ticks + SlidePosition.FRONT_LOWER.ticks) {
+                    setSlideTarget(getSlideTarget() - SlidePosition.FRONT_LOWER.ticks);
+                    flipHandled = true;
+                }
+            }
             slide.setTargetPosition(getSlideTarget());
             slide.setPower(currentSlidePower);
         }
@@ -122,21 +132,21 @@ public class MM_Slide {
         } else if (opMode.leftStickYUpPressed(opMode.GAMEPAD2)) {
             changeStack(-1);
         } else {
-            SlidePosition selectedPosition = SlidePosition.UNUSED;
+            int selectedPosition = SlidePosition.UNUSED.ticks;
             if (opMode.leftBumperPressed(opMode.GAMEPAD2)) {
-                selectedPosition = SlidePosition.RESET;
+                selectedPosition = SlidePosition.RESET.ticks;
             } else if (opMode.xPressed(opMode.GAMEPAD2)) {
-                selectedPosition = SlidePosition.HOVER_FLOOR;
+                selectedPosition = SlidePosition.HOVER_FLOOR.ticks;
             } else if (opMode.aPressed(opMode.GAMEPAD2)) {
-                selectedPosition = SlidePosition.LOW;
+                selectedPosition = SlidePosition.LOW.ticks;
             } else if (opMode.bPressed(opMode.GAMEPAD2)) {
-                selectedPosition = SlidePosition.MEDIUM;
+                selectedPosition = SlidePosition.MEDIUM.ticks;
             } else if (opMode.yPressed(opMode.GAMEPAD2)) {
-                selectedPosition = SlidePosition.HIGH;
+                selectedPosition = SlidePosition.HIGH.ticks;
             }
-            if (selectedPosition != SlidePosition.UNUSED) {
+            if (selectedPosition != SlidePosition.UNUSED.ticks) {
                 stackLevel = 1;
-                setSlideTarget(selectedPosition.ticks);
+                setSlideTarget(selectedPosition);
             }
         }
     }
@@ -188,7 +198,7 @@ public class MM_Slide {
     }
 
     private boolean inSlowZone() {
-        return slowerizationModule.red() > 1000;
+        return slide.getCurrentPosition() < SlidePosition.HOVER_FLOOR.ticks - 125 && slowerizationModule.red() > 1000;
     }
 
     public boolean reachedPosition() {

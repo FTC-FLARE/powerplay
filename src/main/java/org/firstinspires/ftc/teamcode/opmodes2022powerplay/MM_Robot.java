@@ -42,7 +42,7 @@ public class MM_Robot {
             double frontDistance = drivetrain.getFrontSonar();
             if (opMode.parkingColor == MM_EOCVDetection.RED) {
                 if (opMode.startingPosition == MM_OpMode.RIGHT) {
-                    drivetrain.microscopicDriveInches(-45.5 + frontDistance);
+                    drivetrain.microscopicDriveInches(-47 + frontDistance);
                     lift.slide.waitToReachPosition(MM_Slide.SlidePosition.COLLECT);
                 }
             } else if (opMode.parkingColor == MM_EOCVDetection.BLUE) {
@@ -115,7 +115,7 @@ public class MM_Robot {
             drivetrain.resetEncoders();
             double frontDistance = drivetrain.getFrontSonar();
             if (frontDistance < 25) {
-                frontDistance += 41.6;
+                frontDistance += 44.75;
             }
             runtime.reset();
 
@@ -152,7 +152,9 @@ public class MM_Robot {
             }
         }
         while (opMode.opModeIsActive()) {
-            drivetrain.wag();
+            while (opMode.timeRemaining() > 0.3) {
+                drivetrain.wag();
+            }
         }
     }
 
@@ -212,12 +214,13 @@ public class MM_Robot {
         int signalProtectorPosition = 0;
         if (conesScored == 0) {
             if (opMode.startingPosition == MM_OpMode.LEFT) {
+                lift.turner.autoFrontFlip();
                 runSlideandDiagonalDrive(lift.slide.stackTicks(5), 21, -37.5, MM_Drivetrain.DRIVE, 96,6, false, true);
                 signalProtectorPosition = 1;
             }
             else {
                 runSlideandStrafe(lift.slide.stackTicks(5), -18, 3, false);
-                drivetrain.strafeInches(2);
+                drivetrain.strafeInches(3);
                 straightAngle = drivetrain.get180Angle();
                 drivetrain.rotateToAngle(straightAngle);
                 drivetrain.followTapeToStack();
@@ -245,7 +248,7 @@ public class MM_Robot {
             }
             double angle = 0;
             if (opMode.startingPosition == MM_OpMode.RIGHT) {
-                angle = straightAngle;
+                angle = straightAngle + 3;
             }
             drivetrain.rotateToMicroscopicAngle(angle);
             while (opMode.timeRemaining() > MM_Auto.MoveTimes.COLLECT_TIME.seconds + getParkTime(STACK) + 0.2 && opMode.opModeIsActive() && (!autoStackCollect(5 - conesScored) || !drivetrain.coneCollected())) {
@@ -254,9 +257,13 @@ public class MM_Robot {
                     park();
                 } else {
                     drivetrain.resetEncoders();
+
                     drivetrain.driveInches(-12);
                     drivetrain.followTapeToStack();
                 }
+            }
+            if (opMode.startingPosition == MM_OpMode.RIGHT) {
+                drivetrain.rotateToMicroscopicAngle(straightAngle);
             }
             drivetrain.resetEncoders();
         } else {

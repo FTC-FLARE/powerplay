@@ -48,7 +48,7 @@ public class MM_Turner{
             conesCollected += 1;
             turner.setPosition(FRONT - (0.01 * conesCollected));
         } else {
-            turner.setPosition(FRONT - 0.04);
+            turner.setPosition(FRONT);
         }
         opMode.waitSeconds(0.15);
 
@@ -87,6 +87,10 @@ public class MM_Turner{
 
     public double getPosition() {
         return currentPosition;
+    }
+
+    public boolean atFront() {
+        return getPosition() == FRONT;
     }
 
     public boolean isMoving() {
