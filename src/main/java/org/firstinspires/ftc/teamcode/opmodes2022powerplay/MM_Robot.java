@@ -215,7 +215,7 @@ public class MM_Robot {
         if (conesScored == 0) {
             if (opMode.startingPosition == MM_OpMode.LEFT) {
                 lift.turner.autoFrontFlip();
-                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 21, -37.5, MM_Drivetrain.DRIVE, 96,6, false, true);
+                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 21, -36.75, MM_Drivetrain.DRIVE, 96,6, false, true);
                 signalProtectorPosition = 1;
             }
             else {
@@ -231,6 +231,8 @@ public class MM_Robot {
                 if (lastScored == LOW) {
                     runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 10.2, -2, MM_Drivetrain.DRIVE, 40,Math.min(5, opMode.timeRemaining() - getParkTime(STACK)),false, true);
                 } else if (lastScored == MEDIUM) {
+                    drivetrain.strafe(-1);
+                    opMode.waitSeconds(0.22);
                     runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 20, -6, 3, 0,Math.min(5, opMode.timeRemaining() - getParkTime(STACK)),false, true);
                 } else if (lastScored == FRONT_HIGH) {
                     runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 44, -4, 3, 0, Math.min(6, opMode.timeRemaining() - getParkTime(STACK)), false, true);

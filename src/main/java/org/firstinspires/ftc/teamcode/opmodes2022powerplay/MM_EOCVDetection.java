@@ -16,7 +16,7 @@ public class MM_EOCVDetection extends OpenCvPipeline {
     private int maxColor = RED;
     private int mode = 1;
     private int coneColor = RED;
-    private int higherMean = 0;
+    private double highestMean = 0;
 
     private Mat max = new Mat();
     private Mat right = new Mat();
@@ -46,14 +46,19 @@ public class MM_EOCVDetection extends OpenCvPipeline {
                 if (loopCount == RED) {
                     max = cropped;
                     maxColor = RED;
+                    highestMean = mean[RED];
                 } else if (loopCount == BLUE && Math.max(mean[BLUE], mean[RED]) == mean[BLUE]) {
                     max = cropped;
                     maxColor = BLUE;
+                    highestMean = mean[BLUE];
                 } else if (loopCount == YELLOW && Math.max(mean[YELLOW], mean[BLUE]) == mean[YELLOW] && Math.max(mean[YELLOW], mean[RED]) == mean[YELLOW]) {
                     max = cropped;
                     maxColor = YELLOW;
+                    highestMean = mean[YELLOW];
                 }
                 loopCount += 1;
+            } if (highestMean < 10) {
+                maxColor = 4;
             }
         } else if (mode == 2) {
             Mat thresh = new Mat();
@@ -77,27 +82,6 @@ public class MM_EOCVDetection extends OpenCvPipeline {
 
     public void changeMode(int mode) {
         this.mode =  mode;
-    }
-
-    public void setConeColor(int coneColor) {
-        this.coneColor = coneColor;
-    }
-
-    public boolean goodToCollect() {
-/*if (coneColor == BLUE) {
-    return Core.mean(max).val[0] > 1;
-} else {
-    return Core.mean(max).val[0] > 1;
-}*/
-        return true;
-    }
-
-    public int getHigherMean() {
-        if (Core.mean(left).val[0] > Core.mean(right).val[0]) {
-            return -1; //val for left;
-        } else {
-            return 1;
-        }
     }
 
     private Scalar upperBoundColorSleeve(int color) {
@@ -136,20 +120,4 @@ public class MM_EOCVDetection extends OpenCvPipeline {
 
         }
     }
-
-    public String getMaxColorString() {
-        if (maxColor == BLUE) {
-            return "Blue";
-        } else if (maxColor == RED) {
-            return "Red";
-        } else if (maxColor == YELLOW) {
-            return "Yellow";
-        } else {
-            return "no max";
-        }
-    }
-
-    //163, 221, 192
-    //blue 107, 239, 139
-    //120
 }

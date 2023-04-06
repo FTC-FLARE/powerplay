@@ -39,8 +39,8 @@ public class MM_Slide {
         PIVOT_AUTO(1235),
         PIVOT_POSITION(2200),
         LOW(1540),
-        MEDIUM(2740),
-        HIGH(3900);
+        MEDIUM(2780),
+        HIGH(3915);
 
         public final int ticks;
 
@@ -162,7 +162,7 @@ public class MM_Slide {
 
     public int autoScoreLevel(MM_Slide.SlidePosition slidePosition) {
         if (slidePosition == SlidePosition.LOW) {
-            return 1800;
+            return 1750;
         } else if (slidePosition == SlidePosition.MEDIUM) {
             return 2975;
         } else if (slidePosition == SlidePosition.HIGH) {

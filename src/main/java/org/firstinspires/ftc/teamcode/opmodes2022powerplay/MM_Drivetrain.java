@@ -74,7 +74,7 @@ public class MM_Drivetrain {
     private static final int TAPE_RED = 245;  // Need correct value
     private final int ALLIANCE_TAPE_TARGET;  // Set in constructor
     private final int MIN_TAPE_TARGET;  // Set in constructor
-    private static final int TAPE_TOLERANCE_BLUE = 100;
+    private static final int TAPE_TOLERANCE_BLUE = 80;
     private static final int TAPE_TOLERANCE_RED = 70;
     private static final double MAX_TAPE_POWER = 0.45;
     private static final double STACK_DISTANCE = 4.9; //5.2
@@ -87,6 +87,7 @@ public class MM_Drivetrain {
     private int slowMode = SLOW;
     private int previousSlowMode = SLOW;
     private boolean backwardsMode = false;
+    private boolean timerDone = false;
 
     public static int FILTERSIZE = 20;
 
@@ -226,6 +227,7 @@ public class MM_Drivetrain {
 
         this.colorKickOut = colorKickOut;
         this.secondMove = secondMove;
+        bothWereOnTape = false;
         if (secondMove == DRIVE) {
             if (strafeInches < 0) {
                 direction = RIGHT;
@@ -330,9 +332,9 @@ public class MM_Drivetrain {
             }
         }
 
-        if (driving) {
+        if (driving && (!strafing && opMode.robot.conesScored == 0)) {
             if (colorKickOut) {
-                return checkColors() || getSonarDistance(frontSonar) < 16;
+                return checkColors() || getStackDistance() < 6;
             }
         }
         if (!driving && !strafing) {
@@ -631,7 +633,7 @@ public class MM_Drivetrain {
     public boolean reachedPositionTapeDrive() {
         double frontDistance = getStackDistance();
         if (frontDistance > 200) {
-            frontDistance = getSonarDistance(frontSonar) - 4;
+            frontDistance = getSonarDistance(frontSonar) - 4; //TODO Test this value
         }
         double distanceError = frontDistance - STACK_DISTANCE;
         opMode.telemetry.addData("Distance", frontDistance);
@@ -667,16 +669,7 @@ public class MM_Drivetrain {
         if (leftTapeValue >= MIN_TAPE_TARGET && rightTapeValue >= MIN_TAPE_TARGET){
             bothWereOnTape = true;
         }
-        if (getSonarDistance(frontSonar) < 28 && !bothWereOnTape) {
-            if (opMode.startingPosition == MM_OpMode.LEFT) {
-
-            } else {
-                double power = 0.15;
-                flPower += power;
-                frPower += -power;
-                blPower += -power;
-                brPower += power;
-            }
+        if ((getSonarDistance(frontSonar) < 28 || getStackDistance() < 13) && !bothWereOnTape && opMode.robot.scoreTarget == MM_Robot.MEDIUM) { //&& (opMode.robot.scoreTarget != MM_Robot.LOW)) {
         }
 
         flPower += correctPower;
@@ -756,7 +749,7 @@ public class MM_Drivetrain {
             double timeout = 0.30;
             if (opMode.robot.scoreTarget == MM_Robot.MEDIUM) {
                 avgInchesTarget = 26;
-                timeout = 0.42;
+                timeout = 0.32;
             } else if (opMode.robot.scoreTarget == MM_Robot.RIGHT_HIGH) {
                 avgInchesTarget = 26;
             } else {
@@ -766,7 +759,6 @@ public class MM_Drivetrain {
                     avgInchesTarget = 56.75;
                 }
             }
-            //currentDistance > 2.75 && currentDistance < 7
             runtime.reset();
             while (opMode.opModeIsActive() && (avgInches > avgInchesTarget|| runtime.seconds() < timeout)) {
                 double inches = MM_Util.voltageToInches(leftSonar.getVoltage());
@@ -781,7 +773,6 @@ public class MM_Drivetrain {
                     return false;
                 }
                 strafe(LEFT);
-//                normalize(MIN_STRAFE_POWER);
                 handleloopTracker();
             }
             stop();
@@ -814,7 +805,6 @@ public class MM_Drivetrain {
     }
 
     public void strafe(int direction) {
-        //right is negative
         double power = -MIN_STRAFE_POWER * direction;
         flPower = power;
         frPower = -power;
@@ -823,7 +813,6 @@ public class MM_Drivetrain {
 
         strafeCorrect(power, leftPriorEncoderTarget, rightPriorEncoderTarget);
 
-        //angleStraighten(STRAIGHTEN_P, power, power);
         setMotorPower(flPower, frPower, blPower, brPower);
     }
 
@@ -899,7 +888,7 @@ public class MM_Drivetrain {
 
             } else if(slowMode == SLOW) {
                 slowMode = FAST;
-            }else{ // must have been super-slow
+            }else{
                 slowMode = previousSlowMode;
             }
         }

@@ -105,6 +105,13 @@ public class MM_Auto extends MM_OpMode {
 
         startAutosTime();
         parkingColor = detector.getMaxColor();
+        if (parkingColor == 4) {
+            waitSeconds(0.1);
+            parkingColor = detector.getMaxColor();
+            if (parkingColor == 4) {
+                parkingColor = MM_EOCVDetection.RED;
+            }
+        }
         if (lowCones == 4) {
             firstCone = MM_Robot.LOW;
             secondCone = MM_Robot.LOW;
