@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes2022powerplay;
 
 public class MM_Util {
-    private static final double WHEEL_DIAMETER = 2;  // odometry wheels in inches 2
+    private static final double WHEEL_DIAMETER = 2.29625;  // odometry wheels in inches 2
     private static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
     private static final double TICKS_PER_REVOLUTION = 8192; //8192
     private static final double TICKS_PER_INCH = (TICKS_PER_REVOLUTION / WHEEL_CIRCUMFERENCE);

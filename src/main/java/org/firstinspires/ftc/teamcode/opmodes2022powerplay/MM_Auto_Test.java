@@ -44,10 +44,7 @@ public class MM_Auto_Test extends MM_OpMode {
 
         robot.drivetrain.resetEncoders();
         robot.lift.chomper.release();
-        totalTime.reset();
-        camera.stopStreaming();
-        camera.closeCameraDevice();
-        robot.drivetrain.followTapeToStack();
+        robot.drivetrain.driveInches(24);
     }
 
     private void initCamera() {

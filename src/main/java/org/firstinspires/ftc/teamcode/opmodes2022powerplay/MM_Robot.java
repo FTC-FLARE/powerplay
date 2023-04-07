@@ -8,7 +8,7 @@ public class MM_Robot {
     public MM_Lift lift;
 
     static final double MIN_DRIVE_SPEED = 0.23;
-    static final double MAX_DRIVE_SPEED = 0.6;
+    static final double MAX_DRIVE_SPEED = 0.8;
     static final double MIN_STRAFE_POWER = 0.283;
     static final double MAX_STRAFE_POWER = 0.6;
     static final double MIN_ROTATE_POWER = 0.24;

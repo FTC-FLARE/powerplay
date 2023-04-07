@@ -372,7 +372,6 @@ public class MM_Drivetrain {
 
         if (!distanceKickOut || leftDrivePower < 0) {
             setPowerVariables(leftDrivePower, rightDrivePower, leftDrivePower, rightDrivePower);
-
             angleStraighten(STRAIGHTEN_P, leftDrivePower, rightDrivePower);
             normalize(1);
             setMotorPower(flPower, frPower, blPower, brPower);
