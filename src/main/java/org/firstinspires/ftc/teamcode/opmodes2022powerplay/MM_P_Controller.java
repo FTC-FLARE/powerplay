@@ -25,12 +25,12 @@ public class MM_P_Controller {
     private final double P_COEFFICIENT;
     private final double D_COEFFICIENT;
 
-    public MM_P_Controller(LinearOpMode opMode, double pctThreshold, double pCoefficient){
+    public MM_P_Controller(LinearOpMode opMode, double pctThreshold, double pCoefficient, double dCoefficient){
         this.opMode = opMode;
 
         PCT_THRESHOLD = pctThreshold;
         P_COEFFICIENT = pCoefficient;
-        D_COEFFICIENT = 0.00001698;
+        D_COEFFICIENT = 0.00001798; //0.00001698
     }
 
     public double calculatePower(double currentInput){

@@ -7,24 +7,24 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public abstract class MM_OpMode extends LinearOpMode {
     public MM_Robot robot = new MM_Robot(this);
-    public MM_P_Controller pTurnController = new MM_P_Controller(this, 1, TURN_P_COEFFICIENT);
-    public MM_P_Controller pMicroscopicTurnController = new MM_P_Controller(this, 35, TURN_P_COEFFICIENT);
-    public MM_P_Controller pLeftDriveController = new MM_P_Controller(this,0.3, DRIVE_P_COEFFICIENT);
-    public MM_P_Controller pRightDriveController = new MM_P_Controller(this,0.3, DRIVE_P_COEFFICIENT);
-    public MM_P_Controller pLeftDiagDriveController = new MM_P_Controller(this,1.6, DRIVE_P_COEFFICIENT);
-    public MM_P_Controller pRightDiagDriveController = new MM_P_Controller(this,1.6, DRIVE_P_COEFFICIENT);
-    public MM_P_Controller pBackDriveController = new MM_P_Controller(this,2.6, STRAFE_P_COEFFICIENT);
-    public MM_P_Controller pFastLeftDriveController = new MM_P_Controller(this,4, FAST_P_COEFFICIENT);
-    public MM_P_Controller pFastRightDriveController = new MM_P_Controller(this,4, FAST_P_COEFFICIENT);
+    public MM_P_Controller pTurnController = new MM_P_Controller(this, 1, TURN_P_COEFFICIENT, 0);
+    public MM_P_Controller pMicroscopicTurnController = new MM_P_Controller(this, 35, TURN_P_COEFFICIENT, 0);
+    public MM_P_Controller pLeftDriveController = new MM_P_Controller(this,0.3, DRIVE_P_COEFFICIENT, 0.00001798);
+    public MM_P_Controller pRightDriveController = new MM_P_Controller(this,0.3, DRIVE_P_COEFFICIENT, 0.00001798);
+    public MM_P_Controller pLeftDiagDriveController = new MM_P_Controller(this,0.4, DRIVE_P_COEFFICIENT, 0.00001798);
+    public MM_P_Controller pRightDiagDriveController = new MM_P_Controller(this,0.4, DRIVE_P_COEFFICIENT, 0.00001798);
+    public MM_P_Controller pBackDriveController = new MM_P_Controller(this,0.4, STRAFE_P_COEFFICIENT,  0.00001698);
+    public MM_P_Controller pFastLeftDriveController = new MM_P_Controller(this,0.4, FAST_P_COEFFICIENT, 0);
+    public MM_P_Controller pFastRightDriveController = new MM_P_Controller(this,0.4, FAST_P_COEFFICIENT, 0);
 
     public Gamepad gamepad1Current = new Gamepad();
     public Gamepad gamepad1Prior = new Gamepad();
     public Gamepad gamepad2Current = new Gamepad();
     public Gamepad gamepad2Prior = new Gamepad();
 
-    static final double DRIVE_P_COEFFICIENT = 0.00003898;//0.00001598
+    static final double DRIVE_P_COEFFICIENT = 0.00004598;//0.00001598
     static final double FAST_P_COEFFICIENT = 0.00004098;
-    static final double STRAFE_P_COEFFICIENT = 0.0000555;
+    static final double STRAFE_P_COEFFICIENT = 0.0001255;
     static final double TURN_P_COEFFICIENT = .015;
 
     static final int GAMEPAD1 = 0;

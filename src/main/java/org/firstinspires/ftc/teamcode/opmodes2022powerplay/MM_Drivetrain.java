@@ -55,7 +55,7 @@ public class MM_Drivetrain {
     private static final double STRAFE_P = .089;
     private static final double CORRECTION_COEFFICIENT = 0.000055; //Gain per tick
     private static final double DISTANCE_P_COEFFICIENT = 0.0345;
-    private static final double TAPE_P_COEFFICIENT = 0.000677; // .000377
+    private static final double TAPE_P_COEFFICIENT = 0.000417; // .000677
     public static final double SLOW_MULTIPLIER = 0.65;
     public static final double SUPER_SLOW_MULTIPLIER = 0.35;
     public static final double MIN_DRIVE_POWER = 0.16;
@@ -75,8 +75,8 @@ public class MM_Drivetrain {
     private final int ALLIANCE_TAPE_TARGET;  // Set in constructor
     private final int MIN_TAPE_TARGET;  // Set in constructor
     private static final int TAPE_TOLERANCE_BLUE = 80;
-    private static final int TAPE_TOLERANCE_RED = 70;
-    private static final double MAX_TAPE_POWER = 0.45;
+    private static final int TAPE_TOLERANCE_RED = 100;
+    private static final double MAX_TAPE_POWER = 0.40;
     private static final double STACK_DISTANCE = 4.9; //5.2
     private static final double STACK_DISTANCE_TOLERANCE = 0.3; ///0.2
     private static final double LEFT_WAG = 0.25;
@@ -202,8 +202,8 @@ public class MM_Drivetrain {
         timesDetected = 0;
         lastTerm = 322;
 
-        int leftTargetTicks = leftPriorEncoderTarget + MM_Util.inchesToTicks(inches);
-        int rightTargetTicks = rightPriorEncoderTarget + MM_Util.inchesToTicks(inches);
+        int leftTargetTicks = leftPriorEncoderTarget + MM_Util.inchesToTicks(inches * 2/2);
+        int rightTargetTicks = rightPriorEncoderTarget + MM_Util.inchesToTicks(inches * 2/2);
 
         opMode.pLeftDriveController.setup(leftPriorEncoderTarget, leftTargetTicks);
         opMode.pRightDriveController.setup(rightPriorEncoderTarget, rightTargetTicks);
@@ -222,8 +222,8 @@ public class MM_Drivetrain {
 
     public void prepareToDiagonalDrive(double driveInches, double strafeInches, int kickInPercent, int secondMove, boolean colorKickOut) {
         int backTargetTicks = backPriorEncoderTarget + MM_Util.inchesToTicks(strafeInches);
-        int leftTargetTicks = leftPriorEncoderTarget + MM_Util.inchesToTicks(driveInches);
-        int rightTargetTicks = rightPriorEncoderTarget + MM_Util.inchesToTicks(driveInches);
+        int leftTargetTicks = leftPriorEncoderTarget + MM_Util.inchesToTicks(driveInches * 2.03/2);
+        int rightTargetTicks = rightPriorEncoderTarget + MM_Util.inchesToTicks(driveInches * 2.03/2);
 
         this.colorKickOut = colorKickOut;
         this.secondMove = secondMove;
@@ -283,13 +283,14 @@ public class MM_Drivetrain {
             if (withinJunctionRange()) {
                 opMode.telemetry.addLine("aligning with junction");
                 opMode.telemetry.update();
-                alignedWithJunction();
+                //alignedWithJunction();
+                stop();
                 alignedWithJunction = true;
                 return true;
             }
         }
 
-        if (opMode.pLeftDriveController.reachedTarget() || opMode.pRightDriveController.reachedTarget()) {
+        if (Math.abs(leftDrivePower) < 0.3 || Math.abs(rightDrivePower) < 0.3) {
             if (distanceKickOut) {
                 powerKickedOut = true;
                 return false;
@@ -724,19 +725,21 @@ public class MM_Drivetrain {
     }
 
     public boolean withinJunctionRange() {
+        double distance = getJunctionDistance();
+        opMode.telemetry.addData("******************************Distance", distance);
         if (opMode.startingPosition == MM_OpMode.LEFT) {
             if (opMode.robot.scoreTarget == MM_Robot.LOW) {
-                return getJunctionDistance() < 15;
+                return distance < 20;
             } else {
-                return getJunctionDistance() < 4.5;
+                return distance < 4.5;
             }
         } else {
-            return getJunctionDistance() < 11;
+            return distance < 11;
         }
     }
 
     public boolean alignedWithJunction() {
-        if (opMode.startingPosition == MM_OpMode.LEFT) {
+        if (opMode.startingPosition == MM_OpMode.LEFT && opMode.robot.scoreTarget != MM_Robot.MEDIUM) {
             runtime.reset();
             double startingDistance = detectorOfTheScaryYellowJunctions.getDistance(DistanceUnit.INCH);
             double currentDistance = startingDistance;
@@ -748,7 +751,7 @@ public class MM_Drivetrain {
             double timeout = 0.30;
             if (opMode.robot.scoreTarget == MM_Robot.MEDIUM) {
                 avgInchesTarget = 26;
-                timeout = 0.32;
+                timeout = 0.0;
             } else if (opMode.robot.scoreTarget == MM_Robot.RIGHT_HIGH) {
                 avgInchesTarget = 26;
             } else {
@@ -759,7 +762,7 @@ public class MM_Drivetrain {
                 }
             }
             runtime.reset();
-            while (opMode.opModeIsActive() && (avgInches > avgInchesTarget|| runtime.seconds() < timeout)) {
+           /* while (opMode.opModeIsActive() && opMode.robot.scoreTarget != MM_Robot.MEDIUM && (avgInches > avgInchesTarget|| runtime.seconds() < timeout)) {
                 double inches = MM_Util.voltageToInches(leftSonar.getVoltage());
                 sum += inches;
                 sum -= lastTerms[loopTracker];
@@ -773,14 +776,16 @@ public class MM_Drivetrain {
                 }
                 strafe(LEFT);
                 handleloopTracker();
-            }
+            }*/
             stop();
             return true;
         } else {
-            stop();
-            microscopicStrafeInches(3);
-            stop();
-            opMode.waitSeconds(0.15);
+            if (opMode.startingPosition == MM_OpMode.RIGHT) {
+                stop();
+                microscopicStrafeInches(3);
+                stop();
+                opMode.waitSeconds(0.15);
+            }
         }
         return true;
     }
