@@ -54,7 +54,7 @@ public class MM_Drivetrain {
     private static final double STRAIGHTEN_P = .0840; //.0780
     private static final double STRAFE_P = .089;
     private static final double CORRECTION_COEFFICIENT = 0.000055; //Gain per tick
-    private static final double DISTANCE_P_COEFFICIENT = 0.0345;
+    private static final double DISTANCE_P_COEFFICIENT = 0.0335;
     private static final double TAPE_P_COEFFICIENT = 0.000417; // .000677
     public static final double SLOW_MULTIPLIER = 0.65;
     public static final double SUPER_SLOW_MULTIPLIER = 0.35;
@@ -77,7 +77,7 @@ public class MM_Drivetrain {
     private static final int TAPE_TOLERANCE_BLUE = 80;
     private static final int TAPE_TOLERANCE_RED = 100;
     private static final double MAX_TAPE_POWER = 0.40;
-    private static final double STACK_DISTANCE = 4.9; //5.2
+    private static final double STACK_DISTANCE = 5.5; //5.2
     private static final double STACK_DISTANCE_TOLERANCE = 0.3; ///0.2
     private static final double LEFT_WAG = 0.25;
     private static final double RIGHT_WAG = 0.53;
@@ -88,6 +88,7 @@ public class MM_Drivetrain {
     private int previousSlowMode = SLOW;
     private boolean backwardsMode = false;
     private boolean timerDone = false;
+    private boolean over0strafe = true;
 
     public static int FILTERSIZE = 20;
 
@@ -250,6 +251,12 @@ public class MM_Drivetrain {
             strafing = true;
             driving = true;
         }
+        if (strafeInches == 0) {
+            over0strafe = false;
+            strafing = false;
+        } else {
+            over0strafe = true;
+        }
 
         opMode.pLeftDiagDriveController.setup(leftPriorEncoderTarget, leftTargetTicks);
         opMode.pRightDiagDriveController.setup(rightPriorEncoderTarget, rightTargetTicks);
@@ -334,8 +341,9 @@ public class MM_Drivetrain {
         }
 
         if (driving && (!strafing && opMode.robot.conesScored == 0)) {
+            if (getSonarDistance(frontSonar) < 28)
             if (colorKickOut) {
-                return checkColors() || getStackDistance() < 6;
+                return checkColors();
             }
         }
         if (!driving && !strafing) {
@@ -574,7 +582,7 @@ public class MM_Drivetrain {
     }
 
     private void checkKickIn() {
-        if (!(strafing && driving)) {
+        if (!(strafing && driving) && over0strafe) {
             if (secondMove == STRAFE) {
                 if (direction == BACKWARD) {
                     if (leftCurrentTicks < kickInTicks) {

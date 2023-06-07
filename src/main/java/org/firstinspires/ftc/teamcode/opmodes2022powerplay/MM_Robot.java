@@ -215,7 +215,7 @@ public class MM_Robot {
         if (conesScored == 0) {
             if (opMode.startingPosition == MM_OpMode.LEFT) {
                 lift.turner.autoFrontFlip();
-                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 21, -38.75, MM_Drivetrain.DRIVE, 98,6, false, true);
+                runSlideandDiagonalDrive(lift.slide.stackTicks(5), 21, -37.75, MM_Drivetrain.DRIVE, 98,6, false, true);
                 signalProtectorPosition = 1;
             }
             else {
@@ -229,9 +229,9 @@ public class MM_Robot {
         } else {
             if (true) {//opMode.timeRemaining() > getParkTime(STACK) + getCollectTime(lastScored)) {
                 if (lastScored == LOW) {
-                    runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 10.2, -3.5, MM_Drivetrain.DRIVE, 40,Math.min(5., opMode.timeRemaining() - getParkTime(STACK)),false, true);
+                    runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 9.7, -3.5, MM_Drivetrain.DRIVE, 40,Math.min(5., opMode.timeRemaining() - getParkTime(STACK)),false, true);
                 } else if (lastScored == MEDIUM) {
-                    runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 33.5, -0.1, 3, 0,Math.min(5, opMode.timeRemaining() - getParkTime(STACK)),false, true);
+                    runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 32.5, 0, 3, 0,Math.min(5, opMode.timeRemaining() - getParkTime(STACK)),false, true);
                 } else if (lastScored == FRONT_HIGH) {
                     runSlideandDiagonalDrive(lift.slide.stackTicks(5 - conesScored), 44, -4, 3, 0, Math.min(6, opMode.timeRemaining() - getParkTime(STACK)), false, true);
                 } else if (lastScored == RIGHT_HIGH) {
@@ -318,7 +318,7 @@ public class MM_Robot {
             if (scoreTarget == LOW) {
                 runSlideandDrive(lift.slide.autoScoreLevel(MM_Slide.SlidePosition.LOW), -12, Math.min(2.5, opMode.timeRemaining() ), false, true); //- getParkTime(LOW)
             } else if (scoreTarget == MEDIUM) {
-                runSlideandDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -34.5, Math.min(3.5, opMode.timeRemaining() - getParkTime(MEDIUM)), false, true);
+                runSlideandDrive(MM_Slide.SlidePosition.MEDIUM.ticks, -34.3, Math.min(3.5, opMode.timeRemaining() - getParkTime(MEDIUM)), false, true);
             } else if (scoreTarget == FRONT_HIGH){
                 runSlideandDrive(MM_Slide.SlidePosition.HIGH.ticks, -60, Math.min(4.5, opMode.timeRemaining() - getParkTime(FRONT_HIGH)), false, true);
             } else { //Nearside high

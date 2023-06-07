@@ -149,10 +149,7 @@ public class MM_Auto extends MM_OpMode {
             robot.collectFromStack();
             handleLastCone();
             robot.scoreOnJunction(fourthCone);
-            //if (timeRemaining() > robot.getCollectTime(fourthCone) + robot.getScoreTime(MM_Robot.LOW) + robot.getParkTime(MM_Robot.LOW)) {
-                robot.collectFromStack();
-                robot.scoreOnJunction(MM_Robot.MEDIUM);
-            //}
+            robot.collectFromStack();
         } else {
             robot.collectFromStack();
             handleLastCone();
