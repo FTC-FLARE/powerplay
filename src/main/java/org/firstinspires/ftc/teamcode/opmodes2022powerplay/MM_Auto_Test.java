@@ -42,24 +42,9 @@ public class MM_Auto_Test extends MM_OpMode {
             telemetry.update();
         }
 
-        robot.lift.chomper.release();
         robot.drivetrain.resetEncoders();
-        startingPosition = LEFT;
-        alliance = RED;
-
-        robot.drivetrain.autoScore();
-        robot.collectFromStack();
-        robot.scoreOnJunction(MM_Robot.LOW);
-        robot.collectFromStack();
-        robot.scoreOnJunction(MM_Robot.LOW);
-        robot.collectFromStack();
-        robot.scoreOnJunction(MM_Robot.LOW);
-        robot.collectFromStack();
-        robot.scoreOnJunction(MM_Robot.LOW);
-        robot.collectFromStack();
-        robot.scoreOnJunction(MM_Robot.LOW);
-        robot.park();
-
+        robot.lift.chomper.release();
+        robot.drivetrain.driveInches(24);
     }
 
     private void initCamera() {

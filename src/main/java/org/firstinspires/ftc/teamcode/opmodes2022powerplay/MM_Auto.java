@@ -123,12 +123,12 @@ public class MM_Auto extends MM_OpMode {
             thirdCone = MM_Robot.RIGHT_HIGH;
         } else if (parkingColor == MM_EOCVDetection.YELLOW) {
             firstCone = MM_Robot.LOW;
-            secondCone = MM_Robot.MEDIUM;
+            secondCone = MM_Robot.LOW;
             thirdCone = MM_Robot.MEDIUM;
             fourthCone = MM_Robot.FRONT_HIGH;
         } else {
-            firstCone = MM_Robot.MEDIUM;
-            secondCone = MM_Robot.MEDIUM;
+            firstCone = MM_Robot.LOW;
+            secondCone = MM_Robot.LOW;
             thirdCone = MM_Robot.MEDIUM;
             fourthCone = MM_Robot.MEDIUM;
         }
@@ -149,7 +149,10 @@ public class MM_Auto extends MM_OpMode {
             robot.collectFromStack();
             handleLastCone();
             robot.scoreOnJunction(fourthCone);
-            robot.collectFromStack();
+            if (timeRemaining() > robot.getCollectTime(fourthCone) + robot.getScoreTime(MM_Robot.LOW) + robot.getParkTime(MM_Robot.LOW)) {
+                robot.collectFromStack();
+                robot.scoreOnJunction(MM_Robot.LOW);
+            }
         } else {
             robot.collectFromStack();
             handleLastCone();
@@ -160,7 +163,7 @@ public class MM_Auto extends MM_OpMode {
 
     private void handleThirdCone() {
         if (thirdCone != MM_Robot.LOW) { //if you are already not doing the shortest score moves
-/*            double targetTimeLeft = robot.getScoreTime(thirdCone) + robot.getCollectTime(thirdCone) + robot.getScoreTime(fourthCone) + robot.getParkTime(fourthCone);
+            double targetTimeLeft = robot.getScoreTime(thirdCone) + robot.getCollectTime(thirdCone) + robot.getScoreTime(fourthCone) + robot.getParkTime(fourthCone);
             double actualTimeLeft = timeRemaining();
             if (actualTimeLeft < targetTimeLeft) {
                 if (actualTimeLeft > robot.getScoreTime(MM_Robot.MEDIUM) + robot.getCollectTime(MM_Robot.MEDIUM) + robot.getScoreTime(MM_Robot.MEDIUM) + robot.getParkTime(MM_Robot.MEDIUM)) {
@@ -178,12 +181,12 @@ public class MM_Auto extends MM_OpMode {
                 } else {
                     thirdCone = MM_Robot.NO_CONE;
                 }
-            }*/
+            }
         }
     }
 
     private void handleLastCone() {
-        /*int scoreTarget = fourthCone;
+        int scoreTarget = fourthCone;
         if (startingPosition == MM_OpMode.RIGHT) {
             scoreTarget = thirdCone;
         }
@@ -206,7 +209,7 @@ public class MM_Auto extends MM_OpMode {
             } else {
                 thirdCone = MM_Robot.NO_CONE;
             }
-        }*/
+        }
     }
 
     public enum MoveTimes {
